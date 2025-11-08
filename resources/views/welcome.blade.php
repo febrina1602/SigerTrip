@@ -33,7 +33,7 @@
         }
 
         header {
-            background: linear-gradient(90deg, #f4a261, #fcd35d);
+            background: linear-gradient(90deg, #D19878, #FFE75D);
             padding: 15px 40px;
             display: flex;
             justify-content: space-between;
@@ -93,7 +93,7 @@
         }
 
         .footer {
-            background: linear-gradient(90deg, #f4a261, #fcd35d);
+            background: linear-gradient(90deg, #D19878, #FFE75D);
             color: #000;
             position: relative;
             overflow: hidden;
