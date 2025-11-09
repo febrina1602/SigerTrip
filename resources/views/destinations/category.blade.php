@@ -1,10 +1,9 @@
 @extends('layouts.app')
 
-@section('title', 'Beranda - SigerTrip')
+@section('title', $category->name . ' - SigerTrip')
 
 @section('content')
 <div class="min-vh-100 bg-white">
-    
     <header>
         <div class="d-flex align-items-center">
             <img src="{{ asset('images/logo.png') }}" alt="SigerTrip Logo">
@@ -31,47 +30,12 @@
         </div>
     </nav>
 
-    <section class="category-section">
+    <div style="background: linear-gradient(to bottom, #FFF8E7, #FFFFFF);" class="py-5">
         <div class="container">
-            <div class="row g-4">
-                @forelse($categories as $category)
-                <div class="col-6 col-md-2">
-                    {{-- INI YANG DIPERBAIKI --}}
-                    <a href="{{ route('destinations.category', $category->id) }}" class="text-decoration-none">
-                        <div class="category-card">
-                            <div class="mb-2">
-                                @if($category->icon_url)
-                                    <img src="{{ $category->icon_url }}" alt="{{ $category->name }}" class="category-icon">
-                                @else
-                                    {{-- Fallback SVG (Sudah Benar) --}}
-                                    @if(strtolower($category->name) == 'pantai')
-                                    <svg class...></svg>
-                                    @elseif(strtolower($category->name) == 'gunung')
-                                    <svg class...></svg>
-                                    @else
-                                    <svg class="category-icon" viewBox="0 0 100 100" fill="none"> <circle cx="50" cy="50" r="30" fill="#FFB85C"/> </svg>
-                                    @endif
-                                @endif
-                            </div>
-                            <span class="small fw-medium text-dark text-center d-block">{{ $category->name }}</span>
-                        </div>
-                    </a>
-                </div>
-                @empty
-                <div class="col-12 text-center text-secondary py-5">
-                    Belum ada kategori tersedia
-                </div>
-                @endforelse
-            </div>
-        </div>
-    </section>
-
-    <section class="bg-white py-5">
-        <div class="container">
-            <h5 class="fw-bold mb-3">Rekomendasi buat kamu!</h5>
+            <h1 class="h3 fw-bold text-dark mb-4">{{ $category->name }} Pilihan SigerTrip</h1>
             
             <div class="row row-cols-1 row-cols-md-3 g-4">
-                @forelse($recommendations as $destination)
+                @forelse($destinations as $destination)
                 <div class="col">
                     <a href="{{ route('destinations.detail', $destination->id) }}" class="card h-100 shadow-sm text-decoration-none text-dark border-0">
                         <img src="{{ $destination->image_url ?? 'https://images.unsplash.com/photo-1507525428034-b723cf961d3e?w=400&q=80' }}" 
@@ -116,31 +80,18 @@
                                 </div>
                                 @endif
                             </div>
-                            
-                            @if($destination->popular_activities)
-                            <div>
-                                <p class="small fw-semibold text-dark mb-1">Aktivitas Populer:</p>
-                                <p class="small text-muted">
-                                    @if(is_array($destination->popular_activities))
-                                        {{ implode(', ', $destination->popular_activities) }}
-                                    @else
-                                        {{ $destination->popular_activities }}
-                                    @endif
-                                </p>
-                            </div>
-                            @endif
                         </div>
                     </a>
                 </div>
                 @empty
-                <div class="col-12 text-center text-secondary py-5">
-                    <p class="fs-5 mb-2">Belum ada rekomendasi tersedia</p>
+                <div class="col-12 text-center text-muted py-5">
+                    <p class="fs-5 mb-2">Belum ada destinasi {{ strtolower($category->name) }} tersedia</p>
                     <p class="small">Destinasi akan muncul di sini setelah ditambahkan oleh admin</p>
                 </div>
                 @endforelse
             </div>
         </div>
-    </section>
+    </div>
 
     <!-- FOOTER -->
     <footer class="footer position-relative">
