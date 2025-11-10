@@ -19,9 +19,17 @@ return new class extends Migration
             $table->text('description')->nullable();
             $table->text('facilities')->nullable();
             $table->string('image_url')->nullable();
-            $table->timestamps();
+            $table->decimal('rating', 3, 2)->default(0); 
+            $table->decimal('price_per_person', 12, 2)->default(0); 
+            $table->decimal('parking_price', 12, 2)->default(0); 
+            $table->text('popular_activities')->nullable();
+            $table->boolean('is_featured')->default(false); 
+            $table->decimal('latitude', 10, 8); 
+            $table->decimal('longitude', 11, 8); 
+            $table->timestamps(); 
         });
     }
+    
 
     /**
      * Reverse the migrations.
