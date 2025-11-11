@@ -32,50 +32,11 @@ class Destination extends Model
         'latitude' => 'decimal:8',
         'longitude' => 'decimal:8',
         'is_featured' => 'boolean',
+        'popular_activities' => 'array',
     ];
 
-    /**
-     * Accessor untuk popular_activities
-     * Mengubah JSON string menjadi array jika perlu
-     */
-    public function getPopularActivitiesAttribute($value)
-    {
-        if (empty($value)) {
-            return null;
-        }
-        
-        if (is_array($value)) {
-            return $value;
-        }
-        
-        $decoded = json_decode($value, true);
-        if (json_last_error() === JSON_ERROR_NONE) {
-            return $decoded;
-        }
-        
-        return $value;
-    }
-    
-    /**
-     *  untuk mengambil destinasi yang featured (rekomendasi)
-     */
-    public function scopeFeatured($query)
-    {
-        return $query->where('is_featured', true);
-    }
-
-    /**
-     * RELASI: Destinasi dimiliki oleh satu Kategori
-     */
     public function category()
     {
-        return $this->belongsTo(DestinationCategory::class);
-    }
-    /**
-     * Scope untuk mengambil destinasi berdasarkan kategori
-     */
-    public function scopeByCategory($query, $categoryId)
-    {
-        return $query->where('category_id', $categoryId);
+        return $this->belongsTo(DestinationCategory::class, 'category_id');
     }
 }
