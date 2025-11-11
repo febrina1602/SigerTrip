@@ -205,6 +205,9 @@
             }
         }
     </style>
+
+    {{-- Tambahan slot untuk CSS per-halaman --}}
+    @stack('styles')
 </head>
 <body>
     @yield('content')
