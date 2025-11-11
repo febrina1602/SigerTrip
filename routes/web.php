@@ -5,20 +5,10 @@ use App\Http\Controllers\AuthController;
 use App\Http\Controllers\BerandaController;
 use App\Http\Controllers\DestinationController;
 
-/*
-|--------------------------------------------------------------------------
-| Web Routes
-|--------------------------------------------------------------------------
-|
-| Di sini kamu bisa mendefinisikan semua route web aplikasi kamu.
-| Termasuk untuk autentikasi, halaman utama, dan destinasi wisata.
-|
-*/
-
 // ==== HALAMAN UTAMA ====
-Route::get('/', function () {
-    return view('welcome');
-});
+// Boleh pilih salah satu:
+// Route::get('/', fn () => view('welcome'));
+Route::redirect('/', '/beranda'); // langsung ke beranda
 
 // ==== GUEST (belum login) ====
 Route::middleware('guest')->group(function () {
@@ -30,12 +20,16 @@ Route::middleware('guest')->group(function () {
 });
 
 // ==== AUTH (sudah login) ====
+// Arahkan dashboard ke beranda agar tidak perlu dashboard.blade.php
 Route::middleware('auth')->group(function () {
-    Route::get('/dashboard', fn () => view('dashboard'))->name('dashboard'); // pastikan view dashboard.blade.php ada
+    Route::get('/dashboard', [BerandaController::class, 'wisatawan'])->name('dashboard');
     Route::post('/logout', [AuthController::class, 'logout'])->name('logout');
 });
 
 // ==== BERANDA & DESTINASI ====
 Route::get('/beranda', [BerandaController::class, 'wisatawan'])->name('beranda.wisatawan');
-Route::get('/category/{id}', [DestinationController::class, 'byCategory'])->name('destinations.category');
-Route::get('/destination/{id}', [DestinationController::class, 'show'])->name('destinations.detail');
+
+Route::get('/category/{id}', [DestinationController::class, 'byCategory'])
+    ->name('destinations.category');
+Route::get('/destination/{id}', [DestinationController::class, 'show'])
+    ->name('destinations.detail');

@@ -1,151 +1,192 @@
+{{-- resources/views/auth/login.blade.php --}}
 <!DOCTYPE html>
-
 <html lang="id">
 <head>
-<meta charset="UTF-8">
-<meta name="viewport" content="width=device-width, initial-scale=1.0">
-<title>Masuk Akun - Sigertrip (Bootstrap)</title>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Masuk - SigerTrip</title>
 
-<!-- 1. Bootstrap 5 CSS CDN (Wajib) -->
-<link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.3/dist/css/bootstrap.min.css" rel="stylesheet" integrity="sha384-QWTKZyjpPEjISv5WaRU9OFeRpok6YctnYmDr5pNlyT2bRjXh0JMhjY6hW+ALEwIH" crossorigin="anonymous">
+  <!-- Bootstrap & Icons -->
+  <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.3/dist/css/bootstrap.min.css" rel="stylesheet">
+  <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.2/css/all.min.css"/>
 
-<!-- 2. Font Awesome untuk ikon (Wajib) -->
-<link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.2/css/all.min.css" integrity="sha512-SnH5WK+bZxgPHs44uWIX+LLMDJ8C1v2N2/o+1f/r6x3z5p9d4hW45R+kM9/9zP4r6y9W3Xh0o0Qy2z6/5z8o/g==" crossorigin="anonymous" referrerpolicy="no-referrer" />
+  <style>
+    :root{
+      --grad: linear-gradient(90deg,#FFD15C 0%,#FF9739 45%,#FF3D3D 100%);
+      --card: #fff;
+      --bg: #efefef;
+      --radius: 18px;
+      --shadow: 0 12px 30px rgba(0,0,0,.08);
+    }
 
-<!-- 3. Custom CSS untuk styling gradasi dan card shadow -->
-<style>
-    body {
-        background-color: #f8f9fa; 
-        display: flex;
-        justify-content: center;
-        align-items: center;
-        min-height: 100vh;
-        font-family: 'Inter', sans-serif;
+    body{
+      background: var(--bg);
+      font-family: system-ui, -apple-system, "Segoe UI", Roboto, Arial, sans-serif;
     }
-    .auth-card {
-        max-width: 1200px;
-        box-shadow: 0 0.5rem 1rem rgba(0, 0, 0, 0.15); 
-        border-radius: 1rem;
-        overflow: hidden;
-    }
-    .form-control:focus {
-        border-color: #dc3545; /* Merah */
-        box-shadow: 0 0 0 0.25rem rgba(220, 53, 69, 0.25); 
-    }
-    .btn-custom-gradient {
-        /* Gradasi warna Kuning ke Merah */
-        background-image: linear-gradient(to right, #ffc107, #dc3545);
-        color: white;
-        border: none;
-        font-weight: 600;
-        transition: all 0.3s;
-    }
-    .btn-custom-gradient:hover {
-        background-image: linear-gradient(to right, #e0a800, #c82333);
-        color: white;
-    }
-</style>
 
+    .auth-wrapper{
+      max-width: 1240px;          /* sedikit lebih lebar agar layout lega */
+      margin: 28px auto;
+      background: var(--card);
+      border-radius: var(--radius);
+      box-shadow: var(--shadow);
+      overflow: hidden;
+    }
 
+    .topbar{
+      height: 70px;
+      background: var(--grad);
+      display:flex;
+      align-items:center;
+      padding:0 22px;
+    }
+
+    .brand{ display:flex; align-items:center; gap:.6rem; font-weight:800; }
+    .brand img{ height:34px; }
+
+    .content{ padding: 28px; }
+
+    /* ==== Gambar kiri diperbesar tingginya ==== */
+    .image-col{ display:flex; }
+    .image-col img{
+      width: 100%;
+      height: 620px;        /* tinggi default di desktop */
+      max-height: 72vh;     /* jangan melebihi tinggi layar */
+      object-fit: cover;
+      border-radius: 16px;
+    }
+    @media (min-width: 1400px){
+      .image-col img{ height: 700px; } /* layar ekstra lebar */
+    }
+    @media (max-width: 1199.98px){
+      .image-col img{ height: 520px; } /* layar lebih kecil */
+    }
+
+    .kembali{ color:#cf1a1a; text-decoration:none; font-weight:600; }
+    .kembali:hover{ color:#a50f0f; }
+
+    .title{ font-weight:800; text-align:center; margin:.25rem 0 1.2rem; }
+    .form-control{ height:46px; border-radius:10px; padding-right:42px; }
+    .input-icon-btn{ position:absolute; right:12px; top:50%; transform:translateY(-50%); opacity:.6; }
+
+    .btn-grad{
+      background:var(--grad);
+      color:#fff;
+      border:none;
+      height:46px;
+      border-radius:12px;
+      font-weight:700;
+    }
+    .btn-grad:hover{ filter:brightness(.96); color:#fff; }
+
+    .small-links a{ color:#cf1a1a; text-decoration:none; }
+    .small-links a:hover{ text-decoration:underline; }
+
+    @media (max-width: 991.98px){
+      .image-col{ display:none; }
+      .content{ padding:20px; }
+    }
+  </style>
 </head>
 <body>
-<div class="container my-5">
-<div class="row auth-card bg-white mx-auto">
 
-    <!-- Kolom Kiri: Gambar (Tersembunyi di layar kecil) -->
-    <div class="col-lg-6 d-none d-lg-block p-3">
-        <!-- Ganti URL ini dengan URL gambar Anda sendiri -->
-        <img src="https://placehold.co/600x800/ff9900/white/png?text=Sigertrip+Image" 
-             alt="Pemandangan Sigertrip" 
-             class="img-fluid h-100 object-fit-cover rounded-3"
-        >
+<div class="auth-wrapper">
+  <!-- Top gradient bar -->
+  <div class="topbar">
+    <div class="brand">
+      <img src="{{ asset('images/logo-sigertrip.png') }}" alt="Logo" onerror="this.style.display='none'">
+      <span>SigerTrip</span>
     </div>
+  </div>
 
-    <!-- Kolom Kanan: Formulir Login -->
-    <div class="col-lg-6 p-5 d-flex flex-column justify-content-center">
-        
-        <div class="mb-4">
-            <h1 class="h3 fw-bold text-dark">Sigertrip</h1>
-        </div>
+  <div class="content">
+    <div class="row g-4 align-items-center">
+      <!-- Left image -->
+      <div class="col-lg-6 image-col">
+        <img
+          src="{{ asset('images/sunsetlog .png') }}"
+          alt="Sunset SigerTrip"
+          loading="lazy"
+          onerror="this.src='https://images.unsplash.com/photo-1511764220567-4b75a0a36eb1?q=80&w=1200&auto=format&fit=crop'">
+      </div>
 
-        <div class="mb-4">
-            <!-- Tombol Kembali -->
-            <a href="{{ url('/') }}" class="text-danger text-decoration-none fw-semibold d-flex align-items-center">
-                <i class="fas fa-arrow-left me-1"></i>
-                Kembali
-            </a>
-        </div>
+      <!-- Right form -->
+      <div class="col-lg-6">
+        <a href="{{ url()->previous() }}" class="kembali d-inline-block mb-2">
+          <i class="fa-solid fa-chevron-left me-1"></i> Kembali
+        </a>
+        <h2 class="title">Masuk</h2>
 
-        <h2 class="h3 fw-bold text-dark mb-4 border-bottom pb-2">Masuk</h2>
-        
-        <!-- Tampilkan Error Validasi (dari AuthController@login) -->
+        {{-- Error block --}}
         @if ($errors->any())
-            <div class="alert alert-danger" role="alert">
-                <strong>Gagal!</strong> Periksa kembali email dan kata sandi Anda.
-                @if ($errors->has('email') && $errors->first('email') != 'Kredensial yang Anda masukkan tidak valid.')
-                    <ul class="mt-2 mb-0">
-                        @foreach ($errors->all() as $error)
-                            <li>{{ $error }}</li>
-                        @endforeach
-                    </ul>
-                @endif
-            </div>
+          <div class="alert alert-danger">
+            <ul class="mb-0 ps-3">
+              @foreach ($errors->all() as $error)
+                <li>{{ $error }}</li>
+              @endforeach
+            </ul>
+          </div>
         @endif
-        
-        <!-- FORMULIR LOGIN -->
-        <form method="POST" action="{{ route('login.post') }}">
-            @csrf 
 
-            <!-- Field Email -->
-            <div class="mb-3">
-                <label for="email" class="form-label text-muted">Email</label>
-                <input id="email" type="email" name="email" value="{{ old('email') }}" required autofocus 
-                       class="form-control @error('email') is-invalid @enderror" 
-                       placeholder="contoh@sigertrip.com">
-            </div>
+        <form method="POST" action="{{ route('login.post') }}" class="mt-2">
+          @csrf
 
-            <!-- Field Kata Sandi -->
-            <div class="mb-3">
-                <label for="password" class="form-label text-muted">Kata Sandi</label>
-                <div class="input-group">
-                    <input id="password" type="password" name="password" required 
-                           class="form-control @error('password') is-invalid @enderror" 
-                           placeholder="Masukkan kata sandi Anda">
-                </div>
-            </div>
+          <div class="mb-3 position-relative">
+            <input type="email"
+                   name="email"
+                   value="{{ old('email') }}"
+                   class="form-control @error('email') is-invalid @enderror"
+                   placeholder="Email" required autofocus>
+            <i class="fa-regular fa-envelope input-icon-btn"></i>
+          </div>
 
-            <!-- Ingat Saya & Lupa Kata Sandi -->
-            <div class="d-flex justify-content-between align-items-center mb-4">
-                <div class="form-check">
-                    <input class="form-check-input" type="checkbox" name="remember" id="remember">
-                    <label class="form-check-label text-dark" for="remember">
-                        Ingat Saya
-                    </label>
-                </div>
-                <a href="#" class="fw-semibold text-danger text-decoration-none">Lupa Kata Sandi?</a>
-            </div>
+          <div class="mb-2 position-relative">
+            <input id="password"
+                   type="password"
+                   name="password"
+                   class="form-control @error('password') is-invalid @enderror"
+                   placeholder="Kata Sandi" required>
+            <button type="button" class="btn btn-link p-0 input-icon-btn"
+                    onclick="togglePwd('password', this)" aria-label="Tampilkan/Kunci Password">
+              <i class="fa-regular fa-eye"></i>
+            </button>
+          </div>
 
-            <!-- Tombol Masuk -->
-            <div class="d-grid">
-                <button type="submit" class="btn btn-custom-gradient py-2">
-                    Masuk
-                </button>
-            </div>
+          <div class="d-flex justify-content-end mb-3 small-links">
+            <a href="#">Lupa Kata sandi ?</a>
+          </div>
+
+          <div class="d-grid">
+            <button type="submit" class="btn btn-grad">Masuk</button>
+          </div>
+
+          <p class="text-center mt-3 mb-1">
+            Belum memiliki akun? <a href="{{ route('register') }}" class="fw-semibold">Daftar Disini</a>
+          </p>
+          <p class="text-center text-muted small mb-0">
+            Dengan mengakses sistem ini, Anda dianggap menyetujui
+            <a href="#" class="fw-semibold">Ketentuan Layanan</a> dan
+            <a href="#" class="fw-semibold">Kebijakan Privasi</a>.
+          </p>
         </form>
-
-        <p class="mt-4 text-center text-muted small">
-            Belum memiliki akun? 
-            <a href="{{ route('register') }}" class="text-danger fw-semibold text-decoration-none">Daftar di Sini</a>
-        </p>
+      </div>
     </div>
+  </div>
 </div>
 
-
-</div>
-
-<!-- 4. Bootstrap 5 JS CDN (Wajib untuk komponen interaktif) -->
-
-<script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.3/dist/js/bootstrap.bundle.min.js" integrity="sha384-YvpcrYf0tY3lHB60NNkmXc5s9fDVZLESaAA55NDzOxhy9GkcIdslK1eN7N6jIeHz" crossorigin="anonymous"></script>
-
+<script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.3/dist/js/bootstrap.bundle.min.js"></script>
+<script>
+  function togglePwd(id, el){
+    const input = document.getElementById(id);
+    const icon  = el.querySelector('i');
+    if(input.type === 'password'){
+      input.type = 'text';
+      icon.classList.replace('fa-eye', 'fa-eye-slash');
+    } else {
+      input.type = 'password';
+      icon.classList.replace('fa-eye-slash', 'fa-eye');
+    }
+  }
+</script>
 </body>
 </html>
