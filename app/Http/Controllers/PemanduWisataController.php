@@ -26,7 +26,6 @@ class PemanduWisataController extends Controller
         
         $agents = $query->orderBy('created_at', 'desc')->get();
         
-        // PERBAIKAN: Path view disesuaikan (menghapus 'wisatawan.')
         return view('wisatawan.pemanduWisata.index', compact('agents', 'keyword'));
     }
 
@@ -43,7 +42,6 @@ class PemanduWisataController extends Controller
             ->orderBy('created_at', 'desc')
             ->get();
 
-        // PERBAIKAN: Path view disesuaikan dengan file 'detailAgen.blade.php'
         return view('wisatawan.pemanduWisata.detailAgen', compact('agent', 'tourPackages'));
     }
 
@@ -60,7 +58,6 @@ class PemanduWisataController extends Controller
             ->orderBy('created_at', 'desc')
             ->get();
 
-        // PERBAIKAN: Path view disesuaikan
         return view('wisatawan.pemanduWisata.packages', compact('agent', 'tourPackages'));
     }
 
@@ -77,7 +74,6 @@ class PemanduWisataController extends Controller
             abort(404, 'Agen tour tidak ditemukan.');
         }
 
-        // PERBAIKAN: Path view disesuaikan
         return view('wisatawan.pemanduWisata.package-detail', compact('agent', 'tourPackage'));
     }
 }

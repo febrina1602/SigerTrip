@@ -132,9 +132,9 @@
                     </div>
                     
                     <div class="flex-shrink-0">
-                        <a href="#" 
+                        <a href="{{ route('pemandu-wisata.packages', $agent->id) }}"
                         class="btn btn-lg fw-semibold shadow-sm px-5 py-3 text-dark"
-                        style="background: linear-gradient(to right, #FFB85C, #FF8C42);">
+                        style="background: linear-gradient(to right, #FFE75D, #D19878);">
                             Pilih Paket Perjalanan Anda
                         </a>
                     </div>
@@ -155,6 +155,5 @@
             </div>
         </div>
 
-        {{-- Footer akan otomatis diambil dari layouts.app --}}
     </div>
 @endsection
