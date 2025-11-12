@@ -21,6 +21,8 @@ class DatabaseSeeder extends Seeder
         $this->call([
             DestinationCategorySeeder::class, // Harus ada
             DestinationSeeder::class,         // Harus ada
+            AgentSeeder::class,
+            TourPackageSeeder::class,
         ]);
     }
 }

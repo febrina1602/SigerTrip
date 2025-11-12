@@ -53,7 +53,7 @@
 
     <nav class="nav-custom border-top bg-white">
         <div class="container py-0">
-            <div class="d-flex gap-4 justify-content-left">
+            <div class="d-flex gap-4 justify-content-center">
                 <a href="{{ route('beranda.wisatawan') }}"
                    class="nav-link-custom {{ request()->routeIs('beranda.wisatawan') ? 'active' : '' }}">
                     Beranda
@@ -72,39 +72,37 @@
             <div class="row row-cols-1 row-cols-md-3 g-4">
                 
                 @if($agents->isNotEmpty())
-                
-                    <div class="row row-cols-1 row-cols-md-3 g-4">
-                        @foreach($agents as $agent)
-                        <div class="col">
-                            <div class="card h-100 shadow-sm border-0">
-                                <img src="{{ $agent->banner_image_url ?? 'https://images.unsplash.com/photo-1507525428034-b723cf961d3e?w=600&q=80' }}" 
-                                    alt="{{ $agent->name }}" 
-                                    class="card-img-top" style="height: 200px; object-fit: cover;">
-                                
-                                <div class="card-body text-start">
-                                    @if($agent->is_verified)
-                                    <div class="d-flex align-items-center gap-2 mb-2">
-                                        <span class="text-success small fw-semibold">Terverifikasi</span>
-                                        <svg style="width: 1rem; height: 1rem;" class="text-success" fill="currentColor" viewBox="0 0 20 20">
-                                            <path fill-rule="evenodd" d="M10 18a8 8 0 100-16 8 8 0 000 16zm3.707-9.293a1 1 0 00-1.414-1.414L9 10.586 7.707 9.293a1 1 0 00-1.414 1.414l2 2a1 1 0 001.414 0l4-4z" clip-rule="evenodd"/>
-                                        </svg>
-                                    </div>
-                                    @endif
-                                    <h5 class="card-title fw-bold text-dark mb-3">{{ $agent->name }}</h5>
-                                    <a href="#" 
-                                    class="btn btn-danger w-100 fw-semibold">
-                                        Rincian
-                                    </a>
+                    
+                    @foreach($agents as $agent)
+                    <div class="col">
+                        <div class="card h-100 shadow-sm border-0">
+                            <img src="{{ $agent->banner_image_url ?? 'https://images.unsplash.com/photo-1507525428034-b723cf961d3e?w=600&q=80' }}" 
+                                 alt="{{ $agent->name }}" 
+                                 class="card-img-top" style="height: 200px; object-fit: cover;">
+                            
+                            <div class="card-body text-start">
+                                @if($agent->is_verified)
+                                <div class="d-flex align-items-center gap-2 mb-2">
+                                    <span class="text-success small fw-semibold">Terverifikasi</span>
+                                    <svg style="width: 1rem; height: 1rem;" class="text-success" fill="currentColor" viewBox="0 0 20 20">
+                                        <path fill-rule="evenodd" d="M10 18a8 8 0 100-16 8 8 0 000 16zm3.707-9.293a1 1 0 00-1.414-1.414L9 10.586 7.707 9.293a1 1 0 00-1.414 1.414l2 2a1 1 0 001.414 0l4-4z" clip-rule="evenodd"/>
+                                    </svg>
                                 </div>
+                                @endif
+                                <h5 class="card-title fw-bold text-dark mb-3">{{ $agent->name }}</h5>
+                                <a href="#" 
+                                   class="btn btn-danger w-100 fw-semibold">
+                                    Rincian
+                                </a>
                             </div>
                         </div>
-                        @endforeach
                     </div>
+                    @endforeach
                 
                 @else
 
-                    <div class="text-center text-muted d-flex flex-column justify-content-center" 
-                        style="min-height: 50vh;">
+                    <div class="col-12 text-center text-muted d-flex flex-column justify-content-center" 
+                         style="min-height: 50vh;">
                         
                         <p class="fs-5 mb-2">Belum ada agen tour lokal tersedia</p>
                         <p class="small">Agen tour akan muncul di sini setelah terdaftar dan diverifikasi oleh admin</p>

@@ -27,15 +27,13 @@ class TourPackage extends Model
         'destinations_visited',
     ];
 
-    /**
-     * Field yang akan diubah tipe datanya secara otomatis
-     */
+    
     protected $casts = [
         'price_per_person' => 'decimal:2',
         'duration_days' => 'integer',
         'duration_nights' => 'integer',
-        'thumbnail_images' => 'array', // JSON array untuk multiple thumbnail images
-        'destinations_visited' => 'array', // JSON array untuk destinasi yang dikunjungi
+        'thumbnail_images' => 'array', 
+        'destinations_visited' => 'array', 
     ];
 
     /**
@@ -48,7 +46,6 @@ class TourPackage extends Model
 
     /**
      * RELASI: Tour Package memiliki banyak Destination melalui destinations_visited
-     * Menggunakan many-to-many relationship melalui JSON array
      */
     public function destinations()
     {
@@ -73,7 +70,7 @@ class TourPackage extends Model
             return $this->facilities;
         }
         
-        // Coba decode JSON
+        // decode JSON
         $decoded = json_decode($this->facilities, true);
         if (json_last_error() === JSON_ERROR_NONE) {
             return $decoded;

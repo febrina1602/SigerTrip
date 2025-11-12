@@ -8,14 +8,14 @@ use Illuminate\Http\Request;
 
 class PemanduWisataController extends Controller
 {
+    /**
+     * Menampilkan semua agen yang terverifikasi
+     */
     public function index(Request $request)
     {
         $keyword = $request->get('q');
         
-        
-        $query = Agent::where('is_verified', true)
-            ->where('agent_type', 'LOCAL_TOUR');
-        
+        $query = Agent::where('is_verified', true);
         
         if ($keyword) {
             $query->where(function($q) use ($keyword) {
@@ -24,33 +24,36 @@ class PemanduWisataController extends Controller
             });
         }
         
-        
         $agents = $query->orderBy('created_at', 'desc')->get();
         
         return view('wisatawan.pemanduWisata.index', compact('agents', 'keyword'));
     }
 
+    /**
+     * Menampilkan detail satu agen
+     */
     public function show(Agent $agent)
     {
-        // Pastikan agent sudah diverifikasi dan bertipe LOCAL_TOUR
-        if (!$agent->is_verified || $agent->agent_type !== 'LOCAL_TOUR') {
+        if (!$agent->is_verified) {
             abort(404, 'Agen tour tidak ditemukan.');
         }
 
-        // Ambil semua tour packages dari agen ini
         $tourPackages = $agent->tourPackages()
             ->orderBy('created_at', 'desc')
             ->get();
 
         return view('wisatawan.pemanduWisata.show', compact('agent', 'tourPackages'));
     }
+
+    /**
+     * Menampilkan semua paket dari satu agen
+     */
     public function packages(Agent $agent)
     {
-        // Pastikan agent sudah diverifikasi dan bertipe LOCAL_TOUR
-        if (!$agent->is_verified || $agent->agent_type !== 'LOCAL_TOUR') {
+        // Menghapus pengecekan 'agent_type'
+        if (!$agent->is_verified) {
             abort(404, 'Agen tour tidak ditemukan.');
         }
-
         
         $tourPackages = $agent->tourPackages()
             ->orderBy('created_at', 'desc')
@@ -59,15 +62,16 @@ class PemanduWisataController extends Controller
         return view('wisatawan.pemanduWisata.packages', compact('agent', 'tourPackages'));
     }
 
+    /**
+     * Menampilkan detail satu paket perjalanan
+     */
     public function packageDetail(Agent $agent, TourPackage $tourPackage)
     {
-        
         if ($tourPackage->agent_id !== $agent->id) {
             abort(404, 'Paket perjalanan tidak ditemukan.');
         }
 
-        // Pastikan agent sudah diverifikasi dan bertipe LOCAL_TOUR
-        if (!$agent->is_verified || $agent->agent_type !== 'LOCAL_TOUR') {
+        if (!$agent->is_verified) {
             abort(404, 'Agen tour tidak ditemukan.');
         }
 
