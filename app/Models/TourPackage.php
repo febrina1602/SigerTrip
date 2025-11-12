@@ -9,26 +9,98 @@ class TourPackage extends Model
 {
     use HasFactory;
 
-    protected $table = 'tour_packages';
-
     protected $fillable = [
         'agent_id',
         'name',
         'description',
         'cover_image_url',
+        'thumbnail_images',
         'price_per_person',
+        'minimum_participants',
         'duration',
+        'start_time',
+        'end_time',
+        'duration_days',
+        'duration_nights',
+        'availability_period',
         'facilities',
         'destinations_visited',
     ];
 
+    /**
+     * Field yang akan diubah tipe datanya secara otomatis
+     */
     protected $casts = [
-        'destinations_visited' => 'array',
+        'price_per_person' => 'decimal:2',
+        'duration_days' => 'integer',
+        'duration_nights' => 'integer',
+        'thumbnail_images' => 'array', // JSON array untuk multiple thumbnail images
+        'destinations_visited' => 'array', // JSON array untuk destinasi yang dikunjungi
     ];
 
-    // Relasi: satu paket wisata dimiliki oleh satu agen
+    /**
+     * RELASI: Tour Package dimiliki oleh satu Agent
+     */
     public function agent()
     {
         return $this->belongsTo(Agent::class);
     }
+
+    /**
+     * RELASI: Tour Package memiliki banyak Destination melalui destinations_visited
+     * Menggunakan many-to-many relationship melalui JSON array
+     */
+    public function destinations()
+    {
+        if (empty($this->destinations_visited)) {
+            return collect([]);
+        }
+        
+        return Destination::whereIn('id', $this->destinations_visited)->get();
+    }
+
+    /**
+     * Accessor untuk facilities - mengubah menjadi array jika JSON atau split jika text
+     */
+    public function getFacilitiesArrayAttribute()
+    {
+        if (empty($this->facilities)) {
+            return [];
+        }
+        
+        // Jika sudah array, return langsung
+        if (is_array($this->facilities)) {
+            return $this->facilities;
+        }
+        
+        // Coba decode JSON
+        $decoded = json_decode($this->facilities, true);
+        if (json_last_error() === JSON_ERROR_NONE) {
+            return $decoded;
+        }
+        
+        // Jika text biasa, split by newline atau comma
+        return array_filter(array_map('trim', preg_split('/[\n,]+/', $this->facilities)));
+    }
+
+    /**
+     * Scope untuk mengambil paket tour dari agent yang sudah diverifikasi
+     */
+    public function scopeFromVerifiedAgents($query)
+    {
+        return $query->whereHas('agent', function($q) {
+            $q->where('is_verified', true);
+        });
+    }
+
+    /**
+     * Scope untuk mengambil paket tour berdasarkan tipe agent
+     */
+    public function scopeByAgentType($query, $agentType)
+    {
+        return $query->whereHas('agent', function($q) use ($agentType) {
+            $q->where('agent_type', $agentType);
+        });
+    }
 }
+
