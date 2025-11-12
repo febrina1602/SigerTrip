@@ -4,7 +4,8 @@
 
 @section('content')
 <div class="min-vh-100 bg-white">
-    {{-- HEADER --}}
+    
+{{-- HEADER --}}
     <header>
         <div class="container py-2 d-flex align-items-center justify-content-between">
             
@@ -59,7 +60,7 @@
         </div>
     </header>
 
-    {{-- NAV --}}
+{{-- NAV --}}
     <nav class="nav-custom border-top bg-white">
         <div class="container py-0">
             <div class="d-flex gap-4 justify-content-left">
@@ -238,42 +239,5 @@
             </div>
         </div>
     </div>
-
-    <!-- FOOTER -->
-    <footer class="footer position-relative">
-        <div class="container py-3">
-            <div class="row align-items-start">
-                <div class="col-md-3 d-flex align-items-center mb-3 mb-md-0">
-                    <img src="{{ asset('images/logo.png') }}" alt="Logo SigerTrip" class="me-2" style="height:50px;">
-                </div>
-
-                <div class="col-md-3 text-center mb-3 mb-md-0">
-                    <h6 class="fw-bold mb-2">Ikuti Kami</h6>
-                    <div class="d-flex justify-content-center align-items-center social-icons">
-                        <a href="#"><i class="fab fa-instagram"></i></a>
-                        <a href="#"><i class="fab fa-facebook-f"></i></a>
-                        <a href="#"><i class="fab fa-x-twitter"></i></a>
-                        <a href="#"><i class="fab fa-tiktok"></i></a>
-                        <a href="#"><i class="fab fa-youtube"></i></a>
-                    </div>
-                </div>
-
-                <div class="col-md-3 mb-3 mb-md-0">
-                    <h6 class="fw-bold mb-2">Dibuat Oleh:</h6>
-                    <p class="mb-1">Febrina Aulia Azahra</p>
-                    <p class="mb-1">Carissa Oktavia Sanjaya</p>
-                    <p class="mb-1">Dilvi Yola</p>
-                    <p class="mb-0">M. Hafiz Abyan</p>
-                </div>
-
-                <div class="col-md-3">
-                    <h6 class="fw-bold mb-2">Informasi</h6>
-                    <p class="mb-1"><a href="#" class="footer-link">Tentang</a></p>
-                    <p class="mb-0"><a href="#" class="footer-link">FAQ</a></p>
-                </div>
-            </div>
-        </div>
-        <img src="{{ asset('images/siger-pattern.png') }}" alt="Siger Pattern" class="siger-pattern">
-    </footer>
 </div>
 @endsection

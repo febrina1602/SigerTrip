@@ -4,6 +4,23 @@
 
 @section('content')
 <div class="container py-5">
+    {{-- HEADER --}}
+    <header class="d-flex justify-content-between align-items-center py-3 px-4 border-bottom">
+        <div class="d-flex align-items-center gap-2">
+            <img src="{{ asset('images/logo.png') }}" alt="SigerTrip Logo" style="height:50px;">
+        </div>
+        <div class="d-flex align-items-center gap-3">
+            <span class="fw-semibold text-dark">Halo, {{ Auth::user()->full_name ?? Auth::user()->name ?? 'Admin' }}</span>
+
+            {{-- logout via POST --}}
+            <a href="#" class="btn btn-outline-danger btn-sm"
+               onclick="event.preventDefault(); document.getElementById('logout-form').submit();">Keluar</a>
+            <form id="logout-form" action="" method="POST" class="d-none">
+                @csrf
+            </form>
+        </div>
+    </header>
+    
     <h4 class="fw-bold mb-4">Tambah Destinasi Wisata</h4>
 
     {{-- Pesan sukses --}}
