@@ -184,8 +184,12 @@
                         </p>
                         
                         <div class="d-grid">
-                            <a href="#" target="_blank" class="btn btn-lg fw-semibold text-dark" style="background-color: #FFD15C;">
-                                Hubungi Kami
+                            @php
+                                $kontak = $agent->phone_number ?? $agent->contact_phone;
+                                $waLink = $kontak ? 'https://api.whatsapp.com/send?phone=' . preg_replace('/[^0-9]/', '', $kontak) : '#';
+                            @endphp
+                            <a href="{{ $waLink }}" target="_blank" class="btn btn-lg fw-semibold text-dark" style="background-color: #FFD15C;">
+                                <i class="fab fa-whatsapp me-2"></i> Hubungi Kami
                             </a>
                         </div>
                     </div>

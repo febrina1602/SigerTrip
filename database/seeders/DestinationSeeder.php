@@ -30,7 +30,7 @@ class DestinationSeeder extends Seeder
                 'rating' => 4.5, // Sesuai kolom 'rating'
                 'price_per_person' => 50000, // Sesuai 'price_per_person'
                 'parking_price' => 10000, // Sesuai 'parking_price'
-                'popular_activities' => json_encode(['Snorkeling', 'Berenang', 'Fotografi']), // Sesuai 'popular_activities'
+                'popular_activities' => ['Snorkeling', 'Berenang', 'Fotografi'],
                 'is_featured' => true, // Sesuai 'is_featured'
                 'latitude' => -5.678901, // Sesuai 'latitude'
                 'longitude' => 105.123456, // Sesuai 'longitude'
@@ -49,7 +49,7 @@ class DestinationSeeder extends Seeder
                 'rating' => 4.2,
                 'price_per_person' => 0,
                 'parking_price' => 5000,
-                'popular_activities' => json_encode(['Mendaki', 'Berkemah']),
+                'popular_activities' => ['Mendaki', 'Berkemah'],
                 'is_featured' => false,
                 'latitude' => -5.876543,
                 'longitude' => 105.654321,

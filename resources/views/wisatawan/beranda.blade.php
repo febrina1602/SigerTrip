@@ -30,7 +30,6 @@
             <div class="d-flex align-items-center" style="min-width: 150px; justify-content: flex-end;">
                 
                 @guest
-                    {{-- TAMPILAN SAAT BELUM LOGIN (SESUAI DESAIN) --}}
                     <a href="{{ route('login') }}" class="text-dark text-decoration-none d-flex flex-column align-items-center">
                         <i class="fas fa-user-circle" style="font-size: 1.75rem;"></i>
                         <span class="small fw-medium">Akun</span>
@@ -38,12 +37,10 @@
                 @endguest
                 
                 @auth
-                    {{-- TAMPILAN SAAT SUDAH LOGIN (SESUAI PERMINTAAN ANDA) --}}
                     
                     <a href="{{ route('dashboard') }}" class="text-dark text-decoration-none d-flex flex-column align-items-center me-3">
                         <i class="fas fa-user-circle" style="font-size: 1.75rem;"></i>
                         <span class="small fw-medium">
-                            {{-- Mengganti 'Akun' dengan nama user --}}
                             {{ \Illuminate\Support\Str::limit(auth()->user()->full_name ?? auth()->user()->name, 15) }}
                         </span>
                     </a>
@@ -115,11 +112,11 @@
                 <div class="col">
                     <a href="{{ route('destinations.detail', $destination->id) }}" class="card h-100 shadow-sm text-decoration-none text-dark border-0">
                         <img src="{{ $destination->image_url ?? 'https://images.unsplash.com/photo-1507525428034-b723cf961d3e?w=400&q=80' }}" 
-                             alt="{{ $destination->name }}" 
-                             class="card-img-top" style="height: 200px; object-fit: cover;">
+                            alt="{{ $destination->name }}" 
+                            class="card-img-top" style="height: 200px; object-fit: cover;">
                         
                         <div class="card-body">
-                            <div class="d-flex justify-content-between align-items-center mb-2">
+                            <div class="d-flex justify-content-between text-start mb-2">
                                 <h5 class="card-title fw-bold text-dark mb-0">{{ $destination->name }}</h5>
                                 <div class="d-flex align-items-center">
                                     @php
@@ -157,14 +154,26 @@
                                 @endif
                             </div>
                             
-                            @if($destination->popular_activities)
+                            @if(!empty($destination->popular_activities))
                             <div class="mb-2 text-start">
                                 <p class="small fw-semibold text-dark mb-1">Aktivitas Populer:</p>
-                                <p class="small text-muted">
-                                    @if(is_array($destination->popular_activities))
-                                        {{ implode(', ', $destination->popular_activities) }}
+                                
+                                @php
+                                    $acts = $destination->popular_activities;
+                                    // decode jika datanya ternyata string
+                                    if (is_string($acts)) {
+                                        $json = json_decode($acts, true);
+                                        if (json_last_error() === JSON_ERROR_NONE && is_array($json)) { 
+                                            $acts = $json; 
+                                        }
+                                    }
+                                @endphp
+
+                                <p class="small text-muted mb-0">
+                                    @if(is_array($acts))
+                                        {{ implode(', ', $acts) }}
                                     @else
-                                        {{ $destination->popular_activities }}
+                                        {{ $acts }}
                                     @endif
                                 </p>
                             </div>

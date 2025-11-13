@@ -30,7 +30,6 @@
             <div class="d-flex align-items-center" style="min-width: 150px; justify-content: flex-end;">
                 
                 @guest
-                    {{-- TAMPILAN SAAT BELUM LOGIN (SESUAI DESAIN) --}}
                     <a href="{{ route('login') }}" class="text-dark text-decoration-none d-flex flex-column align-items-center">
                         <i class="fas fa-user-circle" style="font-size: 1.75rem;"></i>
                         <span class="small fw-medium">Akun</span>
@@ -38,12 +37,10 @@
                 @endguest
                 
                 @auth
-                    {{-- TAMPILAN SAAT SUDAH LOGIN (SESUAI PERMINTAAN ANDA) --}}
                     
                     <a href="{{ route('dashboard') }}" class="text-dark text-decoration-none d-flex flex-column align-items-center me-3">
                         <i class="fas fa-user-circle" style="font-size: 1.75rem;"></i>
                         <span class="small fw-medium">
-                            {{-- Mengganti 'Akun' dengan nama user --}}
                             {{ \Illuminate\Support\Str::limit(auth()->user()->full_name ?? auth()->user()->name, 15) }}
                         </span>
                     </a>
@@ -184,14 +181,26 @@
                     </div>
                 </div>
 
-                @if($destination->popular_activities)
-                <div class="mb-4">
-                    <h2 class="h4 fw-bold text-dark mb-3">Aktivitas Populer</h2>
-                    <p class="text-secondary">
-                        @if(is_array($destination->popular_activities))
-                            {{ implode(', ', $destination->popular_activities) }}
+                @if(!empty($destination->popular_activities))
+                <div class="mb-2 text-start">
+                    <p class="small fw-semibold text-dark mb-1">Aktivitas Populer:</p>
+                    
+                    @php
+                        $acts = $destination->popular_activities;
+                        //  decode jika datanya ternyata string
+                        if (is_string($acts)) {
+                            $json = json_decode($acts, true);
+                            if (json_last_error() === JSON_ERROR_NONE && is_array($json)) { 
+                                $acts = $json; 
+                            }
+                        }
+                    @endphp
+
+                    <p class="small text-muted mb-0">
+                        @if(is_array($acts))
+                            {{ implode(', ', $acts) }}
                         @else
-                            {{ $destination->popular_activities }}
+                            {{ $acts }}
                         @endif
                     </p>
                 </div>
