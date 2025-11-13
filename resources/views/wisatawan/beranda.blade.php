@@ -69,7 +69,7 @@
                     Beranda
                 </a>
                 <a href="#" class="nav-link-custom">Pasar Digital</a>
-                <a href="#" class="nav-link-custom">Pemandu Wisata</a>
+                <a href="{{ route('pemandu-wisata.index') }}" class="nav-link-custom {{ request()->routeIs('pemandu-wisata.*') ? 'active' : '' }} ">Pemandu Wisata</a>
             </div>
         </div>
     </nav>

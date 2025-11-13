@@ -49,11 +49,7 @@ class TourPackage extends Model
      */
     public function destinations()
     {
-        if (empty($this->destinations_visited)) {
-            return collect([]);
-        }
-        
-        return Destination::whereIn('id', $this->destinations_visited)->get();
+        return Destination::whereIn('id', $this->destinations_visited ?? [])->get();
     }
 
     /**
