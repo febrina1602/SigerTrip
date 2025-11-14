@@ -6,6 +6,7 @@ use App\Http\Controllers\BerandaController;
 use App\Http\Controllers\DestinationController;
 use App\Http\Controllers\AdminController;
 use App\Http\Controllers\AdminDestinationController;
+use App\Http\Controllers\AdminUserController;
 use App\Http\Controllers\PemanduWisataController;
 
 // ==== HALAMAN UTAMA ====
@@ -56,4 +57,17 @@ Route::prefix('admin')->group(function() {
     Route::get('/wisata/{id}/edit', [AdminDestinationController::class, 'edit'])->name('admin.wisata.edit');
     Route::put('/wisata/{id}', [AdminDestinationController::class, 'update'])->name('admin.wisata.update');
     Route::delete('/wisata/{id}', [AdminDestinationController::class, 'destroy'])->name('admin.wisata.destroy');
+
+    // ===== ROUTE ADMIN USER MANAGEMENT =====
+    Route::get('/users', [AdminUserController::class, 'index'])->name('admin.users.index');
+    Route::get('/users/create', [AdminUserController::class, 'create'])->name('admin.users.create');
+    Route::post('/users/store', [AdminUserController::class, 'store'])->name('admin.users.store');
+    Route::get('/users/{id}/edit', [AdminUserController::class, 'edit'])->name('admin.users.edit');
+    Route::put('/users/{id}', [AdminUserController::class, 'update'])->name('admin.users.update');
+    Route::delete('/users/{id}', [AdminUserController::class, 'destroy'])->name('admin.users.destroy');
+    Route::post('/users/{id}/verify', [AdminUserController::class, 'verify'])->name('admin.users.verify');
+    Route::post('/users/{id}/reject', [AdminUserController::class, 'reject'])->name('admin.users.reject'); // BARU
+    Route::post('/users/{id}/toggle-status', [AdminUserController::class, 'toggleStatus'])->name('admin.users.toggleStatus');
+    // Route::get('/users/filter', [AdminUserController::class, 'filter'])->name('admin.users.filter');
+
 });
