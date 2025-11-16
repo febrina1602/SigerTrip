@@ -37,9 +37,15 @@
                 @endguest
                 
                 @auth
-                    
-                    <a href="{{ route('dashboard') }}" class="text-dark text-decoration-none d-flex flex-column align-items-center me-3">
-                        <i class="fas fa-user-circle" style="font-size: 1.75rem;"></i>
+                    @php
+                        $profileRoute = auth()->user()->role == 'agent' 
+                                      ? route('agent.dashboard') 
+                                      : route('profile.show');
+                    @endphp
+                    <a href="{{ $profileRoute }}" class="text-dark text-decoration-none d-flex flex-column align-items-center me-3">
+                        <img src="{{ auth()->user()->profile_picture_url ?? 'https://ui-avatars.com/api/?name=' . urlencode(auth()->user()->full_name) . '&background=FFD15C&color=333&bold=true' }}" 
+                             alt="Foto Profil" 
+                             style="width: 40px; height: 40px; border-radius: 50%; object-fit: cover; border: 2px solid #eee;">
                         <span class="small fw-medium">
                             {{ \Illuminate\Support\Str::limit(auth()->user()->full_name ?? auth()->user()->name, 15) }}
                         </span>

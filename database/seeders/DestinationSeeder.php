@@ -20,20 +20,20 @@ class DestinationSeeder extends Seeder
 
         // 1. Destinasi Rekomendasi (Featured)
         Destination::updateOrCreate(
-            ['name' => 'Pantai Pahawang'], // Cari berdasarkan nama
-            [ // Data untuk diisi (sesuai tabel 'destinations')
+            ['name' => 'Pantai Pahawang'], 
+            [ 
                 'category_id' => $pantai->id,
                 'address' => 'Punduh Pidada, Pesawaran',
                 'description' => 'Pulau Pahawang adalah destinasi snorkeling populer...',
                 'facilities' => 'Toilet, Warung, Tempat Ganti',
                 'image_url' => 'https://images.unsplash.com/photo-1507525428034-b723cf961d3e?w=400&q=80',
-                'rating' => 4.5, // Sesuai kolom 'rating'
-                'price_per_person' => 50000, // Sesuai 'price_per_person'
-                'parking_price' => 10000, // Sesuai 'parking_price'
+                'rating' => 4.5, 
+                'price_per_person' => 50000, 
+                'parking_price' => 10000, 
                 'popular_activities' => ['Snorkeling', 'Berenang', 'Fotografi'],
-                'is_featured' => true, // Sesuai 'is_featured'
-                'latitude' => -5.678901, // Sesuai 'latitude'
-                'longitude' => 105.123456, // Sesuai 'longitude'
+                'is_featured' => true, 
+                'latitude' => -5.678901, 
+                'longitude' => 105.123456, 
             ]
         );
 

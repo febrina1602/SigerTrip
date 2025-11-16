@@ -22,6 +22,9 @@ class User extends Authenticatable
         'email',
         'password',
         'role',  
+        'phone_number', // <-- TAMBAHKAN INI
+        'gender',
+        'profile_picture_url',
     ];
 
 

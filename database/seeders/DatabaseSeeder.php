@@ -19,8 +19,8 @@ class DatabaseSeeder extends Seeder
         //     'email' => 'test@example.com',
         // ]);
         $this->call([
-            DestinationCategorySeeder::class, // Harus ada
-            DestinationSeeder::class,         // Harus ada
+            DestinationCategorySeeder::class, 
+            DestinationSeeder::class,         
             AgentSeeder::class,
             TourPackageSeeder::class,
         ]);

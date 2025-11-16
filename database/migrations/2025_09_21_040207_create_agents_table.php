@@ -17,8 +17,8 @@ return new class extends Migration
             $table->string('name');
             $table->string('email')->unique()->nullable();
             $table->text('address')->nullable();
-            $table->string('phone_number')->nullable(); // Ganti dari contact_phone
-            $table->string('banner_image_url')->nullable(); // Penting untuk UI
+            $table->string('phone_number')->nullable(); 
+            $table->string('banner_image_url')->nullable(); 
             $table->boolean('is_verified')->default(false);
             $table->timestamps();
         });

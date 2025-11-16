@@ -7,6 +7,7 @@ use App\Http\Controllers\DestinationController;
 use App\Http\Controllers\AdminController;
 use App\Http\Controllers\AdminDestinationController;
 use App\Http\Controllers\PemanduWisataController;
+use App\Http\Controllers\ProfileController;
 
 // ==== HALAMAN UTAMA ====
 Route::redirect('/', '/beranda'); // langsung ke beranda
@@ -24,6 +25,11 @@ Route::middleware('guest')->group(function () {
 Route::middleware('auth')->group(function () {
     Route::get('/dashboard', [BerandaController::class, 'wisatawan'])->name('dashboard');
     Route::post('/logout', [AuthController::class, 'logout'])->name('logout');
+
+    Route::get('/profile', [ProfileController::class, 'show'])->name('profile.show');
+    Route::put('/profile', [ProfileController::class, 'update'])->name('profile.update');
+    Route::get('/profile/password', [ProfileController::class, 'showPasswordForm'])->name('profile.password.show');
+
 });
 
 // ==== BERANDA & DESTINASI & PEMANDU WISATA (ROUTE WISATAWAN) ====

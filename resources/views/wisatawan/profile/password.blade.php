@@ -1,6 +1,6 @@
 @extends('layouts.app')
 
-@section('title', 'Pemandu Wisata - SigerTrip')
+@section('title', 'Ubah Password - SigerTrip')
 
 @section('content')
 <div class="bg-white">
@@ -62,79 +62,75 @@
         </div>
     </header>
 
+    {{-- NAV --}}
     <nav class="nav-custom border-top bg-white">
         <div class="container py-0">
             <div class="d-flex gap-4 justify-content-left">
                 <a href="{{ route('beranda.wisatawan') }}"
-                   class="nav-link-custom {{ request()->routeIs('beranda.wisatawan') ? 'active' : '' }}">
+                class="nav-link-custom {{ request()->routeIs('beranda.wisatawan') ? 'active' : '' }}">
                     Beranda
                 </a>
                 <a href="#" class="nav-link-custom">Pasar Digital</a>
-                <a href="#" class="nav-link-custom active">Pemandu Wisata</a>
+                <a href="{{ route('pemandu-wisata.index') }}" class="nav-link-custom {{ request()->routeIs('pemandu-wisata.*') }} ">Pemandu Wisata</a>
             </div>
         </div>
     </nav>
 
-    <div class="py-5 bg-white min-vh-100">
+    <div class="py-5" style="background-color: #f8f9fa;">
         <div class="container">
-            
-            <h1 class="h3 fw-bold text-dark mb-4 text-start">Agen Tour Lokal</h1>
-            
-            <div class="row row-cols-1 row-cols-md-3 g-4">
-                
-                @if($agents->isNotEmpty())
+            <div class="row justify-content-center">
+                <div class="col-lg-6">
                     
-                    @foreach($agents as $agent)
-                    <div class="col">
-                        <div class="card h-100 shadow-sm border-0">
-                            <img src="{{ $agent->banner_image_url ?? 'https://images.unsplash.com/photo-1507525428034-b723cf961d3e?w=600&q=80' }}" 
-                                 alt="{{ $agent->name }}" 
-                                 class="card-img-top" style="height: 200px; object-fit: cover;">
+                    @if(session('success'))
+                        <div class="alert alert-success alert-dismissible fade show" role="alert">
+                            {{ session('success') }}
+                            <button type="button" class="btn-close" data-bs-dismiss="alert" aria-label="Close"></button>
+                        </div>
+                    @endif
+                    @if ($errors->any())
+                        <div class="alert alert-danger">
+                            <ul class="mb-0 ps-3">
+                                @foreach ($errors->all() as $error) <li>{{ $error }}</li> @endforeach
+                            </ul>
+                        </div>
+                    @endif
+
+                    <div class="card shadow-sm border-0 rounded-4">
+                        <div class="card-body p-4 p-md-5">
+                            <h3 class="h3 fw-bold text-dark mb-4 text-center">Ubah Password</h3>
+
+                            <form action="{{ route('profile.update') }}" method="POST">
+                                @csrf
+                                @method('PUT')
+
+                                <div class="mb-3">
+                                    <label for="password" class="form-label fw-medium">Password Baru</label>
+                                    <input type="password" class="form-control" id="password" name="password" 
+                                           placeholder="Minimal 8 karakter" required>
+                                </div>
+                                <div class="mb-3">
+                                    <label for="password_confirmation" class="form-label fw-medium">Konfirmasi Password Baru</label>
+                                    <input type="password" class="form-control" id="password_confirmation" 
+                                           name="password_confirmation" placeholder="Ketik ulang password baru Anda" required>
+                                </div>
+
+                                <div class="d-grid mt-4">
+                                    <button type="submit" class="btn btn-lg fw-semibold text-white" 
+                                            style="background: linear-gradient(90deg, #FFD15C, #FF3D3D); border: none;">
+                                        Ubah Password
+                                    </button>
+                                </div>
+                            </form>
                             
-                            <div class="card-body text-start">
-                                @if($agent->is_verified)
-                                <div class="d-flex align-items-center gap-2 mb-2">
-                                    <span class="text-success small fw-semibold">Terverifikasi</span>
-                                    <svg style="width: 1rem; height: 1rem;" class="text-success" fill="currentColor" viewBox="0 0 20 20">
-                                        <path fill-rule="evenodd" d="M10 18a8 8 0 100-16 8 8 0 000 16zm3.707-9.293a1 1 0 00-1.414-1.414L9 10.586 7.707 9.293a1 1 0 00-1.414 1.414l2 2a1 1 0 001.414 0l4-4z" clip-rule="evenodd"/>
-                                    </svg>
-                                </div>
-                                @endif
-
-                                @if($agent->address)
-                                <div class="d-flex align-items-start gap-2 mb-3 small text-muted">
-                                    <svg style="width: 1rem; height: 1rem;" class="mt-1 flex-shrink-0" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M17.657 16.657L13.414 20.9a1.998 1.998 0 01-2.827 0l-4.244-4.243a8 8 0 1111.314 0z"></path>
-                                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M15 11a3 3 0 11-6 0 3 3 0 016 0z"></path>
-                                    </svg>
-                                    <span>{{ $agent->address }}</span>
-                                </div>
-                                @endif
-
-                                <h5 class="card-title fw-bold text-dark mb-3">{{ $agent->name }}</h5>
-                                <a href="{{ route('pemandu-wisata.show', $agent->id) }}"
-                                   class="btn btn-danger w-100 fw-semibold">
-                                    Rincian
-                                </a>
+                            <div class="text-center mt-3">
+                                <a href="{{ route('profile.show') }}" class="small text-muted text-decoration-none">Kembali ke Profil</a>
                             </div>
+
                         </div>
                     </div>
-                    @endforeach
-                
-                @else
-
-                    <div class="col-12 text-center text-muted d-flex flex-column justify-content-center" 
-                         style="min-height: 50vh;">
-                        
-                        <p class="fs-5 mb-2">Belum ada agen tour lokal tersedia</p>
-                        <p class="small">Agen tour akan muncul di sini setelah terdaftar dan diverifikasi oleh admin</p>
-                    </div>
-                    
-                @endif
-                
+                </div>
             </div>
         </div>
     </div>
-
 </div>
 @endsection
