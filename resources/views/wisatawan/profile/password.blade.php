@@ -70,8 +70,12 @@
                 class="nav-link-custom {{ request()->routeIs('beranda.wisatawan') ? 'active' : '' }}">
                     Beranda
                 </a>
-                <a href="#" class="nav-link-custom">Pasar Digital</a>
-                <a href="{{ route('pemandu-wisata.index') }}" class="nav-link-custom {{ request()->routeIs('pemandu-wisata.*') }} ">Pemandu Wisata</a>
+                <a href="{{ route('pasar-digital.index') }}" class="nav-link-custom {{ request()->routeIs('pasar-digital.*') ? 'active' : '' }}">
+                    Pasar Digital
+                </a>
+                <a href="{{ route('pemandu-wisata.index') }}" class="nav-link-custom {{ request()->routeIs('pemandu-wisata.*') }} ">
+                    Pemandu Wisata
+                </a>
             </div>
         </div>
     </nav>

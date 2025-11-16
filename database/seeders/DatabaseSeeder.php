@@ -23,6 +23,7 @@ class DatabaseSeeder extends Seeder
             DestinationSeeder::class,         
             AgentSeeder::class,
             TourPackageSeeder::class,
+            RentalVehicleSeeder::class,
         ]);
     }
 }

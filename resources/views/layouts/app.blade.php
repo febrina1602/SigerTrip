@@ -39,7 +39,7 @@
         .nav-link-custom { padding: 12px 8px; color: #333; text-decoration: none; font-weight: 600; border-bottom: 2px solid transparent; transition: all 0.3s ease; display: inline-block; }
         .nav-link-custom:hover { color: #dc3545; }
         .nav-link-custom.active { color: #dc3545; border-bottom-color: #dc3545; }
-        .category-section { background: linear-gradient(to bottom, #FFE75D, #FDDEDC); padding: 40px 0; }
+        .category-section { background: linear-gradient(to bottom, #FFF8E7, #FFFFFF); padding: 40px 0; }
         .category-card { background-color: white; border-radius: 8px; box-shadow: 0 2px 4px rgba(0, 0, 0, 0.1); padding: 20px; height: 100%; display: flex; flex-direction: column; align-items: center; justify-content: center; transition: all 0.3s ease; cursor: pointer; }
         .category-card:hover { box-shadow: 0 8px 16px rgba(0, 0, 0, 0.15); transform: translateY(-2px); }
         .category-icon { width: 64px; height: 64px; }

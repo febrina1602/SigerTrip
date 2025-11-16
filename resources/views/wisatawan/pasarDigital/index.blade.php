@@ -1,9 +1,47 @@
 @extends('layouts.app')
 
-@section('title', 'Paket Perjalanan - ' . ($agent->name ?? 'Agen Tour') . ' - SigerTrip')
+@section('title', 'Pasar Digital - SigerTrip')
+
+@push('styles')
+<style>
+    .category-link {
+        display: block;
+        padding: 1.5rem 1rem;
+        border-radius: 12px;
+        background-color: #fff;
+        border: 1px solid #eee;
+        text-decoration: none;
+        color: #333;
+        font-weight: 600;
+        text-align: center;
+        transition: all 0.2s ease-in-out;
+        box-shadow: 0 2px 4px rgba(0,0,0,0.05);
+    }
+    .category-link:hover {
+        transform: translateY(-3px);
+        box-shadow: 0 6px 12px rgba(0,0,0,0.08);
+    }
+    .category-link.active {
+        border-color: #FF3D3D;
+        background-color: #FFF5F5;
+        color: #FF3D3D;
+        box-shadow: 0 4px 10px rgba(255, 61, 61, 0.1);
+    }
+    .category-link i {
+        font-size: 2rem;
+        margin-bottom: 0.75rem;
+        display: block;
+        color: #FF9739;
+    }
+    .category-link.active i {
+        color: #FF3D3D;
+    }
+</style>
+@endpush
 
 @section('content')
 <div class="bg-white min-vh-100">
+    
     {{-- HEADER --}}
     <header>
         <div class="container py-2 d-flex align-items-center justify-content-between">
@@ -73,88 +111,97 @@
                 <a href="{{ route('pasar-digital.index') }}" class="nav-link-custom {{ request()->routeIs('pasar-digital.*') ? 'active' : '' }}">
                     Pasar Digital
                 </a>
-                <a href="{{ route('pemandu-wisata.index') }}" class="nav-link-custom {{ request()->routeIs('pemandu-wisata.*')}} ">
-                    Pemandu Wisata
+                <a href="{{ route('pemandu-wisata.index') }}" 
+                   class="nav-link-custom {{ request()->routeIs('pemandu-wisata.*') ? 'active' : '' }}">
+                   Pemandu Wisata
                 </a>
             </div>
         </div>
     </nav>
 
-    <div class="bg-light py-3 border-bottom">
+    {{-- Kategori Kendaraan --}}
+    <div class="py-5" style="background: linear-gradient(to bottom, #FFF8E7, #FFFFFF);">
         <div class="container">
-            <nav aria-label="breadcrumb" style="--bs-breadcrumb-divider: '>';">
-                <ol class="breadcrumb mb-0 small">
-                    <li class="breadcrumb-item">
-                        <a href="{{ route('pemandu-wisata.index') }}" class="text-decoration-none">Pemandu Wisata</a>
-                    </li>
-                    <li class="breadcrumb-item">
-                        <a href="{{ route('pemandu-wisata.show', $agent->id) }}" class="text-decoration-none">{{ $agent->name }}</a>
-                    </li>
-                    <li class="breadcrumb-item active" aria-current="page">Paket Perjalanan</li>
-                </ol>
-            </nav>
+            <h1 class="h3 fw-bold text-dark mb-4 text-start">Pasar Digital</h1>
+            <div class="row g-3">
+                <div class="col-md-3 col-6">
+                    <a href="{{ route('pasar-digital.index') }}" class="category-link {{ !$currentType ? 'active' : '' }}">
+                        <i class="fas fa-car-alt"></i> Semua Kendaraan
+                    </a>
+                </div>
+                <div class="col-md-3 col-6">
+                    <a href="{{ route('pasar-digital.index', ['type' => 'CAR']) }}" class="category-link {{ $currentType == 'CAR' ? 'active' : '' }}">
+                        <i class="fas fa-car"></i> Mobil
+                    </a>
+                </div>
+                <div class="col-md-3 col-6">
+                    <a href="{{ route('pasar-digital.index', ['type' => 'MOTORCYCLE']) }}" class="category-link {{ $currentType == 'MOTORCYCLE' ? 'active' : '' }}">
+                        <i class="fas fa-motorcycle"></i> Motor
+                    </a>
+                </div>
+            </div>
         </div>
     </div>
 
-    <div class="bg-light py-5">
+    {{-- Daftar Kendaraan --}}
+    <div class="py-5 bg-white">
         <div class="container">
-            <div class="mb-4 text-start">
-                <h1 class="h3 fw-bold text-dark mb-2">Paket Perjalanan dari {{ $agent->name }}</h1>
-                <p class="text-muted">Pilih paket perjalanan yang sesuai dengan kebutuhan Anda</p>
-            </div>
+            <h3 class="h4 fw-bold text-dark mb-4 text-start">
+                @if($currentType == 'CAR')
+                    Pilihan Mobil
+                @elseif($currentType == 'MOTORCYCLE')
+                    Pilihan Motor
+                @else
+                    Semua Pilihan Kendaraan
+                @endif
+            </h3>
             
-            @if($tourPackages->isNotEmpty())
-            <div class="row row-cols-1 row-cols-md-2 row-cols-lg-3 g-4">
-                @foreach($tourPackages as $package)
+            <div class="row row-cols-1 row-cols-md-3 g-4">
+                
+                @forelse($vehicles as $vehicle)
                 <div class="col">
                     <div class="card h-100 shadow-sm border-0">
-                        <div class="position-relative">
-                            <img src="{{ $package->cover_image_url ?? 'https://images.unsplash.com/photo-1507525428034-b723cf961d3e?w=600&q=80' }}" 
-                                 alt="{{ $package->name }}" 
+                        <a href="{{ route('pasar-digital.detail', $vehicle->id) }}" class="text-decoration-none">
+                            <img src="{{ $vehicle->image_url ?? 'https://images.unsplash.com/photo-1553531889-a2b91d310614?w=600&q=80' }}" 
+                                 alt="{{ $vehicle->name }}" 
                                  class="card-img-top" style="height: 200px; object-fit: cover;">
-                            
-                            @if($package->price_per_person > 0)
-                            <div class="position-absolute bottom-0 end-0 bg-dark p-2" style="border-top-left-radius: 0.5rem; opacity: 0.85;">
-                                <p class="small mb-0 text-white opacity-75" style="font-size: 0.7rem; line-height: 1.2;">STARTING FROM IDR</p>
-                                <p class="h5 fw-bold mb-0 text-white" style="line-height: 1.2;">{{ number_format($package->price_per_person, 0, ',', '.') }}</p>
-                                <p class="small mb-0 text-white opacity-75" style="font-size: 0.7rem; line-height: 1.2;">PER PAX</p>
-                            </div>
-                            @endif
-                        </div>
+                        </a>
                         
-                        <div class="card-body d-flex flex-column text-start">
-                            <h5 class="card-title fw-bold text-dark mb-2">{{ $package->name }}</h5>
+                        <div class="card-body text-start d-flex flex-column">
+                            <h5 class="card-title fw-bold text-dark mb-2">{{ $vehicle->name }}</h5>
                             
-                            @if($package->duration)
-                            <div class="d-flex align-items-center gap-2 small text-muted mb-2">
-                                <i class="fas fa-clock fa-fw"></i>
-                                <span>{{ $package->duration }}</span>
+                            <div class="d-flex align-items-center gap-2 mb-3">
+                                <i class="fas fa-user-check text-success small"></i>
+                                <span class="text-muted small"><strong>{{ $vehicle->agent->name }}</strong></span>
                             </div>
-                            @endif
-                            
-                            @if($package->description)
-                            <p class="small text-muted mb-3">
-                                {{ Str::limit($package->description, 100) }}
-                            </p>
-                            @endif
-                            
-                            <a href="{{ route('pemandu-wisata.package-detail', [$agent->id, $package->id]) }}" 
+
+                            <div class="mb-3">
+                                <span class="text-dark h5 fw-bold">Rp {{ number_format($vehicle->price_per_day, 0, ',', '.') }}</span>
+                                <span class="text-muted small">/ hari</span>
+                            </div>
+
+                            <a href="{{ route('pasar-digital.detail', $vehicle->id) }}"
                                class="btn btn-danger w-100 fw-semibold mt-auto">
-                                Lihat Detail
+                                Rincian
                             </a>
                         </div>
                     </div>
                 </div>
-                @endforeach
+                @empty
+                    <div class="col-12 text-center text-muted d-flex flex-column justify-content-center" 
+                         style="min-height: 30vh;">
+                        <i class="fas fa-car-side fa-3x mb-3 text-muted"></i>
+                        <p class="fs-5 mb-2">Kendaraan tidak ditemukan</p>
+                        <p class="small">Coba ubah filter atau kata kunci pencarian Anda.</p>
+                    </div>
+                @endforelse
+                
             </div>
-            @else
-            <div class="text-center text-muted py-5 bg-white rounded shadow-sm d-flex flex-column justify-content-center" style="min-height: 40vh;">
-                <p class="fs-5 mb-2">Belum ada paket perjalanan tersedia</p>
-                <p class="small">Paket perjalanan akan muncul di sini setelah ditambahkan oleh agen</p>
+
+            <div class="mt-5">
+                {{ $vehicles->links() }}
             </div>
-            @endif
         </div>
     </div>
-
 </div>
 @endsection

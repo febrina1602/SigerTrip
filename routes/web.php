@@ -7,6 +7,7 @@ use App\Http\Controllers\DestinationController;
 use App\Http\Controllers\AdminController;
 use App\Http\Controllers\AdminDestinationController;
 use App\Http\Controllers\AdminUserController;
+use App\Http\Controllers\PasarDigitalController;
 use App\Http\Controllers\PemanduWisataController;
 use App\Http\Controllers\ProfileController;
 
@@ -47,6 +48,8 @@ Route::get('/pemandu-wisata/{agent}', [PemanduWisataController::class, 'show'])-
 Route::get('/pemandu-wisata/{agent}/paket', [PemanduWisataController::class, 'packages'])->name('pemandu-wisata.packages');
 Route::get('/pemandu-wisata/{agent}/paket/{tourPackage}', [PemanduWisataController::class, 'packageDetail'])->name('pemandu-wisata.package-detail');
 
+Route::get('/pasar-digital', [PasarDigitalController::class, 'index'])->name('pasar-digital.index');
+Route::get('/pasar-digital/{vehicle}', [PasarDigitalController::class, 'show'])->name('pasar-digital.detail');
 
 // ===== ROUTE ADMIN =====
 Route::prefix('admin')->group(function() {

@@ -4,7 +4,7 @@
 
 @section('content')
 <div class="bg-white">
-        {{-- HEADER --}}
+    {{-- HEADER --}}
     <header>
         <div class="container py-2 d-flex align-items-center justify-content-between">
             
@@ -69,8 +69,12 @@
                    class="nav-link-custom {{ request()->routeIs('beranda.wisatawan') ? 'active' : '' }}">
                     Beranda
                 </a>
-                <a href="#" class="nav-link-custom">Pasar Digital</a>
-                <a href="#" class="nav-link-custom">Pemandu Wisata</a>
+                <a href="{{ route('pasar-digital.index') }}" class="nav-link-custom {{ request()->routeIs('pasar-digital.*') ? 'active' : '' }}">
+                    Pasar Digital
+                </a>
+                <a href="{{ route('pemandu-wisata.index') }}" class="nav-link-custom {{ request()->routeIs('pemandu-wisata.*')}} ">
+                    Pemandu Wisata
+                </a>
             </div>
         </div>
     </nav>
@@ -120,11 +124,10 @@
                         <div class="card shadow-sm border-light">
                             <div class="card-body p-4">
                                 <div class="d-flex align-items-center gap-3">
-                                    <div class="rounded-circle bg-primary d-flex align-items-center justify-content-center flex-shrink-0" style="width: 56px; height: 56px;">
-                                        <svg style="width: 2rem; height: 2rem;" class="text-white" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                                            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M16 7a4 4 0 11-8 0 4 4 0 018 0zM12 14a7 7 0 00-7 7h14a7 7 0 00-7-7z"></path>
-                                        </svg>
-                                    </div>
+                                    <img src="{{ $agent->user->profile_picture_url ?? 'https://ui-avatars.com/api/?name=' . urlencode($agent->name) . '&background=FFD15C&color=333&bold=true' }}" 
+                                        alt="{{ $agent->name }}"
+                                        class="rounded-circle flex-shrink-0" 
+                                        style="width: 56px; height: 56px; object-fit: cover;">
                                     
                                     <div class="flex-grow-1">
                                         <h3 class="h5 fw-bold text-dark mb-1">{{ $agent->name }}</h3>
