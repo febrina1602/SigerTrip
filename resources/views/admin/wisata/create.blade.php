@@ -9,16 +9,27 @@
         <div class="d-flex align-items-center gap-2">
             <img src="{{ asset('images/logo.png') }}" alt="SigerTrip Logo" style="height:50px;">
         </div>
-        <div class="d-flex align-items-center gap-3">
-            <span class="fw-semibold text-dark">Halo, {{ Auth::user()->full_name ?? Auth::user()->name ?? 'Admin' }}</span>
+         {{-- Profil dan Logout --}}
+            <div class="d-flex align-items-center gap-4" style="min-width: 150px; justify-content: flex-end;">
+                
+                {{-- Profil Admin --}}
+                <div class="text-center">
+                    <i class="fas fa-user-circle text-dark" style="font-size: 1.8rem;"></i>
+                    <div class="small fw-medium mt-1 text-dark">
+                        {{ Auth::user()->full_name ?? Auth::user()->name ?? 'Admin' }}
+                    </div>
+                </div>
 
-            {{-- logout via POST --}}
-            <a href="#" class="btn btn-outline-danger btn-sm"
-               onclick="event.preventDefault(); document.getElementById('logout-form').submit();">Keluar</a>
-            <form id="logout-form" action="" method="POST" class="d-none">
-                @csrf
-            </form>
-        </div>
+                {{-- Tombol Logout --}}
+                <form action="{{ route('logout') }}" method="POST" class="m-0 p-0">
+                    @csrf
+                    <button type="submit" class="btn btn-link text-danger p-0" 
+                            style="font-size: 1.6rem; line-height: 1;" 
+                            title="Keluar">
+                        <i class="fas fa-sign-out-alt"></i>
+                    </button>
+                </form>
+            </div>
     </header>
     
     <h4 class="fw-bold mb-4">Tambah Destinasi Wisata</h4>
