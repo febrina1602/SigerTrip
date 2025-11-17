@@ -5,52 +5,98 @@
 @section('content')
 <div class="min-vh-100 bg-white">
     
+    {{-- HEADER --}}
     <header>
-        <div class="d-flex align-items-center">
-            <img src="{{ asset('images/logo.png') }}" alt="SigerTrip Logo">
-        </div>
-        <div>
-            <button class="btn-custom me-2">Masuk</button>
-            <button class="btn-custom">Daftar</button>
+        <div class="container py-2 d-flex align-items-center justify-content-between">
+            
+            <a href="{{ route('beranda.wisatawan') }}" class="d-flex align-items-center text-decoration-none" style="min-width: 150px;">
+                <img src="{{ asset('images/logo.png') }}" alt="SigerTrip Logo"
+                    style="height:42px" loading="lazy" onerror="this.style.display='none'">
+                <span class="ms-2 fw-bold text-dark d-none d-md-block">SigerTrip</span>
+            </a>
+
+            <form class="flex-grow-1 mx-3 mx-md-4" action="#" method="GET">
+                <div class="position-relative" style="max-width: 600px; margin: 0 auto;">
+                    <input type="text" class="form-control" name="search"
+                        placeholder="Wisata apa yang kamu cari?"
+                        style="border-radius: 50px; padding-left: 2.5rem; height: 44px;">
+                    <button type="submit" class="btn p-0" 
+                    style="position: absolute; left: 1rem; top: 50%; transform: translateY(-50%); color: #6c757d; font-size: 1.1rem;">
+                        <i class="fas fa-search"></i>
+                    </button>
+                </div>
+            </form>
+
+            <div class="d-flex align-items-center" style="min-width: 150px; justify-content: flex-end;">
+                
+                @guest
+                    <a href="{{ route('login') }}" class="text-dark text-decoration-none d-flex flex-column align-items-center">
+                        <i class="fas fa-user-circle" style="font-size: 1.75rem;"></i>
+                        <span class="small fw-medium">Akun</span>
+                    </a>
+                @endguest
+                
+                @auth
+                    @php
+                        $profileRoute = auth()->user()->role == 'agent' 
+                                      ? route('agent.dashboard') 
+                                      : route('profile.show');
+                    @endphp
+                    <a href="{{ $profileRoute }}" class="text-dark text-decoration-none d-flex flex-column align-items-center me-3">
+                        <img src="{{ auth()->user()->profile_picture_url ?? 'https://ui-avatars.com/api/?name=' . urlencode(auth()->user()->full_name) . '&background=FFD15C&color=333&bold=true' }}" 
+                             alt="Foto Profil" 
+                             style="width: 40px; height: 40px; border-radius: 50%; object-fit: cover; border: 2px solid #eee;">
+                        <span class="small fw-medium">
+                            {{ \Illuminate\Support\Str::limit(auth()->user()->full_name ?? auth()->user()->name, 15) }}
+                        </span>
+                    </a>
+                    
+                    <form action="{{ route('logout') }}" method="POST" class="m-0">
+                        @csrf
+                        <button type="submit" class="btn btn-link text-danger p-0" title="Logout" 
+                                style="font-size: 1.6rem; line-height: 1;">
+                            <i class="fas fa-sign-out-alt"></i>
+                        </button>
+                    </form>
+                @endauth
+            </div>
         </div>
     </header>
 
-    <nav class="nav-custom">
+    {{-- NAV --}}
+    <nav class="nav-custom border-top bg-white">
         <div class="container py-0">
-            <div class="d-flex gap-4">
-                <a href="{{ route('beranda.wisatawan') }}" class="nav-link-custom active">
+            <div class="d-flex gap-4 justify-content-left">
+                <a href="{{ route('beranda.wisatawan') }}"
+                class="nav-link-custom {{ request()->routeIs('beranda.wisatawan') ? 'active' : '' }}">
                     Beranda
                 </a>
-                <a href="#" class="nav-link-custom">
+                <a href="{{ route('pasar-digital.index') }}" class="nav-link-custom {{ request()->routeIs('pasar-digital.*') ? 'active' : '' }}">
                     Pasar Digital
                 </a>
-                <a href="#" class="nav-link-custom">
+                <a href="{{ route('pemandu-wisata.index') }}" class="nav-link-custom {{ request()->routeIs('pemandu-wisata.*') ? 'active' : '' }} ">
                     Pemandu Wisata
                 </a>
             </div>
         </div>
     </nav>
 
+    {{-- KATEGORI --}}
     <section class="category-section">
         <div class="container">
             <div class="row g-4">
                 @forelse($categories as $category)
                 <div class="col-6 col-md-2">
-                    {{-- INI YANG DIPERBAIKI --}}
                     <a href="{{ route('destinations.category', $category->id) }}" class="text-decoration-none">
                         <div class="category-card">
                             <div class="mb-2">
-                                @if($category->icon_url)
-                                    <img src="{{ $category->icon_url }}" alt="{{ $category->name }}" class="category-icon">
+                                @if(!empty($category->icon_url))
+                                    <img src="{{ $category->icon_url }}" alt="{{ $category->name }}" class="category-icon" loading="lazy">
                                 @else
-                                    {{-- Fallback SVG (Sudah Benar) --}}
-                                    @if(strtolower($category->name) == 'pantai')
-                                    <svg class...></svg>
-                                    @elseif(strtolower($category->name) == 'gunung')
-                                    <svg class...></svg>
-                                    @else
-                                    <svg class="category-icon" viewBox="0 0 100 100" fill="none"> <circle cx="50" cy="50" r="30" fill="#FFB85C"/> </svg>
-                                    @endif
+                                    {{-- Fallback ikon sederhana --}}
+                                    <svg class="category-icon" viewBox="0 0 100 100" fill="none" width="64" height="64" aria-hidden="true">
+                                        <circle cx="50" cy="50" r="30" fill="#FFB85C"/>
+                                    </svg>
                                 @endif
                             </div>
                             <span class="small fw-medium text-dark text-center d-block">{{ $category->name }}</span>
@@ -66,20 +112,21 @@
         </div>
     </section>
 
+    {{-- REKOMENDASI --}}
     <section class="bg-white py-5">
         <div class="container">
-            <h5 class="fw-bold mb-3">Rekomendasi buat kamu!</h5>
+            <h5 class="fw-bold mb-3 text-start">Rekomendasi buat kamu!</h5>
             
             <div class="row row-cols-1 row-cols-md-3 g-4">
                 @forelse($recommendations as $destination)
                 <div class="col">
                     <a href="{{ route('destinations.detail', $destination->id) }}" class="card h-100 shadow-sm text-decoration-none text-dark border-0">
                         <img src="{{ $destination->image_url ?? 'https://images.unsplash.com/photo-1507525428034-b723cf961d3e?w=400&q=80' }}" 
-                             alt="{{ $destination->name }}" 
-                             class="card-img-top" style="height: 200px; object-fit: cover;">
+                            alt="{{ $destination->name }}" 
+                            class="card-img-top" style="height: 200px; object-fit: cover;">
                         
                         <div class="card-body">
-                            <div class="d-flex justify-content-between align-items-center mb-2">
+                            <div class="d-flex justify-content-between text-start mb-2">
                                 <h5 class="card-title fw-bold text-dark mb-0">{{ $destination->name }}</h5>
                                 <div class="d-flex align-items-center">
                                     @php
@@ -117,14 +164,26 @@
                                 @endif
                             </div>
                             
-                            @if($destination->popular_activities)
-                            <div>
+                            @if(!empty($destination->popular_activities))
+                            <div class="mb-2 text-start">
                                 <p class="small fw-semibold text-dark mb-1">Aktivitas Populer:</p>
-                                <p class="small text-muted">
-                                    @if(is_array($destination->popular_activities))
-                                        {{ implode(', ', $destination->popular_activities) }}
+                                
+                                @php
+                                    $acts = $destination->popular_activities;
+                                    // decode jika datanya ternyata string
+                                    if (is_string($acts)) {
+                                        $json = json_decode($acts, true);
+                                        if (json_last_error() === JSON_ERROR_NONE && is_array($json)) { 
+                                            $acts = $json; 
+                                        }
+                                    }
+                                @endphp
+
+                                <p class="small text-muted mb-0">
+                                    @if(is_array($acts))
+                                        {{ implode(', ', $acts) }}
                                     @else
-                                        {{ $destination->popular_activities }}
+                                        {{ $acts }}
                                     @endif
                                 </p>
                             </div>
@@ -142,41 +201,5 @@
         </div>
     </section>
 
-    <!-- FOOTER -->
-    <footer class="footer position-relative">
-        <div class="container py-3">
-            <div class="row align-items-start">
-                <div class="col-md-3 d-flex align-items-center mb-3 mb-md-0">
-                    <img src="{{ asset('images/logo.png') }}" alt="Logo SigerTrip" class="me-2" style="height:50px;">
-                </div>
-
-                <div class="col-md-3 text-center mb-3 mb-md-0">
-                    <h6 class="fw-bold mb-2">Ikuti Kami</h6>
-                    <div class="d-flex justify-content-center align-items-center social-icons">
-                        <a href="#"><i class="fab fa-instagram"></i></a>
-                        <a href="#"><i class="fab fa-facebook-f"></i></a>
-                        <a href="#"><i class="fab fa-x-twitter"></i></a>
-                        <a href="#"><i class="fab fa-tiktok"></i></a>
-                        <a href="#"><i class="fab fa-youtube"></i></a>
-                    </div>
-                </div>
-
-                <div class="col-md-3 mb-3 mb-md-0">
-                    <h6 class="fw-bold mb-2">Dibuat Oleh:</h6>
-                    <p class="mb-1">Febrina Aulia Azahra</p>
-                    <p class="mb-1">Carissa Oktavia Sanjaya</p>
-                    <p class="mb-1">Dilvi Yola</p>
-                    <p class="mb-0">M. Hafiz Abyan</p>
-                </div>
-
-                <div class="col-md-3">
-                    <h6 class="fw-bold mb-2">Informasi</h6>
-                    <p class="mb-1"><a href="#" class="footer-link">Tentang</a></p>
-                    <p class="mb-0"><a href="#" class="footer-link">FAQ</a></p>
-                </div>
-            </div>
-        </div>
-        <img src="{{ asset('images/siger-pattern.png') }}" alt="Siger Pattern" class="siger-pattern">
-    </footer>
 </div>
 @endsection

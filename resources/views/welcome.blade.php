@@ -9,8 +9,9 @@
             <img src="{{ asset('images/logo.png') }}" alt="SigerTrip Logo">
         </div>
         <div>
-            <button class="btn-custom me-2">Masuk</button>
-            <button class="btn-custom">Daftar</button>
+            {{-- Tombol auth --}}
+            <a href="{{ route('login') }}" class="btn-custom me-2">Masuk</a>
+            <a href="{{ route('register') }}" class="btn-custom">Daftar</a>
         </div>
     </header>
 
@@ -32,7 +33,7 @@
             <img src="{{ asset('images/beach.png') }}" class="hero-img mb-4" alt="Pantai Tropis">
             <h4 class="fw-bold">Panduan Digital Terlengkap</h4>
             <p class="text-muted">
-                Akses informasi lengkap tentang tempat wisata, budaya, dan kuliner <br> 
+                Akses informasi lengkap tentang tempat wisata, budaya, dan kuliner <br>
                 hanya dalam satu aplikasi.
             </p>
         </div>
@@ -44,7 +45,7 @@
             <img src="{{ asset('images/sunset.png') }}" class="hero-img mb-4" alt="Senja di Pantai Lampung">
             <h4 class="fw-bold">Dukung UMKM Lokal</h4>
             <p class="text-muted">
-                Beli oleh-oleh dan pesan akomodasi langsung dari pelaku usaha lokal. <br>  
+                Beli oleh-oleh dan pesan akomodasi langsung dari pelaku usaha lokal. <br>
                 Liburanmu bawa dampak nyata.
             </p>
         </div>

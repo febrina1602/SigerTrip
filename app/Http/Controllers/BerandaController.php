@@ -30,7 +30,7 @@ class BerandaController extends Controller
             ->take(6)
             ->get();
 
-        return view('beranda.wisatawan', compact(
+        return view('wisatawan.beranda', compact( 
             'categories',
             'recommendations',
             'tourPackages',

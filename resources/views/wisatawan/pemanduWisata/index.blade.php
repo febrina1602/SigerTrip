@@ -1,0 +1,144 @@
+@extends('layouts.app')
+
+@section('title', 'Pemandu Wisata - SigerTrip')
+
+@section('content')
+    <div class="bg-white">
+    {{-- HEADER --}}
+        <header>
+            <div class="container py-2 d-flex align-items-center justify-content-between">
+                
+                <a href="{{ route('beranda.wisatawan') }}" class="d-flex align-items-center text-decoration-none" style="min-width: 150px;">
+                    <img src="{{ asset('images/logo.png') }}" alt="SigerTrip Logo"
+                        style="height:42px" loading="lazy" onerror="this.style.display='none'">
+                    <span class="ms-2 fw-bold text-dark d-none d-md-block">SigerTrip</span>
+                </a>
+
+                <form class="flex-grow-1 mx-3 mx-md-4" action="#" method="GET">
+                    <div class="position-relative" style="max-width: 600px; margin: 0 auto;">
+                        <input type="text" class="form-control" name="search"
+                            placeholder="Wisata apa yang kamu cari?"
+                            style="border-radius: 50px; padding-left: 2.5rem; height: 44px;">
+                        <button type="submit" class="btn p-0" 
+                        style="position: absolute; left: 1rem; top: 50%; transform: translateY(-50%); color: #6c757d; font-size: 1.1rem;">
+                            <i class="fas fa-search"></i>
+                        </button>
+                    </div>
+                </form>
+
+                <div class="d-flex align-items-center" style="min-width: 150px; justify-content: flex-end;">
+                    
+                    @guest
+                        <a href="{{ route('login') }}" class="text-dark text-decoration-none d-flex flex-column align-items-center">
+                            <i class="fas fa-user-circle" style="font-size: 1.75rem;"></i>
+                            <span class="small fw-medium">Akun</span>
+                        </a>
+                    @endguest
+                    
+                    @auth
+                        @php
+                            $profileRoute = auth()->user()->role == 'agent' 
+                                        ? route('agent.dashboard') 
+                                        : route('profile.show');
+                        @endphp
+                        <a href="{{ $profileRoute }}" class="text-dark text-decoration-none d-flex flex-column align-items-center me-3">
+                            <img src="{{ auth()->user()->profile_picture_url ?? 'https://ui-avatars.com/api/?name=' . urlencode(auth()->user()->full_name) . '&background=FFD15C&color=333&bold=true' }}" 
+                                alt="Foto Profil" 
+                                style="width: 40px; height: 40px; border-radius: 50%; object-fit: cover; border: 2px solid #eee;">
+                            <span class="small fw-medium">
+                                {{ \Illuminate\Support\Str::limit(auth()->user()->full_name ?? auth()->user()->name, 15) }}
+                            </span>
+                        </a>
+                        
+                        <form action="{{ route('logout') }}" method="POST" class="m-0">
+                            @csrf
+                            <button type="submit" class="btn btn-link text-danger p-0" title="Logout" 
+                                    style="font-size: 1.6rem; line-height: 1;">
+                                <i class="fas fa-sign-out-alt"></i>
+                            </button>
+                        </form>
+                    @endauth
+                </div>
+            </div>
+        </header>
+
+        <nav class="nav-custom border-top bg-white">
+            <div class="container py-0">
+                <div class="d-flex gap-4 justify-content-left">
+                    <a href="{{ route('beranda.wisatawan') }}"
+                    class="nav-link-custom {{ request()->routeIs('beranda.wisatawan') ? 'active' : '' }}">
+                        Beranda
+                    </a>
+                    <a href="{{ route('pasar-digital.index') }}" class="nav-link-custom {{ request()->routeIs('pasar-digital.*') ? 'active' : '' }}">
+                        Pasar Digital
+                    </a>
+                    <a href="{{ route('pemandu-wisata.index') }}" class="nav-link-custom {{ request()->routeIs('pemandu-wisata.*') ? 'active' : '' }} ">
+                        Pemandu Wisata
+                    </a>
+                </div>
+            </div>
+        </nav>
+
+        <div class="py-5 bg-white min-vh-100">
+            <div class="container">
+                
+                <h1 class="h3 fw-bold text-dark mb-4 text-start">Agen Tour Lokal</h1>
+                
+                <div class="row row-cols-1 row-cols-md-3 g-4">
+                    
+                    @if($agents->isNotEmpty())
+                        
+                        @foreach($agents as $agent)
+                        <div class="col">
+                            <div class="card h-100 shadow-sm border-0">
+                                <img src="{{ $agent->banner_image_url ?? 'https://images.unsplash.com/photo-1507525428034-b723cf961d3e?w=600&q=80' }}" 
+                                    alt="{{ $agent->name }}" 
+                                    class="card-img-top" style="height: 200px; object-fit: cover;">
+                                
+                                <div class="card-body text-start">
+                                    @if($agent->is_verified)
+                                    <div class="d-flex align-items-center gap-2 mb-2">
+                                        <span class="text-success small fw-semibold">Terverifikasi</span>
+                                        <svg style="width: 1rem; height: 1rem;" class="text-success" fill="currentColor" viewBox="0 0 20 20">
+                                            <path fill-rule="evenodd" d="M10 18a8 8 0 100-16 8 8 0 000 16zm3.707-9.293a1 1 0 00-1.414-1.414L9 10.586 7.707 9.293a1 1 0 00-1.414 1.414l2 2a1 1 0 001.414 0l4-4z" clip-rule="evenodd"/>
+                                        </svg>
+                                    </div>
+                                    @endif
+
+                                    @if($agent->address)
+                                    <div class="d-flex align-items-start gap-2 mb-3 small text-muted">
+                                        <svg style="width: 1rem; height: 1rem;" class="mt-1 flex-shrink-0" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M17.657 16.657L13.414 20.9a1.998 1.998 0 01-2.827 0l-4.244-4.243a8 8 0 1111.314 0z"></path>
+                                            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M15 11a3 3 0 11-6 0 3 3 0 016 0z"></path>
+                                        </svg>
+                                        <span>{{ $agent->address }}</span>
+                                    </div>
+                                    @endif
+
+                                    <h5 class="card-title fw-bold text-dark mb-3">{{ $agent->name }}</h5>
+                                    <a href="{{ route('pemandu-wisata.show', $agent->id) }}"
+                                    class="btn btn-danger w-100 fw-semibold">
+                                        Rincian
+                                    </a>
+                                </div>
+                            </div>
+                        </div>
+                        @endforeach
+                    
+                    @else
+
+                        <div class="col-12 text-center text-muted d-flex flex-column justify-content-center" 
+                            style="min-height: 50vh;">
+                            
+                            <p class="fs-5 mb-2">Belum ada agen tour lokal tersedia</p>
+                            <p class="small">Agen tour akan muncul di sini setelah terdaftar dan diverifikasi oleh admin</p>
+                        </div>
+                        
+                    @endif
+                    
+                </div>
+            </div>
+        </div>
+
+    </div>
+@endsection

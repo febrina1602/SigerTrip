@@ -6,21 +6,43 @@
 <div class="min-vh-100 bg-white">
 
     {{-- HEADER --}}
-    <header class="d-flex justify-content-between align-items-center py-3 px-4 border-bottom">
-        <div class="d-flex align-items-center gap-2">
-            <img src="{{ asset('images/logo.png') }}" alt="SigerTrip Logo" style="height:50px;">
-        </div>
-        <div class="d-flex align-items-center gap-3">
-            <span class="fw-semibold text-dark">Halo, {{ Auth::user()->full_name ?? Auth::user()->name ?? 'Admin' }}</span>
+    <header class="border-bottom bg-white shadow-sm">
+        <div class="container py-2 d-flex align-items-center justify-content-between">
+            
+            {{-- Logo --}}
+            <a href="{{ route('admin.beranda') }}" class="d-flex align-items-center text-decoration-none" style="min-width: 150px;">
+                <img src="{{ asset('images/logo.png') }}" 
+                    alt="SigerTrip Logo"
+                    style="height:42px" 
+                    loading="lazy" 
+                    onerror="this.style.display='none'">
+                <span class="ms-2 fw-bold text-dark d-none d-md-block">SigerTrip</span>
+            </a>
 
-            {{-- logout via POST --}}
-            <a href="#" class="btn btn-outline-danger btn-sm"
-               onclick="event.preventDefault(); document.getElementById('logout-form').submit();">Keluar</a>
-            <form id="logout-form" action="" method="POST" class="d-none">
-                @csrf
-            </form>
+            {{-- Profil dan Logout --}}
+            <div class="d-flex align-items-center gap-4" style="min-width: 150px; justify-content: flex-end;">
+                
+                {{-- Profil Admin --}}
+                <div class="text-center">
+                    <i class="fas fa-user-circle text-dark" style="font-size: 1.8rem;"></i>
+                    <div class="small fw-medium mt-1 text-dark">
+                        {{ Auth::user()->full_name ?? Auth::user()->name ?? 'Admin' }}
+                    </div>
+                </div>
+
+                {{-- Tombol Logout --}}
+                <form action="{{ route('logout') }}" method="POST" class="m-0 p-0">
+                    @csrf
+                    <button type="submit" class="btn btn-link text-danger p-0" 
+                            style="font-size: 1.6rem; line-height: 1;" 
+                            title="Keluar">
+                        <i class="fas fa-sign-out-alt"></i>
+                    </button>
+                </form>
+            </div>
         </div>
     </header>
+
 
     {{-- NAVIGATION --}}
     <nav class="nav-custom bg-light py-2 border-bottom">
@@ -28,11 +50,12 @@
             <a href="{{ route('admin.beranda') }}" class="nav-link-custom active">Beranda</a>
             <a href="#" class="nav-link-custom">Pasar Digital</a>
             <a href="#" class="nav-link-custom">Pemandu Wisata</a>
+            <a href="{{ route('admin.users.index') }}" class="nav-link-custom">Kelola User</a>
         </div>
     </nav>
 
     {{-- STATISTIK --}}
-    <section class="py-5">
+    <section class="category-section">
         <div class="container">
             @if(session('success'))
                 <div class="alert alert-success alert-dismissible fade show" role="alert">
@@ -41,24 +64,23 @@
                 </div>
             @endif
 
-            <h5 class="fw-bold mb-4">Statistik Sistem</h5>
-            <div class="row g-4">
-                <div class="col-md-3">
-                    <div class="card border-0 shadow-sm rounded-4 p-3 text-center">
-                        <h6 class="fw-semibold text-muted mb-2">Total Wisata</h6>
-                        <h3 class="fw-bold text-primary">{{ $totalWisata ?? 0 }}</h3>
+            <div class="row justify-content-center g-4">
+                <div class="col-md-3 col-sm-6">
+                    <div class="card border-0 shadow-sm rounded-4 p-4 text-center h-100 bg-white">
+                        <h6 class="fw-semibold text-muted mb-3">Total Wisata</h6>
+                        <h2 class="fw-bold text-primary mb-0" style="font-size: 3rem;">{{ $totalWisata ?? 0 }}</h2>
                     </div>
                 </div>
-                <div class="col-md-3">
-                    <div class="card border-0 shadow-sm rounded-4 p-3 text-center">
-                        <h6 class="fw-semibold text-muted mb-2">Kategori</h6>
-                        <h3 class="fw-bold text-success">{{ $totalKategori ?? 0 }}</h3>
+                <div class="col-md-3 col-sm-6">
+                    <div class="card border-0 shadow-sm rounded-4 p-4 text-center h-100 bg-white">
+                        <h6 class="fw-semibold text-muted mb-3">Kategori</h6>
+                        <h2 class="fw-bold text-success mb-0" style="font-size: 3rem;">{{ $totalKategori ?? 0 }}</h2>
                     </div>
                 </div>
-                <div class="col-md-3">
-                    <div class="card border-0 shadow-sm rounded-4 p-3 text-center">
-                        <h6 class="fw-semibold text-muted mb-2">Pengguna</h6>
-                        <h3 class="fw-bold text-info">{{ $totalUser ?? 0 }}</h3>
+                <div class="col-md-3 col-sm-6">
+                    <div class="card border-0 shadow-sm rounded-4 p-4 text-center h-100 bg-white">
+                        <h6 class="fw-semibold text-muted mb-3">Pengguna</h6>
+                        <h2 class="fw-bold text-info mb-0" style="font-size: 3rem;">{{ $totalUser ?? 0 }}</h2>
                     </div>
                 </div>
             </div>
@@ -122,9 +144,19 @@
                                 <div class="mb-3">
                                     <p class="fw-semibold mb-1 small">Aktivitas Populer:</p>
                                     <p class="text-muted small mb-0" style="font-size: 11px;">
-                                        {{ Str::limit($destination->popular_activities ?? 'Menikmati pemandangan, jalan santai di tepi pantai', 80) }}
+                                        @php
+                                            $activities = $destination->popular_activities ?? ['Menikmati pemandangan', 'Jalan santai di tepi pantai'];
+
+                                            // Jika berupa array, gabungkan jadi string
+                                            if (is_array($activities)) {
+                                                $activities = implode(', ', $activities);
+                                            }
+                                        @endphp
+
+                                        {{ Str::limit($activities, 80) }}
                                     </p>
                                 </div>
+
 
                                 {{-- Harga & Jumlah Orang --}}
                                 <div class="d-flex justify-content-between align-items-center">
@@ -178,43 +210,6 @@
             </div>
         </div>
     </section>
-
-    {{-- FOOTER --}}
-    <footer class="footer position-relative mt-auto">
-        <div class="container py-3">
-            <div class="row align-items-start">
-                <div class="col-md-3 d-flex align-items-center mb-3 mb-md-0">
-                    <img src="{{ asset('images/logo.png') }}" alt="Logo SigerTrip" class="me-2" style="height:50px;">
-                </div>
-
-                <div class="col-md-3 text-center mb-3 mb-md-0">
-                    <h6 class="fw-bold mb-2">Ikuti Kami</h6>
-                    <div class="d-flex justify-content-center align-items-center social-icons">
-                        <a href="#"><i class="fab fa-instagram"></i></a>
-                        <a href="#"><i class="fab fa-facebook-f"></i></a>
-                        <a href="#"><i class="fab fa-x-twitter"></i></a>
-                        <a href="#"><i class="fab fa-tiktok"></i></a>
-                        <a href="#"><i class="fab fa-youtube"></i></a>
-                    </div>
-                </div>
-
-                <div class="col-md-3 mb-3 mb-md-0">
-                    <h6 class="fw-bold mb-2">Dibuat Oleh:</h6>
-                    <p class="mb-1">Febrina Aulia Azahra</p>
-                    <p class="mb-1">Carissa Oktavia Sanjaya</p>
-                    <p class="mb-1">Dilvi Yola</p>
-                    <p class="mb-0">M. Hafiz Abyan</p>
-                </div>
-
-                <div class="col-md-3">
-                    <h6 class="fw-bold mb-2">Informasi</h6>
-                    <p class="mb-1"><a href="#" class="footer-link">Tentang</a></p>
-                    <p class="mb-0"><a href="#" class="footer-link">FAQ</a></p>
-                </div>
-            </div>
-        </div>
-        <img src="{{ asset('images/siger-pattern.png') }}" alt="Siger Pattern" class="siger-pattern">
-    </footer>
 
 </div>
 @endsection
