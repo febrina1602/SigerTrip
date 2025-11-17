@@ -15,9 +15,10 @@ return new class extends Migration
             $table->id();
             $table->foreignId('user_id')->constrained('users')->onDelete('cascade')->unique();
             $table->string('name');
-            $table->enum('agent_type', ['LOCAL_TOUR','TRANSPORT_RENTAL']);
+            $table->string('email')->unique()->nullable();
             $table->text('address')->nullable();
-            $table->string('contact_phone')->nullable();
+            $table->string('phone_number')->nullable(); 
+            $table->string('banner_image_url')->nullable(); 
             $table->boolean('is_verified')->default(false);
             $table->timestamps();
         });

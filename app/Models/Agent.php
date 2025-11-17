@@ -17,18 +17,23 @@ class Agent extends Model
      */
     protected $fillable = [
         'user_id',
-        'name',          // nama instansi/perusahaan agen
-        'agent_type',    // 'LOCAL_TOUR' atau 'TRANSPORT_RENTAL'
+        'name',             // nama instansi/perusahaan agen
+        'agent_type',       // 'LOCAL_TOUR' atau 'TRANSPORT_RENTAL'
         'address',
+        'location',
         'contact_phone',
         'is_verified',
+        'rating',
+        'banner_image_url',
+        'description',
     ];
 
     /**
      * Casts.
      */
     protected $casts = [
-        'is_verified' => 'bool',
+        'is_verified' => 'boolean',   // ubah 0/1 menjadi true/false
+        'rating'      => 'decimal:1', // rating dengan 1 desimal
     ];
 
     /**
@@ -44,7 +49,22 @@ class Agent extends Model
         return $this->belongsTo(User::class);
     }
 
+    /**
+     * RELASI: Agent memiliki banyak Tour Package
+     */
+    public function tourPackages()
+    {
+        return $this->hasMany(TourPackage::class);
+    }
+
     // ===== Query Scopes (memudahkan filter di controller)
-    public function scopeVerified($q) { return $q->where('is_verified', true); }
-    public function scopePending($q)  { return $q->where('is_verified', false); }
+    public function scopeVerified($q)
+    {
+        return $q->where('is_verified', true);
+    }
+
+    public function scopePending($q)
+    {
+        return $q->where('is_verified', false);
+    }
 }

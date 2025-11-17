@@ -25,6 +25,10 @@ class User extends Authenticatable
         'password',
         'phone_number',
         'role',
+        'status',
+        'verified_at',
+        'gender',
+        'profile_picture_url',
     ];
 
     /**
@@ -37,10 +41,14 @@ class User extends Authenticatable
 
     /**
      * Casts.
-     * Catatan: tidak men-cast email_verified_at karena kolom itu tidak ada di migration Anda.
+     *
+     * Sesuaikan dengan kolom yang ada di migration.
+     * Jika belum ada email_verified_at di tabel users, baris itu bisa dihapus.
      */
     protected $casts = [
-        'password' => 'hashed',
+        'email_verified_at' => 'datetime',
+        'verified_at'       => 'datetime',
+        'password'          => 'hashed',
     ];
 
     /**
@@ -51,8 +59,36 @@ class User extends Authenticatable
         return $this->hasOne(Agent::class);
     }
 
-    // ===== Helper methods
-    public function isAdmin(): bool { return $this->role === self::ROLE_ADMIN; }
-    public function isAgent(): bool { return $this->role === self::ROLE_AGENT; }
-    public function isUser():  bool { return $this->role === self::ROLE_USER;  }
+    // ===== Helper methods role
+    public function isAdmin(): bool
+    {
+        return $this->role === self::ROLE_ADMIN;
+    }
+
+    public function isAgent(): bool
+    {
+        return $this->role === self::ROLE_AGENT;
+    }
+
+    public function isUser(): bool
+    {
+        return $this->role === self::ROLE_USER;
+    }
+
+    // ===== Helper methods status/verifikasi
+    public function isVerified(): bool
+    {
+        return $this->status === 'aktif' && !is_null($this->verified_at);
+    }
+
+    public function isPending(): bool
+    {
+        return $this->status === 'pending';
+    }
+
+    // Accessor untuk name supaya $user->name mengembalikan full_name
+    public function getNameAttribute()
+    {
+        return $this->full_name;
+    }
 }

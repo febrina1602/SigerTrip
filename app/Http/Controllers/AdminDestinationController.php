@@ -6,6 +6,7 @@ use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Storage;
 use App\Models\Destination;
 use App\Models\DestinationCategory;
+use App\Models\User;
 
 class AdminDestinationController extends Controller
 {
@@ -14,7 +15,7 @@ class AdminDestinationController extends Controller
         $destinations = Destination::latest()->get();
         $totalWisata = Destination::count();
         $totalKategori = DestinationCategory::count();
-        $totalUser = \App\Models\User::count();
+        $totalUser = User::count();
 
         return view('admin.beranda', compact('destinations', 'totalWisata', 'totalKategori', 'totalUser'));
     }
