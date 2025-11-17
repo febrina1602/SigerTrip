@@ -9,20 +9,42 @@ class Agent extends Model
 {
     use HasFactory;
 
+    // Tabel 'agents' sudah sesuai konvensi, properti $table sebenarnya opsional.
     protected $table = 'agents';
 
+    /**
+     * Mass assignable.
+     */
     protected $fillable = [
         'user_id',
-        'name',
-        'agent_type',
+        'name',          // nama instansi/perusahaan agen
+        'agent_type',    // 'LOCAL_TOUR' atau 'TRANSPORT_RENTAL'
         'address',
         'contact_phone',
         'is_verified',
     ];
 
-    // Relasi ke tabel users
+    /**
+     * Casts.
+     */
+    protected $casts = [
+        'is_verified' => 'bool',
+    ];
+
+    /**
+     * Konstanta jenis agen (opsional, untuk acuan validasi/UI).
+     */
+    public const TYPES = ['LOCAL_TOUR', 'TRANSPORT_RENTAL'];
+
+    /**
+     * Relasi ke user (kebalikan dari hasOne di User).
+     */
     public function user()
     {
         return $this->belongsTo(User::class);
     }
+
+    // ===== Query Scopes (memudahkan filter di controller)
+    public function scopeVerified($q) { return $q->where('is_verified', true); }
+    public function scopePending($q)  { return $q->where('is_verified', false); }
 }

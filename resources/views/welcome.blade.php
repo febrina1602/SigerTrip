@@ -9,8 +9,13 @@
             <img src="{{ asset('images/logo.png') }}" alt="SigerTrip Logo">
         </div>
         <div>
-            <button class="btn-custom me-2">Masuk</button>
-            <button class="btn-custom">Daftar</button>
+            {{-- Tombol auth --}}
+            <a href="{{ route('login') }}" class="btn-custom me-2">
+                Masuk
+            </a>
+            <a href="{{ route('register') }}" class="btn-custom">
+                Daftar
+            </a>
         </div>
     </header>
 

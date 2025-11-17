@@ -1,6 +1,6 @@
 @extends('layouts.app')
 
-@section('title','Registrasi - SigerTrip')
+@section('title', isset($isAgent) && $isAgent ? 'Registrasi Mitra - SigerTrip' : 'Registrasi - SigerTrip')
 
 @push('styles')
 <style>
@@ -71,7 +71,10 @@
         <a href="{{ url()->previous() }}" class="kembali d-inline-block mb-2">
           <i class="fa-solid fa-chevron-left me-1"></i> Kembali
         </a>
-        <h2 class="form-title">Registrasi</h2>
+
+        <h2 class="form-title">
+          {{ isset($isAgent) && $isAgent ? 'Registrasi Mitra SigerTrip' : 'Registrasi' }}
+        </h2>
 
         @if ($errors->any())
           <div class="alert alert-danger">
@@ -81,8 +84,12 @@
           </div>
         @endif
 
-        <form method="POST" action="{{ route('register') }}" class="mt-2">
+        <form method="POST"
+              action="{{ isset($isAgent) && $isAgent ? route('register.agent.post') : route('register') }}"
+              class="mt-2">
           @csrf
+
+          {{-- Nama lengkap --}}
           <div class="mb-3 position-relative">
             <input type="text" name="full_name" value="{{ old('full_name') }}"
                    class="form-control @error('full_name') is-invalid @enderror"
@@ -90,6 +97,15 @@
             <i class="fa-regular fa-user input-icon"></i>
           </div>
 
+          {{-- Nomor telepon --}}
+          <div class="mb-3 position-relative">
+            <input type="text" name="phone_number" value="{{ old('phone_number') }}"
+                   class="form-control @error('phone_number') is-invalid @enderror"
+                   placeholder="Nomor Telepon" required>
+            <i class="fa-solid fa-phone input-icon"></i>
+          </div>
+
+          {{-- Email --}}
           <div class="mb-3 position-relative">
             <input type="email" name="email" value="{{ old('email') }}"
                    class="form-control @error('email') is-invalid @enderror"
@@ -97,6 +113,7 @@
             <i class="fa-regular fa-envelope input-icon"></i>
           </div>
 
+          {{-- Password --}}
           <div class="mb-3 position-relative">
             <input id="password" type="password" name="password"
                    class="form-control @error('password') is-invalid @enderror"
@@ -107,6 +124,7 @@
             </button>
           </div>
 
+          {{-- Konfirmasi Password --}}
           <div class="mb-3 position-relative">
             <input id="password_confirmation" type="password" name="password_confirmation"
                    class="form-control" placeholder="Konfirmasi Password" required>
@@ -116,6 +134,7 @@
             </button>
           </div>
 
+          {{-- Checkbox syarat & ketentuan --}}
           <div class="mb-3">
             <div class="form-check d-flex align-items-center gap-2">
               <input class="form-check-input" type="checkbox" id="agree" required>
@@ -126,9 +145,21 @@
             </div>
           </div>
 
+          {{-- Tombol daftar --}}
           <div class="d-grid">
-            <button type="submit" class="btn btn-grad">Daftar</button>
+            <button type="submit" class="btn btn-grad">
+              {{ isset($isAgent) && $isAgent ? 'Daftar sebagai Mitra' : 'Daftar' }}
+            </button>
           </div>
+
+          {{-- Tombol ke halaman registrasi mitra (hanya di halaman register biasa) --}}
+          @if (!isset($isAgent) || !$isAgent)
+            <div class="d-grid mt-2">
+              <a href="{{ route('register.agent') }}" class="btn btn-outline-danger">
+                Daftar sebagai Mitra SigerTrip
+              </a>
+            </div>
+          @endif
 
           <p class="text-center mt-3 mb-0">
             Sudah memiliki akun? <a href="{{ route('login') }}" class="text-danger text-decoration-none fw-semibold">Masuk Disini</a>

@@ -36,6 +36,9 @@ class Kernel extends HttpKernel
             \Illuminate\View\Middleware\ShareErrorsFromSession::class,
             \App\Http\Middleware\VerifyCsrfToken::class,
             \Illuminate\Routing\Middleware\SubstituteBindings::class,
+
+            // ⬇️ Middleware untuk mencegah cache (back/forward) di semua route web
+            \App\Http\Middleware\PreventBackHistory::class,
         ],
 
         'api' => [
@@ -64,5 +67,11 @@ class Kernel extends HttpKernel
         'signed' => \App\Http\Middleware\ValidateSignature::class,
         'throttle' => \Illuminate\Routing\Middleware\ThrottleRequests::class,
         'verified' => \Illuminate\Auth\Middleware\EnsureEmailIsVerified::class,
+
+        // ➕ Alias untuk proteksi route admin
+        'is_admin' => \App\Http\Middleware\IsAdmin::class,
+
+        // ➕ Alias untuk mencegah cache halaman setelah login/logout
+        'prevent-back-history' => \App\Http\Middleware\PreventBackHistory::class,
     ];
 }
