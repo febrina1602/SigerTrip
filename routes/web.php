@@ -34,7 +34,12 @@ Route::middleware('guest')->group(function () {
 // Proteksi halaman setelah login + cegah halaman tersimpan di browser cache
 Route::middleware(['auth', 'prevent-back-history'])->group(function () {
 
+    // Dashboard wisatawan (umum)
     Route::get('/dashboard', [BerandaController::class, 'wisatawan'])->name('dashboard');
+
+    // Dashboard untuk agent, tapi diarahkan ke halaman yang sama (dashboard wisatawan)
+    Route::get('/agent/dashboard', [BerandaController::class, 'wisatawan'])->name('agent.dashboard'); // ⬅ tambah ini
+
     Route::post('/logout', [AuthController::class, 'logout'])->name('logout');
 
     // Profile

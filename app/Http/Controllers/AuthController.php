@@ -100,12 +100,7 @@ class AuthController extends Controller
                     'role'         => User::ROLE_AGENT,
                 ]);
 
-                // 2) Buat data agent:
-                //    - name        : pakai full_name
-                //    - agent_type  : default LOCAL_TOUR (pakai konstanta Agent::TYPES[0])
-                //    - address     : sementara kosong (bisa diisi nanti lewat form profil)
-                //    - contact_phone: pakai phone_number
-                //    - is_verified : false (belum diverifikasi admin)
+                // 2) Buat data agent
                 Agent::create([
                     'user_id'       => $user->id,
                     'name'          => $validated['full_name'],
@@ -115,10 +110,6 @@ class AuthController extends Controller
                     'is_verified'   => false,
                 ]);
             });
-
-            // Kalau TIDAK mau auto-login agen baru, pakai ini:
-            // return redirect()->route('login')
-            //     ->with('success','Pendaftaran mitra berhasil, silakan tunggu verifikasi admin.');
 
             // Kalau boleh login tapi fitur mitra dikunci sampai diverifikasi:
             Auth::login($user);
@@ -137,17 +128,34 @@ class AuthController extends Controller
     public function login(Request $request)
     {
         // 1) Validasi
-        $request->validate([
+        $credentials = $request->validate([
             'email'    => 'required|email',
             'password' => 'required',
         ]);
 
         // 2) Coba autentikasi
         $remember = $request->boolean('remember');
-        if (Auth::attempt($request->only('email', 'password'), $remember)) {
+
+        if (Auth::attempt($credentials, $remember)) {
             $request->session()->regenerate();
 
-            return redirect()->intended(route('dashboard'))
+            $user = auth()->user();
+
+            // Redirect berdasarkan role
+            if ($user->role === User::ROLE_ADMIN) {
+                // admin ke dashboard admin
+                return redirect()->route('admin.beranda')
+                    ->with('success', 'Login admin berhasil!');
+            }
+
+            if ($user->role === User::ROLE_AGENT) {
+                // agent ke dashboard agent
+                return redirect()->route('agent.dashboard')
+                    ->with('success', 'Login mitra berhasil!');
+            }
+
+            // default: wisatawan/user biasa
+            return redirect()->route('dashboard')
                 ->with('success', 'Login berhasil!');
         }
 
