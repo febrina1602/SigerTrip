@@ -54,18 +54,20 @@ class AuthController extends Controller
                 'password'     => 'required|string|min:8|confirmed',
             ]);
 
-            // 2) Buat user baru role user
+            // 2) Buat user baru role user - LANGSUNG AKTIF
             $user = User::create([
                 'full_name'    => $validated['full_name'],
                 'phone_number' => $validated['phone_number'],
                 'email'        => $validated['email'],
                 'password'     => Hash::make($validated['password']),
-                'role'         => User::ROLE_USER, // konstanta di model User
+                'role'         => User::ROLE_USER,
+                'status'       => 'aktif',      // ✅ TAMBAHKAN INI
+                'verified_at'  => now(),        // ✅ TAMBAHKAN INI
             ]);
 
             // 3) Login & redirect
             Auth::login($user);
-            $request->session()->regenerate(); // lebih aman
+            $request->session()->regenerate();
 
             return redirect()->intended(route('dashboard'))
                 ->with('success', 'Pendaftaran berhasil! Selamat datang.');
@@ -75,12 +77,11 @@ class AuthController extends Controller
     }
 
     /**
-     * Proses registrasi mitra/agen (role: agent, is_verified = false)
+     * Proses registrasi mitra/agen (role: agent, status = pending)
      */
     public function registerAgent(Request $request)
     {
         try {
-            // Validasi sama seperti user biasa (nanti kalau mau bisa ditambah field khusus agen)
             $validated = $request->validate([
                 'full_name'    => 'required|string|max:255',
                 'phone_number' => 'required|string|max:20',
@@ -91,32 +92,33 @@ class AuthController extends Controller
             $user = null;
 
             DB::transaction(function () use ($validated, &$user) {
-                // 1) Buat user baru role agent
+                // 1) Buat user baru role agent - STATUS PENDING
                 $user = User::create([
                     'full_name'    => $validated['full_name'],
                     'phone_number' => $validated['phone_number'],
                     'email'        => $validated['email'],
                     'password'     => Hash::make($validated['password']),
                     'role'         => User::ROLE_AGENT,
+                    'status'       => 'pending',    // ✅ Agent harus pending
+                    'verified_at'  => null,         // ✅ Belum diverifikasi
                 ]);
 
                 // 2) Buat data agent
                 Agent::create([
                     'user_id'       => $user->id,
                     'name'          => $validated['full_name'],
-                    'agent_type'    => Agent::TYPES[0], // misal 'LOCAL_TOUR'
-                    'address'       => '',               // atau isi alamat default/optional
+                    'agent_type'    => Agent::TYPES[0],
+                    'address'       => '',
                     'contact_phone' => $validated['phone_number'],
                     'is_verified'   => false,
                 ]);
             });
 
-            // Kalau boleh login tapi fitur mitra dikunci sampai diverifikasi:
-            Auth::login($user);
-            $request->session()->regenerate();
-
-            return redirect()->intended(route('dashboard'))
-                ->with('success', 'Pendaftaran mitra berhasil! Akun Anda menunggu verifikasi admin.');
+            // JANGAN login agent yang masih pending
+            // Redirect ke login dengan pesan info
+            return redirect()->route('dashboard')
+                ->with('success', 'Pendaftaran mitra berhasil! Silakan tunggu verifikasi dari admin sebelum dapat login.');
+                
         } catch (ValidationException $e) {
             return back()->withErrors($e->errors())->withInput();
         }
@@ -141,15 +143,29 @@ class AuthController extends Controller
 
             $user = auth()->user();
 
+            // Cek status user - NONAKTIF tidak bisa login
+            if ($user->status === 'nonaktif') {
+                Auth::logout();
+                return back()->withErrors([
+                    'email' => 'Akun Anda telah dinonaktifkan. Hubungi administrator.',
+                ])->onlyInput('email');
+            }
+
+            // Cek status user - PENDING (khusus agent)
+            if ($user->role === User::ROLE_AGENT && $user->status === 'pending') {
+                Auth::logout();
+                return back()->withErrors([
+                    'email' => 'Akun mitra Anda masih menunggu verifikasi dari admin.',
+                ])->onlyInput('email');
+            }
+
             // Redirect berdasarkan role
             if ($user->role === User::ROLE_ADMIN) {
-                // admin ke dashboard admin
                 return redirect()->route('admin.beranda')
-                    ->with('success', 'Login admin berhasil!');
+                    ->with('success', 'Selamat datang, Admin!');
             }
 
             if ($user->role === User::ROLE_AGENT) {
-                // agent ke dashboard agent
                 return redirect()->route('agent.dashboard')
                     ->with('success', 'Login mitra berhasil!');
             }
