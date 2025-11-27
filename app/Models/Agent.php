@@ -50,11 +50,19 @@ class Agent extends Model
     }
 
     /**
-     * RELASI: Agent memiliki banyak Tour Package
+     * RELASI: Agent memiliki banyak LocalTourAgent
+     */
+    public function localTourAgents()
+    {
+        return $this->hasMany(LocalTourAgent::class);
+    }
+
+    /**
+     * RELASI: Agent memiliki banyak Tour Package (melalui LocalTourAgent)
      */
     public function tourPackages()
     {
-        return $this->hasMany(TourPackage::class);
+        return $this->hasManyThrough(TourPackage::class, LocalTourAgent::class);
     }
 
     // ===== Query Scopes (memudahkan filter di controller)

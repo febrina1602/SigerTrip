@@ -10,6 +10,7 @@ use App\Http\Controllers\AdminUserController;
 use App\Http\Controllers\PasarDigitalController;
 use App\Http\Controllers\PemanduWisataController;
 use App\Http\Controllers\ProfileController;
+use App\Http\Controllers\AgentDashboardController;
 
 // ==== HALAMAN UTAMA ====
 // Tampilkan landing page (resources/views/welcome.blade.php)
@@ -37,8 +38,8 @@ Route::middleware(['auth', 'prevent-back-history'])->group(function () {
     // Dashboard wisatawan (umum)
     Route::get('/dashboard', [BerandaController::class, 'wisatawan'])->name('dashboard');
 
-    // Dashboard untuk agent, tapi diarahkan ke halaman yang sama (dashboard wisatawan)
-    Route::get('/agent/dashboard', [BerandaController::class, 'wisatawan'])->name('agent.dashboard'); // ⬅ tambah ini
+    // Dashboard untuk agent
+    Route::get('/agent/dashboard', [AgentDashboardController::class, 'index'])->name('agent.dashboard');
 
     Route::post('/logout', [AuthController::class, 'logout'])->name('logout');
 

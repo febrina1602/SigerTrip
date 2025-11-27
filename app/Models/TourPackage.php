@@ -10,7 +10,7 @@ class TourPackage extends Model
     use HasFactory;
 
     protected $fillable = [
-        'agent_id',
+        'local_tour_agent_id',
         'name',
         'description',
         'cover_image_url',
@@ -37,11 +37,19 @@ class TourPackage extends Model
     ];
 
     /**
-     * RELASI: Tour Package dimiliki oleh satu Agent
+     * RELASI: Tour Package dimiliki oleh satu LocalTourAgent
+     */
+    public function localTourAgent()
+    {
+        return $this->belongsTo(LocalTourAgent::class);
+    }
+
+    /**
+     * RELASI: Tour Package memiliki akses ke Agent melalui LocalTourAgent
      */
     public function agent()
     {
-        return $this->belongsTo(Agent::class);
+        return $this->belongsTo(Agent::class, 'agent_id');
     }
 
     /**
