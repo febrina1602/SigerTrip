@@ -65,27 +65,60 @@
             @endif
 
             <div class="row justify-content-center g-4">
-                <div class="col-md-3 col-sm-6">
-                    <div class="card border-0 shadow-sm rounded-4 p-4 text-center h-100 bg-white">
-                        <h6 class="fw-semibold text-muted mb-3">Total Wisata</h6>
-                        <h2 class="fw-bold text-primary mb-0" style="font-size: 3rem;">{{ $totalWisata ?? 0 }}</h2>
+            <div class="col-md-3 col-sm-6">
+                <div class="card border-0 shadow-sm rounded-4 p-4 text-center h-100 bg-white">
+                    <div class="mb-3">
+                        <i class="fas fa-map-marked-alt text-primary" style="font-size: 2rem;"></i>
                     </div>
+                    <h6 class="fw-semibold text-muted mb-3">Total Wisata</h6>
+                    <h2 class="fw-bold text-primary mb-0" style="font-size: 3rem;">{{ $totalWisata ?? 0 }}</h2>
                 </div>
+            </div>
+                
+                {{-- CARD KATEGORI YANG BISA DIKLIK --}}
                 <div class="col-md-3 col-sm-6">
-                    <div class="card border-0 shadow-sm rounded-4 p-4 text-center h-100 bg-white">
-                        <h6 class="fw-semibold text-muted mb-3">Kategori</h6>
-                        <h2 class="fw-bold text-success mb-0" style="font-size: 3rem;">{{ $totalKategori ?? 0 }}</h2>
-                    </div>
+                    <a href="{{ route('admin.categories.index') }}" class="text-decoration-none">
+                        <div class="card border-0 shadow-sm rounded-4 p-4 text-center h-100 bg-white card-hover">
+                            <div class="mb-3">
+                                <i class="fas fa-tags text-success" style="font-size: 2rem;"></i>
+                            </div>
+                            <h6 class="fw-semibold text-muted mb-3">Kategori</h6>
+                            <h2 class="fw-bold text-success mb-0" style="font-size: 3rem;">{{ $totalKategori ?? 0 }}</h2>
+                        </div>
+                    </a>
                 </div>
+                
                 <div class="col-md-3 col-sm-6">
-                    <div class="card border-0 shadow-sm rounded-4 p-4 text-center h-100 bg-white">
-                        <h6 class="fw-semibold text-muted mb-3">Pengguna</h6>
-                        <h2 class="fw-bold text-info mb-0" style="font-size: 3rem;">{{ $totalUser ?? 0 }}</h2>
-                    </div>
+                    <a href="{{ route('admin.users.index') }}" class="text-decoration-none">
+                        <div class="card border-0 shadow-sm rounded-4 p-4 text-center h-100 bg-white card-hover">
+                            <div class="mb-3">
+                                <i class="fas fa-users text-info" style="font-size: 2rem;"></i>
+                            </div>
+                            <h6 class="fw-semibold text-muted mb-3">Pengguna</h6>
+                            <h2 class="fw-bold text-info mb-0" style="font-size: 3rem;">{{ $totalUser ?? 0 }}</h2>
+                        </div>
+                    </a>
                 </div>
             </div>
         </div>
     </section>
+
+    <style>
+    .card-hover {
+        transition: all 0.3s ease;
+    }
+
+    .card-hover:hover {
+        transform: translateY(-10px);
+        box-shadow: 0 15px 35px rgba(0,0,0,0.2) !important;
+    }
+
+    .card-hover:hover .text-success,
+    .card-hover:hover .text-info {
+        transform: scale(1.1);
+        transition: transform 0.3s ease;
+    }
+    </style>
 
    {{-- DAFTAR DATA TERBARU --}}
     <section class="py-5">

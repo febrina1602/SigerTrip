@@ -7,6 +7,7 @@ use App\Http\Controllers\DestinationController;
 use App\Http\Controllers\AdminController;
 use App\Http\Controllers\AdminDestinationController;
 use App\Http\Controllers\AdminUserController;
+use App\Http\Controllers\AdminCategoryController;
 use App\Http\Controllers\PasarDigitalController;
 use App\Http\Controllers\PemanduWisataController;
 use App\Http\Controllers\ProfileController;
@@ -87,6 +88,15 @@ Route::prefix('admin')->group(function () {
     Route::get('/wisata/{id}/edit', [AdminDestinationController::class, 'edit'])->name('admin.wisata.edit');
     Route::put('/wisata/{id}', [AdminDestinationController::class, 'update'])->name('admin.wisata.update');
     Route::delete('/wisata/{id}', [AdminDestinationController::class, 'destroy'])->name('admin.wisata.destroy');
+
+    // ===== ROUTE ADMIN CATEGORY MANAGEMENT =====
+    Route::get('/categories', [AdminCategoryController::class, 'index'])->name('admin.categories.index');
+    Route::get('/categories/create', [AdminCategoryController::class, 'create'])->name('admin.categories.create');
+    Route::post('/categories/store', [AdminCategoryController::class, 'store'])->name('admin.categories.store');
+    Route::get('/categories/{id}', [AdminCategoryController::class, 'show'])->name('admin.categories.show');
+    Route::get('/categories/{id}/edit', [AdminCategoryController::class, 'edit'])->name('admin.categories.edit');
+    Route::put('/categories/{id}', [AdminCategoryController::class, 'update'])->name('admin.categories.update');
+    Route::delete('/categories/{id}', [AdminCategoryController::class, 'destroy'])->name('admin.categories.destroy');
 });
 
 // ===== ROUTE ADMIN (Proteksi is_admin) UNTUK MITRA/AGEN & USER MANAGEMENT =====

@@ -17,6 +17,6 @@ class DestinationCategory extends Model
    
     public function destinations()
     {
-        return $this->hasMany(Destination::class);
+        return $this->hasMany(Destination::class, 'category_id', 'id');
     }
 }
