@@ -62,21 +62,21 @@
             {{-- Header --}}
             <div class="d-flex justify-content-between align-items-center mb-4">
 
-                <div class="d-flex align-items-center gap-3">
-                    {{-- Tombol Back --}}
-                    <a href="{{ route('admin.beranda') }}" class="btn btn-outline-secondary">
-                        <i class="fas fa-arrow-left me-1"></i> Kembali
+            <h4 class="fw-bold mb-0">
+                    <i class="fas fa-tags me-2"></i>Kelola Kategori Destinasi
+                </h4>
+
+                {{-- Tombol Aksi --}}
+                <div class="d-flex gap-2">
+                    <a href="{{ route('admin.categories.create') }}" class="btn btn-primary">
+                        <i class="fas fa-plus me-2"></i> Tambah Kategori
                     </a>
-
-                    <h4 class="fw-bold mb-0">
-                        <i class="fas fa-tags me-2"></i>Kelola Kategori Destinasi
-                    </h4>
+                    <a href="{{ route('admin.beranda') }}" class="btn btn-secondary">
+                        <i class="fas fa-arrow-left me-2"></i> Kembali
+                    </a>
                 </div>
-
-                <a href="{{ route('admin.categories.create') }}" class="btn btn-primary">
-                    <i class="fas fa-plus me-2"></i> Tambah Kategori
-                </a>
             </div>
+
 
             {{-- Grid Kategori --}}
             <div class="row row-cols-1 row-cols-md-3 row-cols-lg-4 g-4">
