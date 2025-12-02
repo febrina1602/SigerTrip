@@ -76,6 +76,13 @@
           {{ isset($isAgent) && $isAgent ? 'Registrasi Mitra SigerTrip' : 'Registrasi' }}
         </h2>
 
+        {{-- Tampilkan pesan sukses dari session --}}
+        @if (session('success'))
+          <div class="alert alert-info">
+            {{ session('success') }}
+          </div>
+        @endif
+
         @if ($errors->any())
           <div class="alert alert-danger">
             <ul class="mb-0 ps-3">

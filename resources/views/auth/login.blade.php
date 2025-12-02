@@ -67,8 +67,8 @@
 
       {{-- Form kanan --}}
       <div class="col-lg-6">
-        <a href="{{ url()->previous() }}" class="kembali d-inline-block mb-2">
-          <i class="fa-solid fa-chevron-left me-1"></i> Kembali
+        <a href="{{ route('beranda.wisatawan') }}" class="kembali d-inline-block mb-2">
+          <i class="fa-solid fa-chevron-left me-1"></i> Kembali ke Beranda
         </a>
         <h2 class="title">Masuk</h2>
 
@@ -77,6 +77,13 @@
             <ul class="mb-0 ps-3">
               @foreach ($errors->all() as $error) <li>{{ $error }}</li> @endforeach
             </ul>
+          </div>
+        @endif
+
+        {{-- Pesan info jika agent sedang menunggu verifikasi --}}
+        @if (session('info'))
+          <div class="alert alert-warning">
+            {{ session('info') }}
           </div>
         @endif
 

@@ -154,9 +154,8 @@ class AuthController extends Controller
             // Cek status user - PENDING (khusus agent)
             if ($user->role === User::ROLE_AGENT && $user->status === 'pending') {
                 Auth::logout();
-                return back()->withErrors([
-                    'email' => 'Akun mitra Anda masih menunggu verifikasi dari admin.',
-                ])->onlyInput('email');
+                return back()->with('info', 'Akun mitra Anda masih menunggu verifikasi dari admin.')
+                    ->withErrors(['email' => 'Silakan tunggu verifikasi akun Anda.']);
             }
 
             // Redirect berdasarkan role
