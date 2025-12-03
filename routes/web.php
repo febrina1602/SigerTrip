@@ -17,13 +17,14 @@ use App\Http\Controllers\AgentDashboardController;
 // Root langsung ke beranda wisatawan
 Route::redirect('/', '/beranda');
 
-// Kalau ada yang akses /register lama, arahkan ke /register/agent
-Route::redirect('/register', '/register/agent')->name('register');
-
 // ==== GUEST (belum login) ====
 Route::middleware('guest')->group(function () {
 
-    // Registrasi mitra / agen SAJA
+    // Registrasi wisatawan (user biasa)
+    Route::get('/register', [AuthController::class, 'showRegistrationForm'])->name('register');
+    Route::post('/register', [AuthController::class, 'register'])->name('register.post');
+
+    // Registrasi mitra / agen
     Route::get('/register/agent', [AuthController::class, 'showAgentRegistrationForm'])->name('register.agent');
     Route::post('/register/agent', [AuthController::class, 'registerAgent'])->name('register.agent.post');
 
@@ -46,6 +47,23 @@ Route::middleware(['auth', 'prevent-back-history'])->group(function () {
 
     // Dashboard untuk agent
     Route::get('/agent/dashboard', [AgentDashboardController::class, 'index'])->name('agent.dashboard');
+
+    // Agent: Pasar Digital (placeholder for now)
+    Route::get('/agent/pasar-digital', function () {
+        return view('agent.pasar-digital');
+    })->name('agent.pasar-digital.index');
+
+    // Agent actions: create local tour agent (AJAX/modal)
+    Route::post('/agent/local-tour-agents', [AgentDashboardController::class, 'storeLocalTourAgent'])
+        ->name('agent.local_tour_agents.store');
+
+    // Agent manage tour package (delete)
+    Route::post('/agent/tour-packages/{tourPackage}/delete', [AgentDashboardController::class, 'deleteTourPackage'])
+        ->name('agent.tour_packages.delete');
+
+    // Agent update tour package via modal (AJAX)
+    Route::post('/agent/tour-packages/{tourPackage}/update', [AgentDashboardController::class, 'updateTourPackage'])
+        ->name('agent.tour_packages.update');
 
     // Logout
     Route::post('/logout', [AuthController::class, 'logout'])->name('logout');

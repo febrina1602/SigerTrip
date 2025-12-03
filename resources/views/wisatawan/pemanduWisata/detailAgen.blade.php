@@ -4,11 +4,18 @@
 
 @section('content')
 <div class="bg-white">
+            @if(auth()->check() && auth()->user()->role == 'agent')
+                @include('agent._header')
+            @else
     {{-- HEADER --}}
     <header>
-        <div class="container py-2 d-flex align-items-center justify-content-between">
-            
-            <a href="{{ route('beranda.wisatawan') }}" class="d-flex align-items-center text-decoration-none" style="min-width: 150px;">
+            <div class="container py-2 d-flex align-items-center justify-content-between">
+                @php
+                    $homeRoute = auth()->check() && auth()->user()->role == 'agent' ? route('agent.dashboard') : route('beranda.wisatawan');
+                    $marketRoute = auth()->check() && auth()->user()->role == 'agent' ? route('agent.pasar-digital.index') : route('pasar-digital.index');
+                @endphp
+
+                <a href="{{ $homeRoute }}" class="d-flex align-items-center text-decoration-none" style="min-width: 150px;">
                 <img src="{{ asset('images/logo.png') }}" alt="SigerTrip Logo"
                     style="height:42px" loading="lazy" onerror="this.style.display='none'">
                 <span class="ms-2 fw-bold text-dark d-none d-md-block">SigerTrip</span>
@@ -65,11 +72,11 @@
     <nav class="nav-custom border-top bg-white">
         <div class="container py-0">
             <div class="d-flex gap-4 justify-content-left">
-                <a href="{{ route('beranda.wisatawan') }}"
-                   class="nav-link-custom {{ request()->routeIs('beranda.wisatawan') ? 'active' : '' }}">
+                <a href="{{ $homeRoute }}"
+                   class="nav-link-custom {{ (auth()->check() && auth()->user()->role == 'agent') ? (request()->routeIs('agent.dashboard') ? 'active' : '') : (request()->routeIs('beranda.*') ? 'active' : '') }}">
                     Beranda
                 </a>
-                <a href="{{ route('pasar-digital.index') }}" class="nav-link-custom {{ request()->routeIs('pasar-digital.*') ? 'active' : '' }}">
+                <a href="{{ $marketRoute }}" class="nav-link-custom {{ (auth()->check() && auth()->user()->role == 'agent') ? (request()->routeIs('agent.pasar-digital.*') ? 'active' : '') : (request()->routeIs('pasar-digital.*') ? 'active' : '') }}">
                     Pasar Digital
                 </a>
                 <a href="{{ route('pemandu-wisata.index') }}" class="nav-link-custom {{ request()->routeIs('pemandu-wisata.*')}} ">
@@ -78,6 +85,7 @@
             </div>
         </div>
     </nav>
+    @endif
 
         @php
             $heroImage = $agent->banner_image_url ?? ($tourPackages->first()->cover_image_url ?? null);
@@ -146,11 +154,19 @@
                     </div>
                     
                     <div class="flex-shrink-0">
-                        <a href="{{ route('pemandu-wisata.packages', $agent->id) }}"
-                        class="btn btn-lg fw-semibold shadow-sm px-5 py-3 text-dark"
-                        style="background: linear-gradient(to right, #FFE75D, #D19878);">
-                            Pilih Paket Perjalanan Anda
-                        </a>
+                        @if(auth()->check() && auth()->user()->role === 'agent' && isset(auth()->user()->agent) && auth()->user()->agent->id === $agent->id)
+                            <a href="{{ route('pemandu-wisata.packages', $agent->id) }}"
+                               class="btn btn-lg fw-semibold shadow-sm px-5 py-3 text-dark"
+                               style="background: linear-gradient(to right, #FFE75D, #D19878);">
+                                Kelola Paket Perjalanan
+                            </a>
+                        @else
+                            <a href="{{ route('pemandu-wisata.packages', $agent->id) }}"
+                            class="btn btn-lg fw-semibold shadow-sm px-5 py-3 text-dark"
+                            style="background: linear-gradient(to right, #FFE75D, #D19878);">
+                                Pilih Paket Perjalanan Anda
+                            </a>
+                        @endif
                     </div>
                 </div>
 

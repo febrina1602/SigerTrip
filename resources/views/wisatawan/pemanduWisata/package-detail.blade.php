@@ -4,11 +4,18 @@
 
 @section('content')
 <div class="bg-white min-vh-100">
+            @if(auth()->check() && auth()->user()->role == 'agent')
+                @include('agent._header')
+            @else
     {{-- HEADER --}}
     <header>
-        <div class="container py-2 d-flex align-items-center justify-content-between">
-            
-            <a href="{{ route('beranda.wisatawan') }}" class="d-flex align-items-center text-decoration-none" style="min-width: 150px;">
+            <div class="container py-2 d-flex align-items-center justify-content-between">
+                @php
+                    $homeRoute = auth()->check() && auth()->user()->role == 'agent' ? route('agent.dashboard') : route('beranda.wisatawan');
+                    $marketRoute = auth()->check() && auth()->user()->role == 'agent' ? route('agent.pasar-digital.index') : route('pasar-digital.index');
+                @endphp
+
+                <a href="{{ $homeRoute }}" class="d-flex align-items-center text-decoration-none" style="min-width: 150px;">
                 <img src="{{ asset('images/logo.png') }}" alt="SigerTrip Logo"
                     style="height:42px" loading="lazy" onerror="this.style.display='none'">
                 <span class="ms-2 fw-bold text-dark d-none d-md-block">SigerTrip</span>
@@ -66,11 +73,11 @@
     <nav class="nav-custom border-top bg-white">
         <div class="container py-0">
             <div class="d-flex gap-4 justify-content-left">
-                <a href="{{ route('beranda.wisatawan') }}"
-                   class="nav-link-custom {{ request()->routeIs('beranda.wisatawan') ? 'active' : '' }}">
+                <a href="{{ $homeRoute }}"
+                   class="nav-link-custom {{ (auth()->check() && auth()->user()->role == 'agent') ? (request()->routeIs('agent.dashboard') ? 'active' : '') : (request()->routeIs('beranda.*') ? 'active' : '') }}">
                     Beranda
                 </a>
-                <a href="{{ route('pasar-digital.index') }}" class="nav-link-custom {{ request()->routeIs('pasar-digital.*') ? 'active' : '' }}">
+                <a href="{{ $marketRoute }}" class="nav-link-custom {{ (auth()->check() && auth()->user()->role == 'agent') ? (request()->routeIs('agent.pasar-digital.*') ? 'active' : '') : (request()->routeIs('pasar-digital.*') ? 'active' : '') }}">
                     Pasar Digital
                 </a>
                 <a href="{{ route('pemandu-wisata.index') }}" class="nav-link-custom {{ request()->routeIs('pemandu-wisata.*')}} ">
@@ -79,6 +86,7 @@
             </div>
         </div>
     </nav>
+    @endif
 
     <div class="bg-light py-3 border-bottom">
         <div class="container">
@@ -114,9 +122,19 @@
                 @php
                     $destinasiDikunjungi = $tourPackage->destinations();
                 @endphp
+                @if(isset($isOwner) && $isOwner)
+                    <div class="mb-3 text-end">
+                        <button class="btn btn-sm btn-outline-secondary" data-bs-toggle="modal" data-bs-target="#editPackageModal">
+                            <i class="fas fa-pen"></i> Edit Paket
+                        </button>
+                    </div>
+                @endif
                 @if($destinasiDikunjungi->isNotEmpty())
                 <div class="mb-4">
                     <h5 class="fw-bold mb-3">Destinasi yang Dikunjungi:</h5>
+                    @if(isset($isOwner) && $isOwner)
+                        <a href="#" class="ms-2 small text-primary"> <i class="fas fa-pen"></i> Edit</a>
+                    @endif
                     <div class="row row-cols-2 g-3">
                         @foreach($destinasiDikunjungi as $dest)
                         <div class="col">
@@ -136,6 +154,9 @@
                 @if(!empty($fasilitas))
                 <div class="mb-4">
                     <h5 class="fw-bold mb-3">Fasilitas:</h5>
+                    @if(isset($isOwner) && $isOwner)
+                        <a href="#" class="ms-2 small text-primary"> <i class="fas fa-pen"></i> Edit</a>
+                    @endif
                     <div class="row row-cols-2 g-3">
                         @foreach($fasilitas as $item)
                         <div class="col">
@@ -152,6 +173,9 @@
                 @if($tourPackage->description)
                 <div class="mt-5">
                     <h5 class="fw-bold mb-3">Deskripsi Paket</h5>
+                    @if(isset($isOwner) && $isOwner)
+                        <a href="#" class="ms-2 small text-primary"> <i class="fas fa-pen"></i> Edit</a>
+                    @endif
                     <p class="text-secondary" style="line-height: 1.7;">
                         {!! nl2br(e($tourPackage->description)) !!}
                     </p>
@@ -211,5 +235,74 @@
 
         </div>
     </div>
+    
+    @if(isset($isOwner) && $isOwner)
+        <!-- Edit Package Modal -->
+        <div class="modal fade" id="editPackageModal" tabindex="-1">
+            <div class="modal-dialog modal-lg">
+                <div class="modal-content border-0 rounded-4">
+                    <div class="modal-header border-0 pb-0">
+                        <h5 class="modal-title fw-bold">Edit Paket: {{ $tourPackage->name }}</h5>
+                        <button type="button" class="btn-close" data-bs-dismiss="modal"></button>
+                    </div>
+                    <form id="editPackageForm">
+                        <div class="modal-body">
+                            <div id="editPackageAlert" class="alert d-none"></div>
+                            <div class="mb-3">
+                                <label class="form-label">Harga per orang</label>
+                                <input type="number" step="0.01" name="price_per_person" class="form-control" value="{{ $tourPackage->price_per_person }}">
+                            </div>
+                            <div class="mb-3">
+                                <label class="form-label">Durasi</label>
+                                <input type="text" name="duration" class="form-control" value="{{ $tourPackage->duration }}">
+                            </div>
+                            <div class="mb-3">
+                                <label class="form-label">Fasilitas (koma dipisah)</label>
+                                <input type="text" name="facilities" class="form-control" value="{{ is_array($tourPackage->facilities) ? implode(',', $tourPackage->facilities) : $tourPackage->facilities }}">
+                            </div>
+                            <div class="mb-3">
+                                <label class="form-label">Deskripsi</label>
+                                <textarea name="description" class="form-control" rows="6">{{ $tourPackage->description }}</textarea>
+                            </div>
+                        </div>
+                        <div class="modal-footer border-0 pt-0">
+                            <button type="button" class="btn btn-secondary rounded-3" data-bs-dismiss="modal">Tutup</button>
+                            <button type="submit" class="btn btn-primary rounded-3">Simpan</button>
+                        </div>
+                    </form>
+                </div>
+            </div>
+        </div>
+
+        <script>
+            document.addEventListener('DOMContentLoaded', function () {
+                const form = document.getElementById('editPackageForm');
+                const alertBox = document.getElementById('editPackageAlert');
+                form.addEventListener('submit', async function (e) {
+                    e.preventDefault();
+                    alertBox.classList.add('d-none');
+
+                    const data = new FormData(form);
+                    try {
+                        const res = await fetch("{{ route('agent.tour_packages.update', $tourPackage->id) }}", {
+                            method: 'POST',
+                            headers: {
+                                'X-CSRF-TOKEN': document.querySelector('meta[name=csrf-token]').getAttribute('content'),
+                                'Accept': 'application/json'
+                            },
+                            body: data
+                        });
+                        const json = await res.json();
+                        if (!res.ok) throw json;
+                        location.reload();
+                    } catch (err) {
+                        alertBox.classList.remove('d-none');
+                        alertBox.classList.add('alert-danger');
+                        alertBox.innerText = (err && err.message) ? err.message : 'Gagal menyimpan perubahan.';
+                    }
+                });
+            });
+        </script>
+    @endif
 </div>
 @endsection
