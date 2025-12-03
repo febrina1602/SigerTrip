@@ -3,7 +3,7 @@
 @section('title', 'Pasar Digital - Agent')
 
 @section('content')
-@include('agent._header')
+@include('components.layout.header')
 
 <div class="container my-5">
     <div class="text-center py-5">

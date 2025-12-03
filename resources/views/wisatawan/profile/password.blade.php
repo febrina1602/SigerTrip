@@ -4,10 +4,7 @@
 
 @section('content')
 <div class="bg-white">
-    {{-- HEADER --}}
-    <header>
-        <div class="container py-2 d-flex align-items-center justify-content-between">
-            
+    @include('components.layout.header')
             <a href="{{ route('beranda.wisatawan') }}" class="d-flex align-items-center text-decoration-none" style="min-width: 150px;">
                 <img src="{{ asset('images/logo.png') }}" alt="SigerTrip Logo"
                     style="height:42px" loading="lazy" onerror="this.style.display='none'">
@@ -60,8 +57,6 @@
                 @endauth
             </div>
         </div>
-    </header>
-
     {{-- NAV --}}
     <nav class="nav-custom border-top bg-white">
         <div class="container py-0">

@@ -3,17 +3,7 @@
 @section('title', 'SigerTrip | Jelajahi Pesona Lampung')
 
 @section('content')
-    <!-- HEADER -->
-    <header>
-        <div class="d-flex align-items-center">
-            <img src="{{ asset('images/logo.png') }}" alt="SigerTrip Logo">
-        </div>
-        <div>
-            {{-- Tombol auth --}}
-            <a href="{{ route('login') }}" class="btn-custom me-2">Masuk</a>
-            <a href="{{ route('register') }}" class="btn-custom">Daftar</a>
-        </div>
-    </header>
+    @include('components.layout.header')
 
     <!-- HERO -->
     <section>

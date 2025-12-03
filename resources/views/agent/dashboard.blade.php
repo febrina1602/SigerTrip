@@ -5,7 +5,7 @@
 @section('content')
 <div class="min-vh-100 bg-light">
     
-    @include('agent._header')
+    @include('components.layout.header')
 
     {{-- MAIN CONTENT --}}
     <div class="container mt-4 mb-5">
