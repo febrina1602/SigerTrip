@@ -12,18 +12,20 @@ use App\Http\Controllers\PasarDigitalController;
 use App\Http\Controllers\PemanduWisataController;
 use App\Http\Controllers\ProfileController;
 use App\Http\Controllers\AgentDashboardController;
+use App\Http\Controllers\AgentPasarDigitalController;
+
 
 // ==== HALAMAN UTAMA ====
-// Root langsung ke beranda wisatawan
 Route::redirect('/', '/beranda');
 
-// Kalau ada yang akses /register lama, arahkan ke /register/agent
+// Redirect lama
 Route::redirect('/register', '/register/agent')->name('register');
 
-// ==== GUEST (belum login) ====
+
+// ==== GUEST (BELUM LOGIN) ====
 Route::middleware('guest')->group(function () {
 
-    // Registrasi mitra / agen SAJA
+    // Registrasi agent
     Route::get('/register/agent', [AuthController::class, 'showAgentRegistrationForm'])->name('register.agent');
     Route::post('/register/agent', [AuthController::class, 'registerAgent'])->name('register.agent.post');
 
@@ -31,21 +33,16 @@ Route::middleware('guest')->group(function () {
     Route::get('/login', [AuthController::class, 'showLoginForm'])->name('login');
     Route::post('/login', [AuthController::class, 'login'])->name('login.post');
 
-    // Login khusus agent/admin
+    // Login khusus agent
     Route::get('/agent/login', [AuthController::class, 'showAgentLoginForm'])->name('agent.login');
-    // Kalau pakai login agent khusus, tambahkan method agentLogin di AuthController
-    // Route::post('/agent/login', [AuthController::class, 'agentLogin'])->name('agent.login.post');
 });
 
-// ==== AUTH (SUDAH LOGIN) ====
-// Proteksi halaman setelah login + cegah halaman tersimpan di browser cache
+
+// ==== AUTH (SETELAH LOGIN, GLOBAL) ====
 Route::middleware(['auth', 'prevent-back-history'])->group(function () {
 
-    // Dashboard wisatawan (umum)
+    // Dashboard wisatawan (default)
     Route::get('/dashboard', [BerandaController::class, 'wisatawan'])->name('dashboard');
-
-    // Dashboard untuk agent
-    Route::get('/agent/dashboard', [AgentDashboardController::class, 'index'])->name('agent.dashboard');
 
     // Logout
     Route::post('/logout', [AuthController::class, 'logout'])->name('logout');
@@ -56,10 +53,32 @@ Route::middleware(['auth', 'prevent-back-history'])->group(function () {
     Route::get('/profile/password', [ProfileController::class, 'showPasswordForm'])->name('profile.password.show');
 });
 
+
+// ==== ROUTE AGENT (KHUSUS AGENT, WAJIB LOGIN + MIDDLEWARE agent) ====
+Route::prefix('agent')
+    ->middleware(['auth', 'agent', 'prevent-back-history'])
+    ->group(function () {
+
+    // Dashboard agent
+    Route::get('/dashboard', [AgentDashboardController::class, 'index'])->name('agent.dashboard');
+
+    // PASAR DIGITAL (CRUD)
+    Route::get('/pasar-digital', [AgentPasarDigitalController::class, 'index'])->name('agent.pasar.index');
+    Route::get('/pasar-digital/create', [AgentPasarDigitalController::class, 'create'])->name('agent.pasar.create');
+    Route::post('/pasar-digital', [AgentPasarDigitalController::class, 'store'])->name('agent.pasar.store');
+    Route::get('/pasar-digital/{vehicle}/edit', [AgentPasarDigitalController::class, 'edit'])->name('agent.pasar.edit');
+    Route::put('/pasar-digital/{vehicle}', [AgentPasarDigitalController::class, 'update'])->name('agent.pasar.update');
+    Route::delete('/pasar-digital/{vehicle}', [AgentPasarDigitalController::class, 'destroy'])->name('agent.pasar.destroy');
+
+});
+
+
 // ==== ROUTE WISATAWAN / UMUM ====
 
-// Beranda & destinasi
+// Beranda
 Route::get('/beranda', [BerandaController::class, 'wisatawan'])->name('beranda.wisatawan');
+
+// Destinasi
 Route::get('/category/{id}', [DestinationController::class, 'byCategory'])->name('destinations.category');
 Route::get('/destination/{id}', [DestinationController::class, 'show'])->name('destinations.detail');
 
@@ -67,38 +86,36 @@ Route::get('/destination/{id}', [DestinationController::class, 'show'])->name('d
 Route::get('/pemandu-wisata', [PemanduWisataController::class, 'index'])->name('pemandu-wisata.index');
 Route::get('/pemandu-wisata/{agent}', [PemanduWisataController::class, 'show'])->name('pemandu-wisata.show');
 Route::get('/pemandu-wisata/{agent}/paket', [PemanduWisataController::class, 'packages'])->name('pemandu-wisata.packages');
-Route::get(
-    '/pemandu-wisata/{agent}/paket/{tourPackage}',
-    [PemanduWisataController::class, 'packageDetail']
-)->name('pemandu-wisata.package-detail');
+Route::get('/pemandu-wisata/{agent}/paket/{tourPackage}', [PemanduWisataController::class, 'packageDetail'])->name('pemandu-wisata.package-detail');
 
-// Pasar digital
+// Pasar digital (umum)
 Route::get('/pasar-digital', [PasarDigitalController::class, 'index'])->name('pasar-digital.index');
 Route::get('/pasar-digital/{vehicle}', [PasarDigitalController::class, 'show'])->name('pasar-digital.detail');
 
 
 // ==== ROUTE ADMIN (WAJIB LOGIN + ADMIN) ====
-// Semua route admin pakai auth + is_admin + prevent-back-history
-Route::prefix('admin')->middleware(['auth', 'is_admin', 'prevent-back-history'])->group(function () {
+Route::prefix('admin')
+    ->middleware(['auth', 'is_admin', 'prevent-back-history'])
+    ->group(function () {
 
-    // Beranda admin
+    // Dashboard admin
     Route::get('/beranda', [AdminDestinationController::class, 'index'])->name('admin.beranda');
 
-    // Admin data pemandu / pasar / akun
+    // Pemandu / pasar / akun
     Route::get('/pemandu', [AdminController::class, 'pemandu'])->name('admin.pemandu');
     Route::get('/akun', [AdminController::class, 'akun'])->name('admin.akun');
     Route::post('/akun/{id}/verifikasi', [AdminController::class, 'verifikasi'])->name('admin.verifikasi');
 
     Route::get('/pasar', [AdminController::class, 'pasar'])->name('admin.pasar');
 
-    // ===== ROUTE ADMIN DESTINATION =====
+    // DESTINASI
     Route::get('/wisata/create', [AdminDestinationController::class, 'create'])->name('admin.wisata.create');
     Route::post('/wisata/store', [AdminDestinationController::class, 'store'])->name('admin.wisata.store');
     Route::get('/wisata/{id}/edit', [AdminDestinationController::class, 'edit'])->name('admin.wisata.edit');
     Route::put('/wisata/{id}', [AdminDestinationController::class, 'update'])->name('admin.wisata.update');
     Route::delete('/wisata/{id}', [AdminDestinationController::class, 'destroy'])->name('admin.wisata.destroy');
 
-    // ===== ROUTE ADMIN CATEGORY MANAGEMENT =====
+    // CATEGORY
     Route::get('/categories', [AdminCategoryController::class, 'index'])->name('admin.categories.index');
     Route::get('/categories/create', [AdminCategoryController::class, 'create'])->name('admin.categories.create');
     Route::post('/categories/store', [AdminCategoryController::class, 'store'])->name('admin.categories.store');
@@ -107,14 +124,11 @@ Route::prefix('admin')->middleware(['auth', 'is_admin', 'prevent-back-history'])
     Route::put('/categories/{id}', [AdminCategoryController::class, 'update'])->name('admin.categories.update');
     Route::delete('/categories/{id}', [AdminCategoryController::class, 'destroy'])->name('admin.categories.destroy');
 
-    // ===== ROUTE ADMIN MITRA/AGENT & USER MANAGEMENT =====
-
-    // Daftar pengajuan mitra/agen yang pending verifikasi
+    // AGENT VERIFIKASI
     Route::get('/agents', [AdminController::class, 'pendingAgents'])->name('admin.agents.pending');
-    // Verifikasi satu agen
     Route::post('/agents/{agent}/verifikasi', [AdminController::class, 'verifikasiAgen'])->name('admin.agents.verifikasi');
 
-    // User management
+    // USER MANAGEMENT
     Route::get('/users', [AdminUserController::class, 'index'])->name('admin.users.index');
     Route::get('/users/create', [AdminUserController::class, 'create'])->name('admin.users.create');
     Route::post('/users/store', [AdminUserController::class, 'store'])->name('admin.users.store');
@@ -124,4 +138,5 @@ Route::prefix('admin')->middleware(['auth', 'is_admin', 'prevent-back-history'])
     Route::post('/users/{id}/verify', [AdminUserController::class, 'verify'])->name('admin.users.verify');
     Route::post('/users/{id}/reject', [AdminUserController::class, 'reject'])->name('admin.users.reject');
     Route::post('/users/{id}/toggle-status', [AdminUserController::class, 'toggleStatus'])->name('admin.users.toggleStatus');
+
 });
