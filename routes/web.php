@@ -57,6 +57,10 @@ Route::middleware(['auth', 'prevent-back-history'])->group(function () {
     Route::post('/agent/local-tour-agents', [AgentDashboardController::class, 'storeLocalTourAgent'])
         ->name('agent.local_tour_agents.store');
 
+    // Agent: delete local tour agent
+    Route::delete('/agent/local-tour-agents/{localTourAgent}', [AgentDashboardController::class, 'deleteLocalTourAgent'])
+        ->name('agent.local_tour_agents.delete');
+
     // Agent manage tour package (delete)
     Route::post('/agent/tour-packages/{tourPackage}/delete', [AgentDashboardController::class, 'deleteTourPackage'])
         ->name('agent.tour_packages.delete');
@@ -81,12 +85,12 @@ Route::get('/beranda', [BerandaController::class, 'wisatawan'])->name('beranda.w
 Route::get('/category/{id}', [DestinationController::class, 'byCategory'])->name('destinations.category');
 Route::get('/destination/{id}', [DestinationController::class, 'show'])->name('destinations.detail');
 
-// Pemandu wisata
+// Pemandu wisata (catalog LocalTourAgent)
 Route::get('/pemandu-wisata', [PemanduWisataController::class, 'index'])->name('pemandu-wisata.index');
-Route::get('/pemandu-wisata/{agent}', [PemanduWisataController::class, 'show'])->name('pemandu-wisata.show');
-Route::get('/pemandu-wisata/{agent}/paket', [PemanduWisataController::class, 'packages'])->name('pemandu-wisata.packages');
+Route::get('/pemandu-wisata/{localTourAgent}', [PemanduWisataController::class, 'show'])->name('pemandu-wisata.show');
+Route::get('/pemandu-wisata/{localTourAgent}/paket', [PemanduWisataController::class, 'packages'])->name('pemandu-wisata.packages');
 Route::get(
-    '/pemandu-wisata/{agent}/paket/{tourPackage}',
+    '/pemandu-wisata/{localTourAgent}/paket/{tourPackage}',
     [PemanduWisataController::class, 'packageDetail']
 )->name('pemandu-wisata.package-detail');
 

@@ -118,6 +118,26 @@ class AgentDashboardController extends Controller
     }
 
     /**
+     * Delete a local tour agent (agent owner only)
+     */
+    public function deleteLocalTourAgent(\Illuminate\Http\Request $request, \App\Models\LocalTourAgent $localTourAgent)
+    {
+        $user = auth()->user();
+        if (!$user || $user->role !== \App\Models\User::ROLE_AGENT) {
+            return redirect()->back()->with('error', 'Unauthorized');
+        }
+
+        // Check ownership
+        $agent = Agent::where('user_id', $user->id)->first();
+        if (!$agent || $localTourAgent->agent_id !== $agent->id) {
+            return redirect()->back()->with('error', 'Anda tidak berwenang menghapus agen tour ini.');
+        }
+
+        $localTourAgent->delete();
+        return redirect()->back()->with('success', 'Agen tour lokal berhasil dihapus.');
+    }
+
+    /**
      * Delete a tour package (agent owner only)
      */
     public function deleteTourPackage(\Illuminate\Http\Request $request, \App\Models\TourPackage $tourPackage)

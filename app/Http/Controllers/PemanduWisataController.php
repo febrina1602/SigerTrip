@@ -10,21 +10,23 @@ use Illuminate\Http\Request;
 class PemanduWisataController extends Controller
 {
     /**
-     * Menampilkan semua agen yang terverifikasi
+     * Main catalog: tampilkan semua LocalTourAgent
+     * - Jika agent login: tampilkan LocalTourAgent milik agent itu (untuk manage)
+     * - Jika user/guest: tampilkan LocalTourAgent dari verified agents (katalog)
      */
     public function index(Request $request)
     {
         $keyword = $request->get('q');
 
-        // Jika user agent yang login, tampilkan LocalTourAgent milik agent tersebut
+        // AGENT: lihat LocalTourAgent milik mereka (manage mode)
         if (auth()->check() && auth()->user()->role === \App\Models\User::ROLE_AGENT) {
             $userAgent = Agent::where('user_id', auth()->id())->first();
             if ($userAgent) {
-                $localQuery = LocalTourAgent::where('agent_id', $userAgent->id);
+                $query = LocalTourAgent::where('agent_id', $userAgent->id);
                 if ($keyword) {
-                    $localQuery->where('name', 'like', '%' . $keyword . '%');
+                    $query->where('name', 'like', '%' . $keyword . '%');
                 }
-                $localTourAgents = $localQuery->orderBy('created_at', 'desc')->get();
+                $localTourAgents = $query->with('tourPackages')->orderBy('created_at', 'desc')->get();
             } else {
                 $localTourAgents = collect();
             }
@@ -32,48 +34,62 @@ class PemanduWisataController extends Controller
             return view('wisatawan.pemanduWisata.index', compact('localTourAgents', 'keyword'));
         }
 
-        $query = Agent::where('is_verified', true);
+        // USER/GUEST: lihat catalog semua LocalTourAgent dari verified agents
+        $query = LocalTourAgent::whereHas('agent', function($q) {
+            $q->where('is_verified', true);
+        });
 
         if ($keyword) {
             $query->where(function($q) use ($keyword) {
                 $q->where('name', 'like', '%' . $keyword . '%')
-                  ->orWhere('address', 'like', '%' . $keyword . '%');
+                  ->orWhere('description', 'like', '%' . $keyword . '%');
             });
         }
 
-        $agents = $query->orderBy('created_at', 'desc')->get();
-
-        return view('wisatawan.pemanduWisata.index', compact('agents', 'keyword'));
-    }
-
-    /**
-     * Menampilkan detail satu agen
-     */
-    public function show(Agent $agent)
-    {
-        if (!$agent->is_verified) {
-            abort(404, 'Agen tour tidak ditemukan.');
-        }
-
-        $tourPackages = $agent->tourPackages()
+        $localTourAgents = $query->with(['agent', 'tourPackages'])
             ->orderBy('created_at', 'desc')
             ->get();
 
-        return view('wisatawan.pemanduWisata.detailAgen', compact('agent', 'tourPackages'));
+        // Untuk compatibility (jika ada logic yang butuh $agents)
+        $agents = null;
+
+        return view('wisatawan.pemanduWisata.index', compact('localTourAgents', 'agents', 'keyword'));
     }
 
     /**
-     * Menampilkan semua paket dari satu agen
+     * Menampilkan detail satu LocalTourAgent + paket-paketnya
      */
-    public function packages(Agent $agent)
+    public function show(LocalTourAgent $localTourAgent)
     {
-        if (!$agent->is_verified) {
+        // Pastikan agen verified jika di-browse user
+        if (!auth()->check() || auth()->user()->role !== \App\Models\User::ROLE_AGENT) {
+            // User/guest browsing - hanya lihat agen dari agent yang verified
+            if (!$localTourAgent->agent || !$localTourAgent->agent->is_verified) {
+                abort(404, 'Agen tour tidak ditemukan.');
+            }
+        } else {
+            // Agent yang login - hanya lihat agen mereka sendiri (atau allow browse semua?)
+            // Untuk sekarang, allow agent browse semua untuk preview
+        }
+
+        $tourPackages = $localTourAgent->tourPackages()->orderBy('created_at', 'desc')->get();
+        $agent = $localTourAgent->agent;
+
+        return view('wisatawan.pemanduWisata.detailAgen', compact('localTourAgent', 'agent', 'tourPackages'));
+    }
+
+    /**
+     * Menampilkan semua paket dari satu LocalTourAgent
+     */
+    public function packages(LocalTourAgent $localTourAgent)
+    {
+        // Pastikan agen verified
+        if (!$localTourAgent->agent || !$localTourAgent->agent->is_verified) {
             abort(404, 'Agen tour tidak ditemukan.');
         }
-        
-        $tourPackages = $agent->tourPackages()
-            ->orderBy('created_at', 'desc')
-            ->get();
+
+        $tourPackages = $localTourAgent->tourPackages()->orderBy('created_at', 'desc')->get();
+        $agent = $localTourAgent->agent;
 
         $isOwner = false;
         if (auth()->check() && auth()->user()->role === \App\Models\User::ROLE_AGENT) {
@@ -81,21 +97,25 @@ class PemanduWisataController extends Controller
             $isOwner = $userAgent && $userAgent->id === $agent->id;
         }
 
-        return view('wisatawan.pemanduWisata.packages', compact('agent', 'tourPackages', 'isOwner'));
+        return view('wisatawan.pemanduWisata.packages', compact('localTourAgent', 'agent', 'tourPackages', 'isOwner'));
     }
 
     /**
-     * Menampilkan detail satu paket perjalanan
+     * Menampilkan detail satu paket perjalanan dari LocalTourAgent
      */
-    public function packageDetail(Agent $agent, TourPackage $tourPackage)
+    public function packageDetail(LocalTourAgent $localTourAgent, TourPackage $tourPackage)
     {
-        if ($tourPackage->agent_id !== $agent->id) {
+        // Cek paket milik LocalTourAgent
+        if ($tourPackage->local_tour_agent_id !== $localTourAgent->id) {
             abort(404, 'Paket perjalanan tidak ditemukan.');
         }
 
-        if (!$agent->is_verified) {
+        // Pastikan agen verified
+        if (!$localTourAgent->agent || !$localTourAgent->agent->is_verified) {
             abort(404, 'Agen tour tidak ditemukan.');
         }
+
+        $agent = $localTourAgent->agent;
 
         $isOwner = false;
         if (auth()->check() && auth()->user()->role === \App\Models\User::ROLE_AGENT) {
@@ -103,6 +123,6 @@ class PemanduWisataController extends Controller
             $isOwner = $userAgent && $userAgent->id === $agent->id;
         }
 
-        return view('wisatawan.pemanduWisata.package-detail', compact('agent', 'tourPackage', 'isOwner'));
+        return view('wisatawan.pemanduWisata.package-detail', compact('localTourAgent', 'agent', 'tourPackage', 'isOwner'));
     }
 }
