@@ -89,4 +89,99 @@ class AgentDashboardController extends Controller
             'user'
         ));
     }
+
+    /**
+     * Store a new LocalTourAgent (called from modal via AJAX)
+     */
+    public function storeLocalTourAgent(Request $request)
+    {
+        $user = auth()->user();
+        if (!$user || $user->role !== \App\Models\User::ROLE_AGENT) {
+            return response()->json(['error' => 'Unauthorized'], 403);
+        }
+
+        $agent = Agent::where('user_id', $user->id)->first();
+        if (!$agent) {
+            return response()->json(['error' => 'Agent profile not found'], 404);
+        }
+
+        $validated = $request->validate([
+            'name' => 'required|string|max:255',
+            'description' => 'nullable|string',
+            'address' => 'nullable|string',
+            'contact_phone' => 'nullable|string',
+        ]);
+
+        $local = LocalTourAgent::create(array_merge($validated, ['agent_id' => $agent->id]));
+
+        return response()->json(['success' => true, 'local' => $local]);
+    }
+
+    /**
+     * Delete a local tour agent (agent owner only)
+     */
+    public function deleteLocalTourAgent(\Illuminate\Http\Request $request, \App\Models\LocalTourAgent $localTourAgent)
+    {
+        $user = auth()->user();
+        if (!$user || $user->role !== \App\Models\User::ROLE_AGENT) {
+            return redirect()->back()->with('error', 'Unauthorized');
+        }
+
+        // Check ownership
+        $agent = Agent::where('user_id', $user->id)->first();
+        if (!$agent || $localTourAgent->agent_id !== $agent->id) {
+            return redirect()->back()->with('error', 'Anda tidak berwenang menghapus agen tour ini.');
+        }
+
+        $localTourAgent->delete();
+        return redirect()->back()->with('success', 'Agen tour lokal berhasil dihapus.');
+    }
+
+    /**
+     * Delete a tour package (agent owner only)
+     */
+    public function deleteTourPackage(\Illuminate\Http\Request $request, \App\Models\TourPackage $tourPackage)
+    {
+        $user = auth()->user();
+        if (!$user || $user->role !== \App\Models\User::ROLE_AGENT) {
+            return redirect()->back()->with('error', 'Unauthorized');
+        }
+
+        // Check ownership: tourPackage.agent_id must match agent record for this user
+        $agent = Agent::where('user_id', $user->id)->first();
+        if (!$agent || $tourPackage->agent_id !== $agent->id) {
+            return redirect()->back()->with('error', 'Anda tidak berwenang menghapus paket ini.');
+        }
+
+        $tourPackage->delete();
+        return redirect()->back()->with('success', 'Paket perjalanan berhasil dihapus.');
+    }
+
+    /**
+     * Update a tour package (agent owner only) via AJAX
+     */
+    public function updateTourPackage(\Illuminate\Http\Request $request, \App\Models\TourPackage $tourPackage)
+    {
+        $user = auth()->user();
+        if (!$user || $user->role !== \App\Models\User::ROLE_AGENT) {
+            return response()->json(['error' => 'Unauthorized'], 403);
+        }
+
+        $agent = Agent::where('user_id', $user->id)->first();
+        if (!$agent || $tourPackage->agent_id !== $agent->id) {
+            return response()->json(['error' => 'Not owner'], 403);
+        }
+
+        $validated = $request->validate([
+            'description' => 'nullable|string',
+            'facilities' => 'nullable|string',
+            'price_per_person' => 'nullable|numeric',
+            'duration' => 'nullable|string',
+        ]);
+
+        $tourPackage->fill($validated);
+        $tourPackage->save();
+
+        return response()->json(['success' => true]);
+    }
 }

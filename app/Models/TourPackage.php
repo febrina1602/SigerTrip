@@ -103,5 +103,23 @@ class TourPackage extends Model
             $q->where('agent_type', $agentType);
         });
     }
+
+    /**
+     * Ensure `agent_id` is set from `local_tour_agent_id` when saving.
+     * This keeps the redundant `agent_id` column synchronized when packages
+     * are created/updated via a LocalTourAgent.
+     */
+    protected static function booted()
+    {
+        static::saving(function ($model) {
+            if (empty($model->agent_id) && !empty($model->local_tour_agent_id)) {
+                $local = LocalTourAgent::find($model->local_tour_agent_id);
+                if ($local) {
+                    $model->agent_id = $local->agent_id;
+                }
+            }
+        });
+    }
+
 }
 

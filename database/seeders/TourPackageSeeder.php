@@ -23,10 +23,21 @@ class TourPackageSeeder extends Seeder
             return;
         }
 
+        // Get or create a LocalTourAgent for this Agent (required for new structure)
+        $localTourAgent = \App\Models\LocalTourAgent::firstOrCreate(
+            ['agent_id' => $agent->id, 'name' => $agent->name . ' - Local Tour'],
+            [
+                'description' => 'Local tour agent untuk ' . $agent->name,
+                'contact_phone' => $agent->contact_phone ?? '',
+                'is_verified' => true,
+            ]
+        );
+
         TourPackage::updateOrCreate(
             ['name' => 'Paket Snorkeling Pahawang 2D1N'],
             [
-                'agent_id' => $agent->id,
+                'local_tour_agent_id' => $localTourAgent->id,
+                'agent_id' => $agent->id, // booted() will set this, but explicit for clarity
                 'description' => 'Nikmati keindahan bawah laut Pulau Pahawang...',
                 'cover_image_url' => 'https://images.unsplash.com/photo-1507525428034-b723cf961d3e?w=600&q=80',
                 'price_per_person' => 500000,
@@ -39,6 +50,7 @@ class TourPackageSeeder extends Seeder
         TourPackage::updateOrCreate(
             ['name' => 'Surfing Trip Krui 3D2N'],
             [
+                'local_tour_agent_id' => $localTourAgent->id,
                 'agent_id' => $agent->id,
                 'description' => 'Paket khusus untuk para peselancar...',
                 'cover_image_url' => 'https://images.unsplash.com/photo-1519046904884-53103b34b206?w=600&q=80',
@@ -52,6 +64,7 @@ class TourPackageSeeder extends Seeder
         TourPackage::updateOrCreate(
             ['name' => 'One Day Trip Pulau Tegal Mas'],
             [
+                'local_tour_agent_id' => $localTourAgent->id,
                 'agent_id' => $agent->id,
                 'description' => 'Liburan singkat ke Tegal Mas...',
                 'cover_image_url' => 'https://images.unsplash.com/photo-1502602898657-3e91760c0341?w=600&q=80',

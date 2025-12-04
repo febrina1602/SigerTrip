@@ -20,7 +20,8 @@ class DatabaseSeeder extends Seeder
         // ]);
         $this->call([
             DestinationCategorySeeder::class, 
-            DestinationSeeder::class,         
+            DestinationSeeder::class,
+            UserSeeder::class,
             AgentSeeder::class,
             TourPackageSeeder::class,
             RentalVehicleSeeder::class,
