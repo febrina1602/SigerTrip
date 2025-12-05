@@ -38,12 +38,34 @@
 
     /* BUTTON DAFTARKAN KENDARAAN */
     .btn-daftar-kendaraan {
-        background-color: #007bff;
+        background: linear-gradient(90deg, #FFD15C 0%, #FF9739 45%, #FF3D3D 100%);
         color: white;
         font-weight: 700;
-        border-radius: 999px;
+        border-radius: 12px;
         padding: 0.65rem 1.8rem;
-        box-shadow: 0 6px 15px rgba(0,123,255,0.35);
+        box-shadow: 0 6px 15px rgba(255,123,255,0.35);
+        border: none;
+    }
+
+    .btn-daftar-kendaraan:hover {
+        filter: brightness(.95);
+        color: #fff;
+    }
+
+    /* BUTTON KEMBALI */
+    .btn-back {
+        background: linear-gradient(90deg, #FFD15C 0%, #FF9739 45%, #FF3D3D 100%);
+        color: white;
+        font-weight: 700;
+        border-radius: 12px;
+        padding: 0.5rem 1.5rem;
+        font-weight: 600;
+        border: 1px solid #FF3D3D;
+    }
+
+    .btn-back:hover {
+        filter: brightness(.96);
+        color: #fff;
     }
 </style>
 @endpush
@@ -74,17 +96,17 @@
 
         <div class="d-flex gap-3 flex-wrap mb-4">
 
-            <a href="{{ route('pasar-digital.index') }}"
+            <a href="{{ route('agent.pasar.index') }}"
                class="category-box {{ !$type ? 'active' : '' }}">
                 <i class="fa-solid fa-car-side"></i> Semua Kendaraan
             </a>
 
-            <a href="{{ route('pasar-digital.index', ['type' => 'CAR']) }}"
+            <a href="{{ route('agent.pasar.index', ['type' => 'CAR']) }}"
                class="category-box {{ $type === 'CAR' ? 'active' : '' }}">
                 <i class="fa-solid fa-car"></i> Mobil
             </a>
 
-            <a href="{{ route('pasar-digital.index', ['type' => 'MOTORCYCLE']) }}"
+            <a href="{{ route('agent.pasar.index', ['type' => 'MOTORCYCLE']) }}"
                class="category-box {{ $type === 'MOTORCYCLE' ? 'active' : '' }}">
                 <i class="fa-solid fa-motorcycle"></i> Motor
             </a>

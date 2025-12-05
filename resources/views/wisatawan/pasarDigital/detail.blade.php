@@ -29,7 +29,7 @@
     </div>
 
     <div>
-        <img src="{{ $vehicle->image_url ?? 'https://images.unsplash.com/photo-1553531889-a2b91d310614?w=1200&q=80' }}" 
+        <img src="{{ asset('storage/'.$vehicle->image_url) ?? 'https://images.unsplash.com/photo-1553531889-a2b91d310614?w=1200&q=80' }}" 
              alt="{{ $vehicle->name }}" 
              class="w-100" style="height: 450px; object-fit: cover;">
     </div>
@@ -40,6 +40,7 @@
             <div class="col-lg-8">
                 <h1 class="h3 fw-bold text-dark mb-3">{{ $vehicle->name }}</h1>
 
+                {{-- Location --}}
                 @if($vehicle->location)
                 <div class="d-flex align-items-start gap-2 mb-3 small text-muted">
                     <svg style="width: 1rem; height: 1rem;" class="mt-1 flex-shrink-0" fill="none" stroke="currentColor" viewBox="0 0 24 24">
@@ -50,7 +51,7 @@
                 </div>
                 @endif
                 
-                {{-- Info Agen (Penyedia) --}}
+                {{-- Agent Information --}}
                 <div class="card shadow-sm border-light mb-4">
                     <div class="card-body p-3">
                         <div class="d-flex align-items-center gap-3">
@@ -67,11 +68,24 @@
                     </div>
                 </div>
 
+                {{-- Deskripsi Kendaraan --}}
                 @if($vehicle->description)
                 <div class="mt-5">
                     <h5 class="fw-bold mb-3">Deskripsi Kendaraan</h5>
                     <p class="text-secondary" style="line-height: 1.7;">
                         {!! nl2br(e($vehicle->description)) !!}
+                    </p>
+                </div>
+                @else
+                <p class="text-muted">Deskripsi kendaraan tidak tersedia.</p>
+                @endif
+
+                {{-- Syarat & Ketentuan Sewa --}}
+                @if($vehicle->terms_conditions)
+                <div class="mt-5">
+                    <h5 class="fw-bold mb-3">Syarat & Ketentuan Sewa</h5>
+                    <p class="text-secondary" style="line-height: 1.7;">
+                        {!! nl2br(e($vehicle->terms_conditions)) !!}
                     </p>
                 </div>
                 @endif
@@ -104,6 +118,23 @@
                         </div>
                     </div>
                 </div>
+
+                {{-- Detail Kendaraan --}}
+                <div class="card shadow-sm border-light mb-4">
+                    <div class="card-body p-3">
+                        <h6 class="fw-bold mb-2">Detail Kendaraan</h6>
+                        <ul class="list-unstyled">
+                            <li><strong>Merek:</strong> {{ $vehicle->brand }}</li>
+                            <li><strong>Model / Tipe:</strong> {{ $vehicle->model }}</li>
+                            <li><strong>Tahun:</strong> {{ $vehicle->year }}</li>
+                            <li><strong>Transmisi:</strong> {{ $vehicle->transmission }}</li>
+                            <li><strong>Kapasitas Kursi:</strong> {{ $vehicle->seats }}</li>
+                            <li><strong>Jenis Bahan Bakar:</strong> {{ $vehicle->fuel_type }}</li>
+                            <li><strong>Nomor Polisi:</strong> {{ $vehicle->plate_number ?? 'Tidak tersedia' }}</li>
+                        </ul>
+                    </div>
+                </div>
+
             </div>
 
         </div>

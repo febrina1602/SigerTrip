@@ -22,18 +22,34 @@
   }
 
   /* Tombol gradien seperti di login / register */
-  .btn-grad{
-      background:linear-gradient(90deg,#FFD15C 0%,#FF9739 45%,#FF3D3D 100%);
-      color:#fff;
-      border:none;
-      height:46px;
-      border-radius:12px;
-      font-weight:700;
-      padding:0 32px;
+  .btn-grad {
+      background: linear-gradient(90deg, #FFD15C 0%, #FF9739 45%, #FF3D3D 100%);
+      color: #fff;
+      border: none;
+      height: 46px;
+      border-radius: 12px;
+      font-weight: 700;
+      padding: 0 32px;
   }
-  .btn-grad:hover{
-      filter:brightness(.96);
-      color:#fff;
+
+  .btn-grad:hover {
+      filter: brightness(.96);
+      color: #fff;
+  }
+
+  /* Tombol Kembali dengan warna sama */
+  .btn-back {
+      background: linear-gradient(90deg, #FFD15C 0%, #FF9739 45%, #FF3D3D 100%);
+      color: #fff;
+      border-radius: 12px;
+      padding: 0.5rem 1.5rem;
+      font-weight: 600;
+      border: 1px solid #FF3D3D;
+  }
+
+  .btn-back:hover {
+      filter: brightness(.96);
+      color: #fff;
   }
 </style>
 @endpush
@@ -41,6 +57,13 @@
 @section('content')
 <div class="container py-5">
     <div class="row g-4">
+
+        {{-- Tombol Kembali --}}
+        <div class="col-12">
+            <a href="{{ route('agent.pasar.index') }}" class="btn btn-back mb-3">
+                <i class="fas fa-arrow-left me-2"></i> Kembali
+            </a>
+        </div>
 
         {{-- FORM DAFTAR KENDARAAN --}}
         <div class="col-lg-8">

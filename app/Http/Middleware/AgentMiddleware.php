@@ -1,5 +1,4 @@
 <?php
-
 namespace App\Http\Middleware;
 
 use Closure;
@@ -13,22 +12,23 @@ class AgentMiddleware
      */
     public function handle(Request $request, Closure $next)
     {
-        // Jika belum login, lempar ke login
+        // Cek apakah user sudah login
         if (!Auth::check()) {
-            return redirect()->route('login');
+            return redirect()->route('login'); // Redirect ke halaman login jika belum login
         }
 
         $user = Auth::user();
 
-        // Kalau punya helper isAgent() di model User
+        // Jika pengguna tidak memiliki role 'agent', maka redirect atau abort
         if (! $user->isAgent()) {
-            // Bisa abort 403 atau redirect ke beranda
-            return abort(403, 'Halaman ini hanya untuk mitra/agent.');
-            // atau:
-            // return redirect()->route('beranda.wisatawan')
-            //     ->with('error', 'Anda bukan mitra/agent.');
+            // Pilihan 1: Menggunakan Abort 403
+            // return abort(403, 'Halaman ini hanya untuk mitra/agent.');
+
+            // Pilihan 2: Redirect ke halaman beranda dengan pesan error
+            return redirect()->route('beranda.wisatawan')
+                ->with('error', 'Hanya mitra/agent yang dapat mengakses halaman ini.');
         }
 
-        return $next($request);
+        return $next($request); // Lanjutkan request jika role sesuai
     }
 }

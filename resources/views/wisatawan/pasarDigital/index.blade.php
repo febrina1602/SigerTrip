@@ -87,7 +87,7 @@
                 <div class="col">
                     <div class="card h-100 shadow-sm border-0">
                         <a href="{{ route('pasar-digital.detail', $vehicle->id) }}" class="text-decoration-none">
-                            <img src="{{ $vehicle->image_url ?? 'https://images.unsplash.com/photo-1553531889-a2b91d310614?w=600&q=80' }}" 
+                            <img src="{{ asset('storage/'.$vehicle->image_url) ?? 'https://images.unsplash.com/photo-1553531889-a2b91d310614?w=600&q=80' }}" 
                                  alt="{{ $vehicle->name }}" 
                                  class="card-img-top" style="height: 200px; object-fit: cover;">
                         </a>
