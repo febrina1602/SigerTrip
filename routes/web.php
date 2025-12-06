@@ -8,6 +8,7 @@ use App\Http\Controllers\AdminController;
 use App\Http\Controllers\AdminDestinationController;
 use App\Http\Controllers\AdminUserController;
 use App\Http\Controllers\AdminCategoryController;
+use App\Http\Controllers\AdminPasarDigitalController;
 use App\Http\Controllers\PasarDigitalController;
 use App\Http\Controllers\PemanduWisataController;
 use App\Http\Controllers\ProfileController;
@@ -118,12 +119,16 @@ Route::prefix('admin')
         // Dashboard admin
         Route::get('/beranda', [AdminDestinationController::class, 'index'])->name('admin.beranda');
 
-        // Pemandu / pasar / akun
+        // Pemandu / akun
         Route::get('/pemandu', [AdminController::class, 'pemandu'])->name('admin.pemandu');
         Route::get('/akun', [AdminController::class, 'akun'])->name('admin.akun');
         Route::post('/akun/{id}/verifikasi', [AdminController::class, 'verifikasi'])->name('admin.verifikasi');
 
-        Route::get('/pasar', [AdminController::class, 'pasar'])->name('admin.pasar');
+        // PASAR DIGITAL (Admin) - PENTING: Harus sebelum route lain yang pakai prefix /pasar
+        Route::get('/pasar', [AdminPasarDigitalController::class, 'index'])->name('admin.pasar');
+        Route::get('/pasar/{vehicle}/edit', [AdminPasarDigitalController::class, 'edit'])->name('admin.pasar.edit');
+        Route::put('/pasar/{vehicle}', [AdminPasarDigitalController::class, 'update'])->name('admin.pasar.update');
+        Route::delete('/pasar/{vehicle}', [AdminPasarDigitalController::class, 'destroy'])->name('admin.pasar.destroy');
 
         // DESTINASI
         Route::get('/wisata/create', [AdminDestinationController::class, 'create'])->name('admin.wisata.create');
@@ -155,4 +160,5 @@ Route::prefix('admin')
         Route::post('/users/{id}/verify', [AdminUserController::class, 'verify'])->name('admin.users.verify');
         Route::post('/users/{id}/reject', [AdminUserController::class, 'reject'])->name('admin.users.reject');
         Route::post('/users/{id}/toggle-status', [AdminUserController::class, 'toggleStatus'])->name('admin.users.toggleStatus');
+ 
     });
