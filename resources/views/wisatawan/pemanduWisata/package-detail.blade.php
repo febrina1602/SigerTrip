@@ -25,10 +25,10 @@
         </div>
     </div>
 
-    <div>
-        <img src="{{ $tourPackage->cover_image_url ?? 'https://images.unsplash.com/photo-1507525428034-b723cf961d3e?w=1200&q=80' }}" 
+    <div style="height: 450px; background-color: #f0f0f0;">
+        <img src="{{ $tourPackage->cover_image_url ? asset('storage/'.$tourPackage->cover_image_url) : 'https://images.unsplash.com/photo-1507525428034-b723cf961d3e?w=1200&q=80' }}" 
              alt="{{ $tourPackage->name }}" 
-             class="w-100" style="height: 450px; object-fit: cover;">
+             class="w-100 h-100 object-fit-cover">
     </div>
     
     <div class="container py-5">
@@ -153,74 +153,5 @@
 
         </div>
     </div>
-    
-    @if(isset($isOwner) && $isOwner)
-        <!-- Edit Package Modal -->
-        <div class="modal fade" id="editPackageModal" tabindex="-1">
-            <div class="modal-dialog modal-lg">
-                <div class="modal-content border-0 rounded-4">
-                    <div class="modal-header border-0 pb-0">
-                        <h5 class="modal-title fw-bold">Edit Paket: {{ $tourPackage->name }}</h5>
-                        <button type="button" class="btn-close" data-bs-dismiss="modal"></button>
-                    </div>
-                    <form id="editPackageForm">
-                        <div class="modal-body">
-                            <div id="editPackageAlert" class="alert d-none"></div>
-                            <div class="mb-3">
-                                <label class="form-label">Harga per orang</label>
-                                <input type="number" step="0.01" name="price_per_person" class="form-control" value="{{ $tourPackage->price_per_person }}">
-                            </div>
-                            <div class="mb-3">
-                                <label class="form-label">Durasi</label>
-                                <input type="text" name="duration" class="form-control" value="{{ $tourPackage->duration }}">
-                            </div>
-                            <div class="mb-3">
-                                <label class="form-label">Fasilitas (koma dipisah)</label>
-                                <input type="text" name="facilities" class="form-control" value="{{ is_array($tourPackage->facilities) ? implode(',', $tourPackage->facilities) : $tourPackage->facilities }}">
-                            </div>
-                            <div class="mb-3">
-                                <label class="form-label">Deskripsi</label>
-                                <textarea name="description" class="form-control" rows="6">{{ $tourPackage->description }}</textarea>
-                            </div>
-                        </div>
-                        <div class="modal-footer border-0 pt-0">
-                            <button type="button" class="btn btn-secondary rounded-3" data-bs-dismiss="modal">Tutup</button>
-                            <button type="submit" class="btn btn-primary rounded-3">Simpan</button>
-                        </div>
-                    </form>
-                </div>
-            </div>
-        </div>
-
-        <script>
-            document.addEventListener('DOMContentLoaded', function () {
-                const form = document.getElementById('editPackageForm');
-                const alertBox = document.getElementById('editPackageAlert');
-                form.addEventListener('submit', async function (e) {
-                    e.preventDefault();
-                    alertBox.classList.add('d-none');
-
-                    const data = new FormData(form);
-                    try {
-                        const res = await fetch("{{ route('agent.tour_packages.update', $tourPackage->id) }}", {
-                            method: 'POST',
-                            headers: {
-                                'X-CSRF-TOKEN': document.querySelector('meta[name=csrf-token]').getAttribute('content'),
-                                'Accept': 'application/json'
-                            },
-                            body: data
-                        });
-                        const json = await res.json();
-                        if (!res.ok) throw json;
-                        location.reload();
-                    } catch (err) {
-                        alertBox.classList.remove('d-none');
-                        alertBox.classList.add('alert-danger');
-                        alertBox.innerText = (err && err.message) ? err.message : 'Gagal menyimpan perubahan.';
-                    }
-                });
-            });
-        </script>
-    @endif
 </div>
 @endsection

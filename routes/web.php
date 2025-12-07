@@ -105,14 +105,12 @@ Route::get('/beranda', [BerandaController::class, 'wisatawan'])->name('beranda.w
 Route::get('/category/{id}', [DestinationController::class, 'byCategory'])->name('destinations.category');
 Route::get('/destination/{id}', [DestinationController::class, 'show'])->name('destinations.detail');
 
-// Pemandu wisata (catalog LocalTourAgent)
+// Pemandu wisata (Katalog)
 Route::get('/pemandu-wisata', [PemanduWisataController::class, 'index'])->name('pemandu-wisata.index');
-Route::get('/pemandu-wisata/{localTourAgent}', [PemanduWisataController::class, 'show'])->name('pemandu-wisata.show');
-Route::get('/pemandu-wisata/{localTourAgent}/paket', [PemanduWisataController::class, 'packages'])->name('pemandu-wisata.packages');
-Route::get(
-    '/pemandu-wisata/{localTourAgent}/paket/{tourPackage}',
-    [PemanduWisataController::class, 'packageDetail']
-)->name('pemandu-wisata.package-detail');
+
+Route::get('/pemandu-wisata/{agent}', [PemanduWisataController::class, 'show'])->name('pemandu-wisata.show');
+Route::get('/pemandu-wisata/{agent}/paket', [PemanduWisataController::class, 'packages'])->name('pemandu-wisata.packages');
+Route::get('/pemandu-wisata/{agent}/paket/{tourPackage}', [PemanduWisataController::class, 'packageDetail'])->name('pemandu-wisata.package-detail');
 
 // Pasar digital (umum, sisi wisatawan)
 Route::get('/pasar-digital', [PasarDigitalController::class, 'index'])->name('pasar-digital.index');

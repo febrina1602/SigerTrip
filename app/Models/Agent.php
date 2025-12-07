@@ -9,12 +9,8 @@ class Agent extends Model
 {
     use HasFactory;
 
-    // Tabel agents (opsional karena mengikuti konvensi Laravel)
     protected $table = 'agents';
 
-    /**
-     * Mass assignable attributes.
-     */
     protected $fillable = [
         'user_id',
         'name',                 
@@ -28,52 +24,40 @@ class Agent extends Model
         'description',
     ];
 
-    /**
-     * Casts for specific fields.
-     */
     protected $casts = [
         'is_verified' => 'boolean',
         'rating'      => 'decimal:1',
     ];
 
-    /**
-     * Constants for agent type.
-     */
     public const TYPES = ['LOCAL_TOUR', 'TRANSPORT_RENTAL'];
 
-    /**
-     * RELASI: Agent milik satu user.
-     */
     public function user()
     {
         return $this->belongsTo(User::class);
     }
 
-    /**
-     * RELASI: Agent memiliki banyak LocalTourAgent.
-     */
     public function localTourAgents()
     {
         return $this->hasMany(LocalTourAgent::class);
     }
 
     /**
-     * RELASI: Agent memiliki banyak TourPackage melalui LocalTourAgent.
+     * PERBAIKAN: Ubah relasi agar langsung ke TourPackage
      */
     public function tourPackages()
     {
-        return $this->hasManyThrough(TourPackage::class, LocalTourAgent::class);
+        // SEBELUMNYA (Salah karena lewat LocalTourAgent):
+        // return $this->hasManyThrough(TourPackage::class, LocalTourAgent::class);
+        
+        // SEKARANG (Benar, langsung ke agent_id di tour_packages):
+        return $this->hasMany(TourPackage::class, 'agent_id');
     }
 
-    /**
-     * RELASI: Agent memiliki banyak kendaraan rental (Pasar Digital).
-     */
     public function rentalVehicles()
     {
         return $this->hasMany(RentalVehicle::class);
     }
 
-    // ===== Query Scopes
     public function scopeVerified($q)
     {
         return $q->where('is_verified', true);

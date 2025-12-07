@@ -7,12 +7,22 @@
     @include('components.layout.header')
 
         @php
-            $heroImage = $agent->banner_image_url ?? ($tourPackages->first()->cover_image_url ?? null);
+            // Ambil gambar banner, atau cover paket pertama, atau placeholder
+            $bannerUrl = $agent->banner_image_url ? asset('storage/'.$agent->banner_image_url) : null;
+            
+            $firstPackage = $tourPackages->first();
+            $packageCoverUrl = ($firstPackage && $firstPackage->cover_image_url) ? asset('storage/'.$firstPackage->cover_image_url) : null;
+            
+            $defaultUrl = 'https://images.unsplash.com/photo-1507525428034-b723cf961d3e?w=1200&q=80';
+            
+            $heroImage = $bannerUrl ?? $packageCoverUrl ?? $defaultUrl;
         @endphp
-        <div class="w-100">
-            <img src="{{ $heroImage ?? 'https://images.unsplash.com/photo-1507525428034-b723cf961d3e?w=1200&q=80' }}" 
+
+        <div class="position-relative" style="height: 350px; background-color: #333;">
+            <img src="{{ $heroImage }}" 
                 alt="{{ $agent->name }}" 
-                class="w-100" style="height: 500px; object-fit: cover;">
+                class="w-100 h-100 object-fit-cover opacity-75">
+            <div class="position-absolute bottom-0 start-0 w-100 bg-gradient-to-t from-black" style="background: linear-gradient(to top, rgba(0,0,0,0.8), transparent); height: 150px;"></div>
         </div> 
         
         <div class="bg-white py-5">

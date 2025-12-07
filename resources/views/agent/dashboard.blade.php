@@ -17,7 +17,7 @@
                     <div class="row align-items-center">
                         <div class="col-md-8">
                             <h2 class="fw-bold mb-2">Selamat Datang, {{ $user->full_name }}! 👋</h2>
-                            <p class="mb-0 opacity-90">
+                            <p class="mb-0 text-white">
                                 Kelola agen tour lokal Anda, buat paket perjalanan menarik, dan tingkatkan rating untuk menjadi partner terpercaya SigerTrip.
                             </p>
                         </div>
@@ -109,11 +109,6 @@
                 <h5 class="fw-bold mb-3">Aksi Cepat</h5>
                 <div class="row g-3">
                     <div class="col-md-6 col-lg-3">
-                        <button class="btn btn-outline-primary w-100 rounded-3 py-3" data-bs-toggle="modal" data-bs-target="#addLocalTourAgentModal">
-                            <i class="fas fa-plus me-2"></i> Tambah Agen Tour Lokal
-                        </button>
-                    </div>
-                    <div class="col-md-6 col-lg-3">
                         {{-- Tombol untuk menambah paket (Sementara Modal) --}}
                         <button class="btn btn-outline-success w-100 rounded-3 py-3" data-bs-toggle="modal" data-bs-target="#addTourPackageModal">
                             <i class="fas fa-plus me-2"></i> Buat Paket Perjalanan
@@ -130,50 +125,6 @@
                         </a>
                     </div>
                 </div>
-            </div>
-        </div>
-
-        {{-- AGEN TOUR LOKAL LIST --}}
-        <div class="row mb-5">
-            <div class="col-12">
-                <div class="d-flex justify-content-between align-items-center mb-3">
-                    <h5 class="fw-bold mb-0">Agen Tour Lokal Anda</h5>
-                </div>
-
-                @if($recentLocalTourAgents->count() > 0)
-                    <div class="row g-3">
-                        @foreach($recentLocalTourAgents as $localAgent)
-                            <div class="col-md-6 col-lg-4">
-                                <div class="card border-0 rounded-4 shadow-sm overflow-hidden h-100">
-                                    <div class="card-body">
-                                        <h6 class="card-title fw-bold mb-2">{{ $localAgent->name }}</h6>
-                                        <p class="card-text small text-muted mb-2">
-                                            <i class="fas fa-map-pin me-1" style="color: #667eea;"></i>
-                                            {{ $localAgent->address ?? 'Alamat belum diisi' }}
-                                        </p>
-                                        <p class="card-text small text-muted mb-3">
-                                            <i class="fas fa-phone me-1" style="color: #667eea;"></i>
-                                            {{ $localAgent->contact_phone ?? '-' }}
-                                        </p>
-                                        
-                                        <form action="{{ route('agent.local_tour_agents.delete', $localAgent->id) }}" method="POST" onsubmit="return confirm('Yakin ingin menghapus agen ini?');">
-                                            @csrf
-                                            @method('DELETE')
-                                            <button type="submit" class="btn btn-sm btn-outline-danger w-100">
-                                                <i class="fas fa-trash me-1"></i> Hapus
-                                            </button>
-                                        </form>
-                                    </div>
-                                </div>
-                            </div>
-                        @endforeach
-                    </div>
-                @else
-                    <div class="alert alert-warning border-0 rounded-4">
-                        <i class="fas fa-exclamation-circle me-2"></i>
-                        Belum ada agen tour lokal. Silakan tambahkan terlebih dahulu.
-                    </div>
-                @endif
             </div>
         </div>
 
