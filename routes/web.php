@@ -14,6 +14,7 @@ use App\Http\Controllers\PemanduWisataController;
 use App\Http\Controllers\ProfileController;
 use App\Http\Controllers\AgentDashboardController;
 use App\Http\Controllers\AgentPasarDigitalController;
+use App\Http\Controllers\TourPackageController;
 
 // ==== HALAMAN UTAMA ====
 Route::redirect('/', '/beranda');
@@ -70,6 +71,10 @@ Route::middleware(['auth', 'prevent-back-history'])->group(function () {
 Route::prefix('agent')
     ->middleware(['auth', 'agent', 'prevent-back-history'])
     ->group(function () {
+        Route::get('/profile/edit', [\App\Http\Controllers\AgentProfileController::class, 'edit'])->name('agent.profile.edit');
+        
+        Route::put('/profile/update', [\App\Http\Controllers\AgentProfileController::class, 'update'])->name('agent.profile.update');
+
         // Dashboard agent
         Route::get('/dashboard', [AgentDashboardController::class, 'index'])->name('agent.dashboard');
 
@@ -80,8 +85,17 @@ Route::prefix('agent')
         Route::get('/pasar-digital/{vehicle}/edit', [AgentPasarDigitalController::class, 'edit'])->name('agent.pasar.edit');
         Route::put('/pasar-digital/{vehicle}', [AgentPasarDigitalController::class, 'update'])->name('agent.pasar.update');
         Route::delete('/pasar-digital/{vehicle}', [AgentPasarDigitalController::class, 'destroy'])->name('agent.pasar.destroy');
-    });
 
+        Route::resource('tour-packages', TourPackageController::class, ['as' => 'agent']);
+        
+        // Route Hapus Khusus (jika Anda masih pakai form manual di dashboard)
+        Route::delete('/tour-packages/{tourPackage}/delete', [TourPackageController::class, 'destroy'])->name('agent.tour_packages.delete');
+        
+        // Route Agen Lokal (Lama/Legacy) - Tetap ada jika controller masih dipanggil
+        Route::post('/local-tour-agents', [AgentDashboardController::class, 'storeLocalTourAgent'])->name('agent.local_tour_agents.store');
+        Route::delete('/local-tour-agents/{localTourAgent}', [AgentDashboardController::class, 'deleteLocalTourAgent'])->name('agent.local_tour_agents.delete');
+    });
+    
 // ==== ROUTE WISATAWAN / UMUM ====
 
 // Beranda

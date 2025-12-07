@@ -10,7 +10,7 @@
         <div class="container py-2 d-flex align-items-center justify-content-between" style="padding:0;">
             
             {{-- Logo kiri --}}
-            <a href="{{ route('beranda.wisatawan') }}"
+            <a href="{{ $isAgent ? route('agent.dashboard') : route('beranda.wisatawan') }}"
                class="d-flex align-items-center text-decoration-none"
                style="min-width:150px;">
                 <img src="{{ asset('images/logo.png') }}" alt="SigerTrip Logo"
@@ -19,14 +19,15 @@
                 <span class="ms-2 fw-bold text-dark d-none d-md-block">SigerTrip</span>
             </a>
 
-            {{-- Search bar tengah (universal) --}}
+            {{-- Search bar tengah (Hanya untuk Wisatawan/Guest) --}}
+            @if(!$isAgent)
             <form class="flex-grow-1 mx-3 mx-md-4"
                   action="{{ route('pemandu-wisata.index') }}" method="GET">
                 <div class="position-relative" style="max-width:600px; margin:0 auto;">
                     <input type="text" name="q"
                            value="{{ request('q', '') }}"
                            class="form-control"
-                           placeholder="Cari agen..."
+                           placeholder="Cari agen atau destinasi..."
                            style="border-radius:50px; padding-left:2.5rem; height:44px;">
                     <button type="submit" class="btn p-0"
                             style="position:absolute; left:1rem; top:50%; transform:translateY(-50%); color:#6c757d; font-size:1.1rem;">
@@ -34,6 +35,9 @@
                     </button>
                 </div>
             </form>
+            @else
+            <div class="flex-grow-1"></div> {{-- Spacer untuk agent --}}
+            @endif
 
             {{-- Kanan: akun / notif / profil --}}
             <div class="d-flex align-items-center"
@@ -64,15 +68,16 @@
                                 type="button" id="profileDropdown" data-bs-toggle="dropdown"
                                 aria-expanded="false">
                             <img src="{{ $user->profile_picture_url
-                                         ?? 'https://ui-avatars.com/api/?name='
-                                            . urlencode($user->full_name)
-                                            . '&background=FFD15C&color=333&bold=true' }}"
+                                      ?? 'https://ui-avatars.com/api/?name='
+                                      . urlencode($user->full_name)
+                                      . '&background=FFD15C&color=333&bold=true' }}"
                                  alt="Foto Profil"
                                  style="width:40px; height:40px; border-radius:50%; object-fit:cover; border:2px solid #ddd;">
                         </button>
                         <ul class="dropdown-menu dropdown-menu-end" aria-labelledby="profileDropdown">
                             <li>
-                                <a class="dropdown-item" href="{{ route('profile.show') }}">
+                                {{-- Route profil agent berbeda dengan user biasa --}}
+                                <a class="dropdown-item" href="{{ $isAgent ? route('agent.profile.edit') : route('profile.show') }}">
                                     <i class="fas fa-user me-2"></i> Profil
                                 </a>
                             </li>
@@ -110,14 +115,14 @@
                         <i class="fas fa-store me-1"></i> Pasar Digital
                     </a>
 
-                    <a href="{{ route('pemandu-wisata.index') }}"
-                       class="app-nav-link {{ request()->routeIs('pemandu-wisata.*') ? 'active' : '' }}">
+                    <a href="{{ route('agent.tour-packages.index') }}"
+                       class="app-nav-link {{ request()->routeIs('agent.tour-packages.*') ? 'active' : '' }}">
                         <i class="fas fa-map-location-dot me-1"></i> Pemandu Wisata
                     </a>
                 @else
                     {{-- NAV UNTUK USER BIASA / GUEST --}}
                     <a href="{{ route('beranda.wisatawan') }}"
-                       class="app-nav-link {{ request()->routeIs('beranda.*') ? 'active' : '' }}">
+                       class="app-nav-link {{ request()->routeIs('beranda.wisatawan') ? 'active' : '' }}">
                         <i class="fas fa-home me-1"></i> Beranda
                     </a>
 

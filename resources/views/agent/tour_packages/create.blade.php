@@ -1,180 +1,106 @@
 @extends('layouts.app')
 
+@section('title', 'Buat Paket Baru')
+
 @section('content')
-<div class="container mt-4 mb-5">
-    <div class="d-flex justify-content-between align-items-center mb-4">
-        <h1 class="h4 fw-bold">Buat Paket Perjalanan Baru</h1>
-        <a href="{{ route('tour-packages.index') }}" class="btn btn-outline-secondary">Kembali</a>
+@include('components.layout.header')
+
+<div class="container my-5">
+    <div class="row justify-content-center">
+        <div class="col-lg-8">
+            <div class="card border-0 shadow-sm rounded-4">
+                <div class="card-header bg-white py-3">
+                    <h5 class="fw-bold mb-0">Buat Paket Perjalanan Baru</h5>
+                </div>
+                <div class="card-body p-4">
+                    @if ($errors->any())
+                        <div class="alert alert-danger">
+                            <ul class="mb-0">
+                                @foreach ($errors->all() as $error)
+                                    <li>{{ $error }}</li>
+                                @endforeach
+                            </ul>
+                        </div>
+                    @endif
+
+                    <form action="{{ route('agent.tour-packages.store') }}" method="POST" enctype="multipart/form-data">
+                        @csrf
+                        
+                        {{-- Pilih Cabang --}}
+                        @php
+                            $user = auth()->user();
+                            $localAgents = $user->agent ? $user->agent->localTourAgents : collect([]);
+                        @endphp
+
+                        @if($localAgents->count() > 0)
+                            <div class="mb-3">
+                                <label class="form-label fw-bold small">Pilih Cabang (Opsional)</label>
+                                <select name="local_tour_agent_id" class="form-select">
+                                    <option value="">-- Pusat (Tanpa Cabang) --</option>
+                                    @foreach($localAgents as $localAgent)
+                                        <option value="{{ $localAgent->id }}" {{ old('local_tour_agent_id') == $localAgent->id ? 'selected' : '' }}>
+                                            {{ $localAgent->name }}
+                                        </option>
+                                    @endforeach
+                                </select>
+                            </div>
+                        @endif
+
+                        {{-- Informasi Utama --}}
+                        <div class="mb-3">
+                            <label class="form-label fw-bold small">Nama Paket <span class="text-danger">*</span></label>
+                            <input type="text" name="name" class="form-control" required placeholder="Contoh: Eksplorasi Pahawang 2H1M" value="{{ old('name') }}">
+                        </div>
+
+                        <div class="row">
+                            <div class="col-md-6 mb-3">
+                                <label class="form-label fw-bold small">Harga per Orang (Rp) <span class="text-danger">*</span></label>
+                                <input type="number" name="price_per_person" class="form-control" required min="0" value="{{ old('price_per_person') }}">
+                            </div>
+                            <div class="col-md-6 mb-3">
+                                <label class="form-label fw-bold small">Durasi (Teks)</label>
+                                <input type="text" name="duration" class="form-control" placeholder="Contoh: 3 Hari 2 Malam" value="{{ old('duration') }}">
+                            </div>
+                        </div>
+
+                        {{-- Fasilitas & Destinasi --}}
+                        <div class="mb-3">
+                            <label class="form-label fw-bold small">Destinasi yang Dikunjungi</label>
+                            <textarea name="destinations_visited" class="form-control" rows="2" placeholder="Pulau Kelagian, Pasir Timbul, ...">{{ old('destinations_visited') }}</textarea>
+                            <div class="form-text">Pisahkan dengan koma.</div>
+                        </div>
+
+                        <div class="mb-3">
+                            <label class="form-label fw-bold small">Fasilitas</label>
+                            <textarea name="facilities" class="form-control" rows="3" placeholder="Makan siang, Tiket masuk, Transportasi...">{{ old('facilities') }}</textarea>
+                            <div class="form-text">Pisahkan dengan koma atau baris baru.</div>
+                        </div>
+
+                        {{-- Deskripsi --}}
+                        <div class="mb-3">
+                            <label class="form-label fw-bold small">Deskripsi Lengkap</label>
+                            <textarea name="description" class="form-control" rows="5">{{ old('description') }}</textarea>
+                        </div>
+
+                        {{-- Foto & Status --}}
+                        <div class="mb-4">
+                            <label class="form-label fw-bold small">Foto Cover</label>
+                            <input type="file" name="cover_image_file" class="form-control" accept="image/*">
+                        </div>
+
+                        <div class="mb-4 form-check form-switch">
+                            <input class="form-check-input" type="checkbox" id="is_published" name="is_published" value="1" checked>
+                            <label class="form-check-label fw-bold small" for="is_published">Publikasikan Paket Ini?</label>
+                        </div>
+
+                        <div class="d-flex justify-content-end gap-2">
+                            <a href="{{ route('agent.tour-packages.index') }}" class="btn btn-light">Batal</a>
+                            <button type="submit" class="btn btn-primary px-4">Simpan Paket</button>
+                        </div>
+                    </form>
+                </div>
+            </div>
+        </div>
     </div>
-
-    @if ($errors->any())
-        <div class="alert alert-danger border-0 rounded-3 mb-4">
-            <h5 class="alert-heading"><i class="fas fa-exclamation-circle me-2"></i>Validasi Gagal</h5>
-            <ul class="mb-0">
-                @foreach ($errors->all() as $error)
-                    <li>{{ $error }}</li>
-                @endforeach
-            </ul>
-        </div>
-    @endif
-    @if(session('error'))
-        <div class="alert alert-danger border-0 rounded-3 alert-dismissible fade show mb-4" role="alert">
-            <i class="fas fa-exclamation-circle me-2"></i> {{ session('error') }}
-            <button type="button" class="btn-close" data-bs-dismiss="alert" aria-label="Close"></button>
-        </div>
-    @endif
-
-    <form action="{{ route('tour-packages.store') }}" method="POST" enctype="multipart/form-data">
-        @csrf
-
-        <div class="card rounded-4 shadow-sm mb-4">
-            <div class="card-header bg-light rounded-top-4 py-3 border-0">
-                <h5 class="mb-0 fw-bold">Informasi Dasar</h5>
-            </div>
-            <div class="card-body">
-                {{-- Judul Paket --}}
-                <div class="mb-3">
-                    <label for="title" class="form-label fw-bold">Judul Paket <span class="text-danger">*</span></label>
-                    <input type="text" class="form-control @error('title') is-invalid @enderror" id="title" name="title" 
-                           value="{{ old('title') }}" required>
-                    @error('title')
-                        <div class="invalid-feedback">{{ $message }}</div>
-                    @enderror
-                </div>
-
-                {{-- Deskripsi --}}
-                <div class="mb-3">
-                    <label for="description" class="form-label fw-bold">Deskripsi Paket</label>
-                    <textarea class="form-control @error('description') is-invalid @enderror" id="description" 
-                              name="description" rows="4">{{ old('description') }}</textarea>
-                    @error('description')
-                        <div class="invalid-feedback">{{ $message }}</div>
-                    @enderror
-                </div>
-
-                {{-- Cover Image --}}
-                <div class="mb-3">
-                    <label for="cover_image_file" class="form-label fw-bold">Gambar Sampul</label>
-                    <input type="file" class="form-control @error('cover_image_file') is-invalid @enderror" 
-                           id="cover_image_file" name="cover_image_file" accept="image/*">
-                    <small class="form-text text-muted">Format: JPG, PNG. Ukuran maksimal: 2MB</small>
-                    @error('cover_image_file')
-                        <div class="invalid-feedback">{{ $message }}</div>
-                    @enderror
-                </div>
-            </div>
-        </div>
-
-        <div class="card rounded-4 shadow-sm mb-4">
-            <div class="card-header bg-light rounded-top-4 py-3 border-0">
-                <h5 class="mb-0 fw-bold">Harga & Durasi</h5>
-            </div>
-            <div class="card-body">
-                <div class="row">
-                    {{-- Harga Per Orang --}}
-                    <div class="col-md-6 mb-3">
-                        <label for="price_per_person" class="form-label fw-bold">Harga Per Orang (Rp) <span class="text-danger">*</span></label>
-                        <input type="number" class="form-control @error('price_per_person') is-invalid @enderror" 
-                               id="price_per_person" name="price_per_person" 
-                               value="{{ old('price_per_person') }}" required step="1000">
-                        @error('price_per_person')
-                            <div class="invalid-feedback">{{ $message }}</div>
-                        @enderror
-                    </div>
-
-                    {{-- Durasi --}}
-                    <div class="col-md-6 mb-3">
-                        <label for="duration" class="form-label fw-bold">Durasi</label>
-                        <input type="text" class="form-control @error('duration') is-invalid @enderror" 
-                               id="duration" name="duration"
-                               value="{{ old('duration') }}">
-                        @error('duration')
-                            <div class="invalid-feedback">{{ $message }}</div>
-                        @enderror
-                    </div>
-                </div>
-
-                <div class="row">
-                    {{-- Hari --}}
-                    <div class="col-md-6 mb-3">
-                        <label for="duration_days" class="form-label fw-bold">Jumlah Hari</label>
-                        <input type="number" class="form-control @error('duration_days') is-invalid @enderror" 
-                               id="duration_days" name="duration_days"
-                               value="{{ old('duration_days') }}" min="0">
-                        @error('duration_days')
-                            <div class="invalid-feedback">{{ $message }}</div>
-                        @enderror
-                    </div>
-
-                    {{-- Malam --}}
-                    <div class="col-md-6 mb-3">
-                        <label for="duration_nights" class="form-label fw-bold">Jumlah Malam</label>
-                        <input type="number" class="form-control @error('duration_nights') is-invalid @enderror" 
-                               id="duration_nights" name="duration_nights"
-                               value="{{ old('duration_nights') }}" min="0">
-                        @error('duration_nights')
-                            <div class="invalid-feedback">{{ $message }}</div>
-                        @enderror
-                    </div>
-                </div>
-            </div>
-        </div>
-
-        <div class="card rounded-4 shadow-sm mb-4">
-            <div class="card-header bg-light rounded-top-4 py-3 border-0">
-                <h5 class="mb-0 fw-bold">Fasilitas & Persyaratan</h5>
-            </div>
-            <div class="card-body">
-                {{-- Fasilitas --}}
-                <div class="mb-3">
-                    <label for="facilities" class="form-label fw-bold">Fasilitas Paket</label>
-                    <textarea class="form-control @error('facilities') is-invalid @enderror" id="facilities" 
-                              name="facilities" rows="4">{{ old('facilities') }}</textarea>
-                    <small class="form-text text-muted">Tulis satu fasilitas per baris atau pisahkan dengan koma</small>
-                    @error('facilities')
-                        <div class="invalid-feedback">{{ $message }}</div>
-                    @enderror
-                </div>
-
-                {{-- Peserta Minimum --}}
-                <div class="mb-3">
-                    <label for="minimum_participants" class="form-label fw-bold">Peserta Minimum</label>
-                    <input type="number" class="form-control @error('minimum_participants') is-invalid @enderror" 
-                           id="minimum_participants" name="minimum_participants"
-                           value="{{ old('minimum_participants') }}" min="0">
-                    @error('minimum_participants')
-                        <div class="invalid-feedback">{{ $message }}</div>
-                    @enderror
-                </div>
-            </div>
-        </div>
-
-        <div class="card rounded-4 shadow-sm mb-4">
-            <div class="card-header bg-light rounded-top-4 py-3 border-0">
-                <h5 class="mb-0 fw-bold">Periode & Status</h5>
-            </div>
-            <div class="card-body">
-                {{-- Periode Ketersediaan --}}
-                <div class="mb-3">
-                    <label for="availability_period" class="form-label fw-bold">Periode Ketersediaan</label>
-                    <input type="text" class="form-control @error('availability_period') is-invalid @enderror" 
-                           id="availability_period" name="availability_period"
-                           value="{{ old('availability_period') }}">
-                    @error('availability_period')
-                        <div class="invalid-feedback">{{ $message }}</div>
-                    @enderror
-                </div>
-            </div>
-        </div>
-
-        <div class="d-flex gap-2 mb-5">
-            <button type="submit" class="btn btn-primary btn-lg rounded-3 flex-grow-1">
-                <i class="fas fa-save me-2"></i> Simpan Paket
-            </button>
-            <a href="{{ route('tour-packages.index') }}" class="btn btn-outline-secondary btn-lg rounded-3">
-                <i class="fas fa-times me-2"></i> Batal
-            </a>
-        </div>
-    </form>
 </div>
 @endsection

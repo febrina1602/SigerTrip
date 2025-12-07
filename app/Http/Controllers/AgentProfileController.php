@@ -2,32 +2,56 @@
 
 namespace App\Http\Controllers;
 
-use App\Models\Agent;
 use Illuminate\Http\Request;
+use Illuminate\Support\Facades\Auth;
+use Illuminate\Support\Facades\Storage;
 
 class AgentProfileController extends Controller
 {
-    /**
-     * Show the agent profile form (display only, no DB save)
-     */
-    public function show()
+    // Tampilkan form edit profil
+    public function edit()
     {
-        // Check if user is authenticated
-        $user = auth()->user();
-        if (!$user) {
-            return redirect('/login');
-        }
+        $user = Auth::user();
+        $agent = $user->agent;
 
-        // Check if user is an agent
-        if (!$user->isAgent()) {
-            return redirect('/tour-packages')->with('error', 'Anda tidak memiliki akses ke halaman ini.');
-        }
+        // Pastikan view ini ada di: resources/views/agent/profile/edit.blade.php
+        return view('agent.profile.edit', compact('user', 'agent'));
+    }
 
-        // Get current authenticated user's agent profile (if exists)
-        $agent = Agent::where('user_id', auth()->id())->first();
+    // Proses update profil agensi
+    public function update(Request $request)
+    {
+        $user = Auth::user();
+        $agent = $user->agent;
 
-        return view('agent.profile', [
-            'agent' => $agent,
+        $validated = $request->validate([
+            'name'          => 'required|string|max:255',
+            'address'       => 'required|string|max:255',
+            'contact_phone' => 'required|string|max:20',
+            'description'   => 'required|string|min:10',
+            'location'      => 'nullable|string|max:255',
+            'banner_image'  => 'nullable|image|mimes:jpg,jpeg,png,webp|max:2048',
         ]);
+
+        // Update Banner jika ada
+        if ($request->hasFile('banner_image')) {
+            if ($agent->banner_image_url) {
+                Storage::disk('public')->delete($agent->banner_image_url);
+            }
+            $agent->banner_image_url = $request->file('banner_image')->store('agent-banners', 'public');
+        }
+
+        // Update data Agent
+        $agent->update([
+            'name'          => $validated['name'],
+            'address'       => $validated['address'],
+            'contact_phone' => $validated['contact_phone'],
+            'description'   => $validated['description'],
+            'location'      => $validated['location'] ?? $agent->location,
+        ]);
+
+        // Redirect sukses
+        return redirect()->route('agent.dashboard')
+            ->with('success', 'Profil agensi berhasil diperbarui! Akses fitur kini terbuka.');
     }
 }

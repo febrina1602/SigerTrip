@@ -15,25 +15,26 @@ class TourPackageController extends Controller
     public function index()
     {
         $user = Auth::user();
-        $isAgent = $user && $user->isAgent();
         
-        if ($isAgent) {
-            // If agent doesn't have agent profile yet, redirect to setup
+        // Cek apakah user adalah agent
+        if ($user->isAgent()) {
+            // Pastikan profil agent sudah ada
             if (!$user->agent) {
-                return redirect('/agent/profile')->with('warning', 'Harap lengkapi profil agensi Anda terlebih dahulu.');
+                return redirect()->route('agent.profile.edit')
+                    ->with('warning', 'Harap lengkapi profil agensi Anda terlebih dahulu.');
             }
             
-            // Agent: Show only their packages
-            $packages = TourPackage::where('agent_id', $user->agent->id)->paginate(12);
-            return view('agent.tour-packages.index', compact('packages', 'isAgent'));
-        } else {
-            // User: Show all published packages from all agents
-            $packages = TourPackage::where('is_published', true)
-                ->with('agent')
+            // Agent: Tampilkan paket miliknya saja
+            $packages = TourPackage::where('agent_id', $user->agent->id)
                 ->orderBy('created_at', 'desc')
                 ->paginate(12);
-            return view('agent.tour-packages.index', compact('packages', 'isAgent'));
-        }
+
+            // PERBAIKAN: Gunakan 'agent.tour_packages.index' (underscore)
+            return view('agent.tour_packages.index', compact('packages'));
+        } 
+        
+        // Fallback untuk non-agent (jika route ini diakses admin/user)
+        abort(403, 'Unauthorized access.');
     }
 
     /**
@@ -41,27 +42,8 @@ class TourPackageController extends Controller
      */
     public function create()
     {
-        // Show the create form. If the blade doesn't exist, return a simple fallback view.
-        if (view()->exists('agent.tour-packages.create')) {
-            return view('agent.tour-packages.create');
-        }
-
-        return view('agent.tour-packages.create', []);
-    }
-
-    /**
-     * Display a single tour package detail.
-     */
-    public function show($id)
-    {
-        $package = TourPackage::findOrFail($id);
-
-        // Only show published packages to non-agents
-        if (!$package->is_published && (!Auth::check() || !Auth::user()->isAgent())) {
-            abort(403, 'Paket ini belum dipublikasikan.');
-        }
-
-        return view('wisatawan.tour-packages.show', compact('package'));
+        // PERBAIKAN: Gunakan 'agent.tour_packages.create'
+        return view('agent.tour_packages.create');
     }
 
     /**
@@ -69,158 +51,117 @@ class TourPackageController extends Controller
      */
     public function store(Request $request)
     {
-        // Validate input
         $validated = $request->validate([
-            'title' => 'required|string|max:255',
-            'description' => 'nullable|string|max:1000',
+            'name' => 'required|string|max:255',
+            'description' => 'nullable|string',
             'price_per_person' => 'required|numeric|min:0',
             'duration' => 'nullable|string|max:100',
-            'duration_days' => 'nullable|integer|min:0',
-            'duration_nights' => 'nullable|integer|min:0',
             'facilities' => 'nullable|string',
-            'minimum_participants' => 'nullable|integer|min:0',
-            'availability_period' => 'nullable|string|max:255',
-            'cover_image_file' => 'nullable|image|mimes:jpeg,png,jpg,gif|max:2048',
+            'minimum_participants' => 'nullable|integer|min:1',
+            'cover_image_file' => 'nullable|image|mimes:jpeg,png,jpg,webp|max:2048',
         ]);
 
-        // Get the authenticated user's agent
         $user = Auth::user();
-        if (!$user || !$user->isAgent() || !$user->agent) {
-            return redirect()->route('tour-packages.index')
-                ->with('error', 'Anda harus menjadi agen untuk membuat paket perjalanan.');
-        }
-
-        // Handle file upload
+        
         $imageUrl = null;
         if ($request->hasFile('cover_image_file')) {
-            $file = $request->file('cover_image_file');
-            $path = $file->store('tour_packages', 'public');
-            $imageUrl = Storage::url($path);
+            $imageUrl = $request->file('cover_image_file')->store('tour_packages', 'public');
         }
 
-        // Create the tour package
-        $package = new TourPackage();
-        $package->agent_id = $user->agent->id;
-        $package->name = $validated['title'];
-        $package->description = $validated['description'] ?? '';
-        $package->price_per_person = $validated['price_per_person'];
-        $package->duration = $validated['duration'] ?? null;
-        $package->facilities = $validated['facilities'] ?? null; // Model mutator handles JSON conversion
-        $package->cover_image_url = $imageUrl;
-        // Store additional fields from the form when available
-        $package->duration_days = isset($validated['duration_days']) ? $validated['duration_days'] : null;
-        $package->duration_nights = isset($validated['duration_nights']) ? $validated['duration_nights'] : null;
-        $package->minimum_participants = isset($validated['minimum_participants']) ? $validated['minimum_participants'] : null;
-        $package->availability_period = $validated['availability_period'] ?? null;
-        
-        // Store additional fields if there are other DB columns to map
-        $package->save();
+        TourPackage::create([
+            'agent_id' => $user->agent->id,
+            'name' => $validated['name'],
+            'description' => $validated['description'] ?? '',
+            'price_per_person' => $validated['price_per_person'],
+            'duration' => $validated['duration'],
+            'facilities' => $validated['facilities'],
+            'minimum_participants' => $validated['minimum_participants'] ?? 1,
+            'cover_image_url' => $imageUrl,
+            // Field opsional lain bisa ditambahkan defaultnya
+            'duration_days' => 1,
+            'duration_nights' => 0,
+        ]);
 
-        return redirect()->route('tour-packages.index')
+        return redirect()->route('agent.tour-packages.index')
             ->with('success', 'Paket perjalanan berhasil dibuat!');
     }
 
     /**
      * Show the form for editing the specified resource.
      */
-    public function edit(string $id)
+    public function edit($id)
     {
-        $package = TourPackage::find($id);
-        
-        if (!$package) {
-            return redirect()->route('tour-packages.index')
-                ->with('error', 'Paket perjalanan tidak ditemukan.');
-        }
-
-        // Check if user owns this package
+        $package = TourPackage::findOrFail($id);
         $user = Auth::user();
-        if (!$user || !$user->agent || $package->agent_id !== $user->agent->id) {
-            return redirect()->route('tour-packages.index')
-                ->with('error', 'Anda tidak memiliki hak untuk mengedit paket ini.');
+
+        // Pastikan milik agent yang sedang login
+        if ($package->agent_id !== $user->agent->id) {
+            abort(403);
         }
 
-        return view('agent.tour-packages.edit', compact('package'));
+        // PERBAIKAN: Gunakan 'agent.tour_packages.edit'
+        return view('agent.tour_packages.edit', compact('package'));
     }
 
     /**
      * Update the specified resource in storage.
      */
-    public function update(Request $request, string $id)
+    public function update(Request $request, $id)
     {
-        $package = TourPackage::find($id);
-        
-        if (!$package) {
-            return redirect()->route('tour-packages.index')
-                ->with('error', 'Paket perjalanan tidak ditemukan.');
-        }
-
-        // Check if user owns this package
+        $package = TourPackage::findOrFail($id);
         $user = Auth::user();
-        if (!$user || !$user->agent || $package->agent_id !== $user->agent->id) {
-            return redirect()->route('tour-packages.index')
-                ->with('error', 'Anda tidak memiliki hak untuk mengedit paket ini.');
+
+        if ($package->agent_id !== $user->agent->id) {
+            abort(403);
         }
 
-        // Validate input
         $validated = $request->validate([
-            'title' => 'required|string|max:255',
-            'description' => 'nullable|string|max:1000',
+            'name' => 'required|string|max:255',
+            'description' => 'nullable|string',
             'price_per_person' => 'required|numeric|min:0',
             'duration' => 'nullable|string|max:100',
-            'duration_days' => 'nullable|integer|min:0',
-            'duration_nights' => 'nullable|integer|min:0',
             'facilities' => 'nullable|string',
-            'minimum_participants' => 'nullable|integer|min:0',
-            'availability_period' => 'nullable|string|max:255',
-            'cover_image_file' => 'nullable|image|mimes:jpeg,png,jpg,gif|max:2048',
+            'cover_image_file' => 'nullable|image|mimes:jpeg,png,jpg,webp|max:2048',
         ]);
 
-        // Handle file upload (replace old image if new one provided)
         if ($request->hasFile('cover_image_file')) {
-            $file = $request->file('cover_image_file');
-            $path = $file->store('tour_packages', 'public');
-            $package->cover_image_url = Storage::url($path);
+            if ($package->cover_image_url) {
+                Storage::disk('public')->delete($package->cover_image_url);
+            }
+            $package->cover_image_url = $request->file('cover_image_file')->store('tour_packages', 'public');
         }
 
-        // Update the package
-        $package->name = $validated['title'];
-        $package->description = $validated['description'] ?? '';
-        $package->price_per_person = $validated['price_per_person'];
-        $package->duration = $validated['duration'] ?? null;
-        $package->facilities = $validated['facilities'] ?? null; // Model mutator handles JSON conversion
-        // Update additional fields from the form
-        $package->duration_days = isset($validated['duration_days']) ? $validated['duration_days'] : $package->duration_days;
-        $package->duration_nights = isset($validated['duration_nights']) ? $validated['duration_nights'] : $package->duration_nights;
-        $package->minimum_participants = isset($validated['minimum_participants']) ? $validated['minimum_participants'] : $package->minimum_participants;
-        $package->availability_period = $validated['availability_period'] ?? $package->availability_period;
-        $package->save();
+        $package->update([
+            'name' => $validated['name'],
+            'description' => $validated['description'],
+            'price_per_person' => $validated['price_per_person'],
+            'duration' => $validated['duration'],
+            'facilities' => $validated['facilities'],
+        ]);
 
-        return redirect()->route('tour-packages.index')
+        return redirect()->route('agent.tour-packages.index')
             ->with('success', 'Paket perjalanan berhasil diperbarui!');
     }
 
     /**
      * Remove the specified resource from storage.
      */
-    public function destroy(string $id)
+    public function destroy($id)
     {
-        $package = TourPackage::find($id);
-        
-        if (!$package) {
-            return redirect()->route('tour-packages.index')
-                ->with('error', 'Paket perjalanan tidak ditemukan.');
+        $package = TourPackage::findOrFail($id);
+        $user = Auth::user();
+
+        if ($package->agent_id !== $user->agent->id) {
+            abort(403);
         }
 
-        // Check if user owns this package
-        $user = Auth::user();
-        if (!$user || !$user->agent || $package->agent_id !== $user->agent->id) {
-            return redirect()->route('tour-packages.index')
-                ->with('error', 'Anda tidak memiliki hak untuk menghapus paket ini.');
+        if ($package->cover_image_url) {
+            Storage::disk('public')->delete($package->cover_image_url);
         }
 
         $package->delete();
 
-        return redirect()->route('tour-packages.index')
+        return redirect()->route('agent.tour-packages.index')
             ->with('success', 'Paket perjalanan berhasil dihapus!');
     }
 }
