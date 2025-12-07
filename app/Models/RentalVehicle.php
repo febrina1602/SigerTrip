@@ -20,7 +20,7 @@ class RentalVehicle extends Model
         'description',
         'image_url',
 
-        // 🔽 DETAIL TAMBAHAN
+        // DETAIL KENDARAAN
         'brand',                // Merek kendaraan (Toyota, Honda, dll)
         'model',                // Model (Avanza, Brio, dll)
         'year',                 // Tahun kendaraan
@@ -29,14 +29,14 @@ class RentalVehicle extends Model
         'plate_number',         // Nomor polisi
         'fuel_type',            // Bensin / Solar / Hybrid
 
-        // OPSI KEUNTUNGAN / INCLUDE PAKET
-        'include_driver',       // apakah termasuk sopir (boolean)
-        'include_fuel',         // apakah termasuk BBM (boolean)
-        'include_pickup_drop',  // antar jemput
+        // OPSI INCLUDE / KEUNTUNGAN PAKET
+        'include_driver',       // Boolean
+        'include_fuel',         // Boolean
+        'include_pickup_drop',  // Antar-jemput
 
         // PERSYARATAN SEWA
-        'min_rental_days',      // minimal hari sewa
-        'terms_conditions',     // syarat & ketentuan tambahan
+        'min_rental_days',      // Minimal lama sewa
+        'terms_conditions',     // S&K tambahan
     ];
 
     /**

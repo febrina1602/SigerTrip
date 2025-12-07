@@ -7,7 +7,10 @@ use Illuminate\Foundation\Http\Kernel as HttpKernel;
 class Kernel extends HttpKernel
 {
     /**
-     * Global HTTP middleware (dijalankan pada setiap request)
+     * The application's global HTTP middleware stack.
+     * Middleware ini berjalan di setiap request.
+     *
+     * @var array<int, class-string|string>
      */
     protected $middleware = [
         // \App\Http\Middleware\TrustHosts::class,
@@ -20,7 +23,9 @@ class Kernel extends HttpKernel
     ];
 
     /**
-     * Middleware Groups
+     * The application's route middleware groups.
+     *
+     * @var array<string, array<int, class-string|string>>
      */
     protected $middlewareGroups = [
         'web' => [
@@ -31,19 +36,21 @@ class Kernel extends HttpKernel
             \App\Http\Middleware\VerifyCsrfToken::class,
             \Illuminate\Routing\Middleware\SubstituteBindings::class,
 
-            // Middleware blokir cache halaman
+            // Mencegah cache halaman (back button)
             \App\Http\Middleware\PreventBackHistory::class,
         ],
 
         'api' => [
-            \Illuminate\Routing\Middleware\ThrottleRequests::class.':api',
+            \Illuminate\Routing\Middleware\ThrottleRequests::class . ':api',
             \Illuminate\Routing\Middleware\SubstituteBindings::class,
         ],
     ];
 
     /**
-     * Route Middleware Aliases
-     * Bisa dipakai di route seperti: ->middleware(['auth', 'agent'])
+     * Route middleware aliases.
+     * Alias memudahkan assign middleware ke route.
+     *
+     * @var array<string, class-string|string>
      */
     protected $middlewareAliases = [
         'auth' => \App\Http\Middleware\Authenticate::class,
@@ -58,13 +65,13 @@ class Kernel extends HttpKernel
         'throttle' => \Illuminate\Routing\Middleware\ThrottleRequests::class,
         'verified' => \Illuminate\Auth\Middleware\EnsureEmailIsVerified::class,
 
-        // ⭐ Alias ADMIN
+        // Alias untuk route admin
         'is_admin' => \App\Http\Middleware\IsAdmin::class,
 
-        // ⭐ Alias Agent (DITAMBAHKAN)
+        // Alias untuk route agen (tambahan dari kode 2)
         'agent' => \App\Http\Middleware\AgentMiddleware::class,
 
-        // ⭐ Cegah back-history cache
+        // Cegah cache setelah login/logout
         'prevent-back-history' => \App\Http\Middleware\PreventBackHistory::class,
     ];
 }
