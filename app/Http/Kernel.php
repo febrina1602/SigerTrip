@@ -71,6 +71,9 @@ class Kernel extends HttpKernel
         // Alias untuk route agent
         'agent' => \App\Http\Middleware\IsAgent::class,
 
+        // TAMBAHKAN INI: Alias untuk route user (wisatawan)
+        'is_user' => \App\Http\Middleware\IsUser::class,
+
         // Cegah cache setelah login/logout
         'prevent-back-history' => \App\Http\Middleware\PreventBackHistory::class,
     ];

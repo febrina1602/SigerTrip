@@ -10,16 +10,20 @@ class IsAdmin
 {
     public function handle(Request $request, Closure $next)
     {
-        // belum login -> arahkan ke login
         if (!Auth::check()) {
             return redirect()->route('login');
         }
 
-        // bukan admin -> tolak
-        if (Auth::user()->role !== 'admin') {
-            // pilih salah satu: abort 403 atau redirect dgn pesan
-            // abort(403, 'Anda tidak memiliki akses.');
-            return redirect('/')->with('error', 'Akses admin saja.');
+        $user = Auth::user();
+
+        if ($user->role !== 'admin') {
+            if ($user->role === 'agent') {
+                return redirect()->route('agent.dashboard')->with('error', 'Akses khusus Admin.');
+            }
+            if ($user->role === 'user') {
+                return redirect()->route('dashboard')->with('error', 'Akses khusus Admin.');
+            }
+            return redirect('/')->with('error', 'Akses ditolak.');
         }
 
         return $next($request);

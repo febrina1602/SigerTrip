@@ -52,15 +52,6 @@
                 @endguest
 
                 @auth
-                    {{-- Bell notifikasi (dummy) --}}
-                    <a href="#" class="text-dark text-decoration-none" title="Notifikasi">
-                        <i class="fas fa-bell" style="font-size:1.4rem; position:relative;">
-                            <span class="badge bg-danger rounded-pill"
-                                  style="position:absolute; top:-5px; right:-8px; font-size:0.6rem; padding:0.25rem 0.4rem;">
-                                3
-                            </span>
-                        </i>
-                    </a>
 
                     {{-- Dropdown profil --}}
                     <div class="dropdown">
