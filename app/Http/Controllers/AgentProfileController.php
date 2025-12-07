@@ -2,6 +2,7 @@
 
 namespace App\Http\Controllers;
 
+use App\Models\Agent;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Auth;
 use Illuminate\Support\Facades\Storage;
@@ -14,7 +15,15 @@ class AgentProfileController extends Controller
         $user = Auth::user();
         $agent = $user->agent;
 
-        // Pastikan view ini ada di: resources/views/agent/profile/edit.blade.php
+        // Jika belum ada agent, buat baru
+        if (!$agent) {
+            $agent = Agent::create([
+                'user_id' => $user->id,
+                'name' => '',
+                'agent_type' => 'LOCAL_TOUR',
+            ]);
+        }
+
         return view('agent.profile.edit', compact('user', 'agent'));
     }
 
@@ -23,6 +32,15 @@ class AgentProfileController extends Controller
     {
         $user = Auth::user();
         $agent = $user->agent;
+
+        // Jika belum ada agent, buat baru
+        if (!$agent) {
+            $agent = Agent::create([
+                'user_id' => $user->id,
+                'name' => '',
+                'agent_type' => 'LOCAL_TOUR',
+            ]);
+        }
 
         $validated = $request->validate([
             'name'          => 'required|string|max:255',

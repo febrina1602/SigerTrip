@@ -9,6 +9,7 @@ use App\Http\Controllers\AdminDestinationController;
 use App\Http\Controllers\AdminUserController;
 use App\Http\Controllers\AdminCategoryController;
 use App\Http\Controllers\AdminPasarDigitalController;
+use App\Http\Controllers\AdminAgentProfileController;
 use App\Http\Controllers\PasarDigitalController;
 use App\Http\Controllers\PemanduWisataController;
 use App\Http\Controllers\ProfileController;
@@ -110,6 +111,13 @@ Route::prefix('admin')
         // Agent Management
         Route::get('/agents', [AdminController::class, 'pendingAgents'])->name('admin.agents.pending');
         Route::post('/agents/{agent}/verifikasi', [AdminController::class, 'verifikasiAgen'])->name('admin.agents.verifikasi');
+        
+        // Profil Agent - PENTING: Delete route HARUS sebelum resource
+        Route::delete('/profil-agent/{agent}', [AdminAgentProfileController::class, 'destroy'])->name('admin.profil-agent.destroy');
+        Route::post('/profil-agent/{agent}/verify', [AdminAgentProfileController::class, 'verify'])->name('admin.profil-agent.verify');
+        Route::put('/profil-agent/{agent}/reset', [AdminAgentProfileController::class, 'reset'])->name('admin.profil-agent.reset');
+        Route::post('/profil-agent/{agent}/reject', [AdminAgentProfileController::class, 'reject'])->name('admin.profil-agent.reject');
+        Route::resource('profil-agent', AdminAgentProfileController::class, ['as' => 'admin']);
         
         // Pasar Digital (Admin)
         Route::resource('pasar', AdminPasarDigitalController::class, ['as' => 'admin', 'parameters' => ['pasar' => 'vehicle']]);
