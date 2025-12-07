@@ -112,8 +112,9 @@ class TourPackage extends Model
     protected static function booted()
     {
         static::saving(function ($model) {
-            if (empty($model->agent_id) && !empty($model->local_tour_agent_id)) {
-                $local = LocalTourAgent::find($model->local_tour_agent_id);
+            // Selalu sinkronisasi jika local_tour_agent_id ada
+            if (!empty($model->local_tour_agent_id)) {
+                $local = \App\Models\LocalTourAgent::find($model->local_tour_agent_id);
                 if ($local) {
                     $model->agent_id = $local->agent_id;
                 }

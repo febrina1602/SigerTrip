@@ -20,7 +20,6 @@ Route::redirect('/', '/beranda');
 
 // ==== GUEST (BELUM LOGIN) ====
 Route::middleware('guest')->group(function () {
-
     // Registrasi wisatawan (user biasa)
     Route::get('/register', [AuthController::class, 'showRegistrationForm'])->name('register');
     Route::post('/register', [AuthController::class, 'register'])->name('register.post');
@@ -33,19 +32,14 @@ Route::middleware('guest')->group(function () {
     Route::get('/login', [AuthController::class, 'showLoginForm'])->name('login');
     Route::post('/login', [AuthController::class, 'login'])->name('login.post');
 
-    // Login khusus agent (kalau nanti mau form berbeda)
+    // Login khusus agent
     Route::get('/agent/login', [AuthController::class, 'showAgentLoginForm'])->name('agent.login');
 });
 
 // ==== AUTH (SETELAH LOGIN, GLOBAL) ====
 Route::middleware(['auth', 'prevent-back-history'])->group(function () {
-
     // Dashboard wisatawan (default)
     Route::get('/dashboard', [BerandaController::class, 'wisatawan'])->name('dashboard');
-
-    // --- PERHATIAN ---
-    // Jangan definisikan /agent/dashboard & /agent/pasar-digital di sini lagi
-    // karena sudah ada di group prefix('agent') di bawah.
 
     // Agent actions: create local tour agent (AJAX/modal)
     Route::post('/agent/local-tour-agents', [AgentDashboardController::class, 'storeLocalTourAgent'])
@@ -76,11 +70,10 @@ Route::middleware(['auth', 'prevent-back-history'])->group(function () {
 Route::prefix('agent')
     ->middleware(['auth', 'agent', 'prevent-back-history'])
     ->group(function () {
-
         // Dashboard agent
         Route::get('/dashboard', [AgentDashboardController::class, 'index'])->name('agent.dashboard');
 
-        // PASAR DIGITAL (CRUD)
+        // PASAR DIGITAL (CRUD Manual)
         Route::get('/pasar-digital', [AgentPasarDigitalController::class, 'index'])->name('agent.pasar.index');
         Route::get('/pasar-digital/create', [AgentPasarDigitalController::class, 'create'])->name('agent.pasar.create');
         Route::post('/pasar-digital', [AgentPasarDigitalController::class, 'store'])->name('agent.pasar.store');
@@ -119,25 +112,25 @@ Route::prefix('admin')
         // Dashboard admin
         Route::get('/beranda', [AdminDestinationController::class, 'index'])->name('admin.beranda');
 
-        // Pemandu / akun
-        Route::get('/pemandu', [AdminController::class, 'pemandu'])->name('admin.pemandu');
-        Route::get('/akun', [AdminController::class, 'akun'])->name('admin.akun');
-        Route::post('/akun/{id}/verifikasi', [AdminController::class, 'verifikasi'])->name('admin.verifikasi');
+        // Pemandu / Agent Verification
+        Route::get('/agents', [AdminController::class, 'pendingAgents'])->name('admin.agents.pending');
+        Route::post('/agents/{agent}/verifikasi', [AdminController::class, 'verifikasiAgen'])->name('admin.agents.verifikasi');
 
-        // PASAR DIGITAL (Admin) - PENTING: Harus sebelum route lain yang pakai prefix /pasar
-        Route::get('/pasar', [AdminPasarDigitalController::class, 'index'])->name('admin.pasar');
-        Route::get('/pasar/{vehicle}/edit', [AdminPasarDigitalController::class, 'edit'])->name('admin.pasar.edit');
-        Route::put('/pasar/{vehicle}', [AdminPasarDigitalController::class, 'update'])->name('admin.pasar.update');
-        Route::delete('/pasar/{vehicle}', [AdminPasarDigitalController::class, 'destroy'])->name('admin.pasar.destroy');
+        // PASAR DIGITAL (Admin) - Resource Controller
+        // 'parameters' digunakan agar variabel di controller adalah $vehicle (bukan $pasar)
+        Route::resource('pasar', AdminPasarDigitalController::class, [
+            'as' => 'admin', 
+            'parameters' => ['pasar' => 'vehicle']
+        ]);
 
-        // DESTINASI
+        // DESTINASI (CRUD Manual)
         Route::get('/wisata/create', [AdminDestinationController::class, 'create'])->name('admin.wisata.create');
         Route::post('/wisata/store', [AdminDestinationController::class, 'store'])->name('admin.wisata.store');
         Route::get('/wisata/{id}/edit', [AdminDestinationController::class, 'edit'])->name('admin.wisata.edit');
         Route::put('/wisata/{id}', [AdminDestinationController::class, 'update'])->name('admin.wisata.update');
         Route::delete('/wisata/{id}', [AdminDestinationController::class, 'destroy'])->name('admin.wisata.destroy');
 
-        // CATEGORY
+        // CATEGORY (CRUD Manual)
         Route::get('/categories', [AdminCategoryController::class, 'index'])->name('admin.categories.index');
         Route::get('/categories/create', [AdminCategoryController::class, 'create'])->name('admin.categories.create');
         Route::post('/categories/store', [AdminCategoryController::class, 'store'])->name('admin.categories.store');
@@ -146,19 +139,12 @@ Route::prefix('admin')
         Route::put('/categories/{id}', [AdminCategoryController::class, 'update'])->name('admin.categories.update');
         Route::delete('/categories/{id}', [AdminCategoryController::class, 'destroy'])->name('admin.categories.destroy');
 
-        // AGENT VERIFIKASI
-        Route::get('/agents', [AdminController::class, 'pendingAgents'])->name('admin.agents.pending');
-        Route::post('/agents/{agent}/verifikasi', [AdminController::class, 'verifikasiAgen'])->name('admin.agents.verifikasi');
-
-        // USER MANAGEMENT
-        Route::get('/users', [AdminUserController::class, 'index'])->name('admin.users.index');
-        Route::get('/users/create', [AdminUserController::class, 'create'])->name('admin.users.create');
-        Route::post('/users/store', [AdminUserController::class, 'store'])->name('admin.users.store');
-        Route::get('/users/{id}/edit', [AdminUserController::class, 'edit'])->name('admin.users.edit');
-        Route::put('/users/{id}', [AdminUserController::class, 'update'])->name('admin.users.update');
-        Route::delete('/users/{id}', [AdminUserController::class, 'destroy'])->name('admin.users.destroy');
+        // USER MANAGEMENT - Resource Controller
+        Route::resource('users', AdminUserController::class, ['as' => 'admin']);
+        
+        // Custom Routes User Management (tidak tercover oleh resource)
         Route::post('/users/{id}/verify', [AdminUserController::class, 'verify'])->name('admin.users.verify');
         Route::post('/users/{id}/reject', [AdminUserController::class, 'reject'])->name('admin.users.reject');
         Route::post('/users/{id}/toggle-status', [AdminUserController::class, 'toggleStatus'])->name('admin.users.toggleStatus');
- 
+
     });

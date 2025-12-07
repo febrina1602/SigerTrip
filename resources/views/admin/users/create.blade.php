@@ -17,7 +17,7 @@
                 <div class="text-center">
                     <i class="fas fa-user-circle text-dark" style="font-size: 1.8rem;"></i>
                     <div class="small fw-medium mt-1 text-dark">
-                        {{ Auth::user()->full_name ?? 'Admin' }}
+                        {{ Auth::user()->full_name ?? Auth::user()->name ?? 'Admin' }}
                     </div>
                 </div>
 
@@ -36,7 +36,8 @@
         <div class="container d-flex gap-4">
             <a href="{{ route('admin.beranda') }}" class="nav-link-custom">Beranda</a>
             <a href="#" class="nav-link-custom">Profil Agent</a>
-            <a href="{{ route('admin.pasar') }}" class="nav-link-custom">Pasar Digital</a>
+            {{-- PERBAIKAN: admin.pasar.index --}}
+            <a href="{{ route('admin.pasar.index') }}" class="nav-link-custom">Pasar Digital</a>
             <a href="#" class="nav-link-custom">Pemandu Wisata</a>
             <a href="{{ route('admin.users.index') }}" class="nav-link-custom active">Kelola User</a>
         </div>

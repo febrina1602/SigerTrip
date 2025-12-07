@@ -43,13 +43,12 @@
         </div>
     </header>
 
-
     {{-- NAVIGATION --}}
     <nav class="nav-custom bg-light py-2 border-bottom">
         <div class="container d-flex gap-4">
             <a href="{{ route('admin.beranda') }}" class="nav-link-custom active">Beranda</a>
             <a href="#" class="nav-link-custom">Profil Agent</a>
-            <a href="{{ route('admin.pasar') }}" class="nav-link-custom">Pasar Digital</a>
+            <a href="{{ route('admin.pasar.index') }}" class="nav-link-custom">Pasar Digital</a>
             <a href="#" class="nav-link-custom">Pemandu Wisata</a>
             <a href="{{ route('admin.users.index') }}" class="nav-link-custom">Kelola User</a>
         </div>
@@ -66,17 +65,16 @@
             @endif
 
             <div class="row justify-content-center g-4">
-            <div class="col-md-3 col-sm-6">
-                <div class="card border-0 shadow-sm rounded-4 p-4 text-center h-100 bg-white">
-                    <div class="mb-3">
-                        <i class="fas fa-map-marked-alt text-primary" style="font-size: 2rem;"></i>
+                <div class="col-md-3 col-sm-6">
+                    <div class="card border-0 shadow-sm rounded-4 p-4 text-center h-100 bg-white">
+                        <div class="mb-3">
+                            <i class="fas fa-map-marked-alt text-primary" style="font-size: 2rem;"></i>
+                        </div>
+                        <h6 class="fw-semibold text-muted mb-3">Total Wisata</h6>
+                        <h2 class="fw-bold text-primary mb-0" style="font-size: 3rem;">{{ $totalWisata ?? 0 }}</h2>
                     </div>
-                    <h6 class="fw-semibold text-muted mb-3">Total Wisata</h6>
-                    <h2 class="fw-bold text-primary mb-0" style="font-size: 3rem;">{{ $totalWisata ?? 0 }}</h2>
                 </div>
-            </div>
                 
-                {{-- CARD KATEGORI YANG BISA DIKLIK --}}
                 <div class="col-md-3 col-sm-6">
                     <a href="{{ route('admin.categories.index') }}" class="text-decoration-none">
                         <div class="card border-0 shadow-sm rounded-4 p-4 text-center h-100 bg-white card-hover">

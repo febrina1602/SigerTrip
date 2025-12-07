@@ -38,7 +38,7 @@ class AdminPasarDigitalController extends Controller
         $paginatedAgents = $allGrouped->slice(($page - 1) * $perPage, $perPage);
         
         $vehicles = new LengthAwarePaginator(
-            $paginatedAgents->values()->all(),
+            $paginatedAgents, // Hapus values()->all() agar keys terjaga
             $total,
             $perPage,
             $page,
@@ -117,7 +117,8 @@ class AdminPasarDigitalController extends Controller
             'terms_conditions'   => $data['terms_conditions'] ?? null,
         ]);
 
-        return redirect()->route('admin.pasar')
+        // PERBAIKAN: Redirect ke index (bukan admin.pasar)
+        return redirect()->route('admin.pasar.index')
             ->with('success', 'Data kendaraan berhasil diperbarui.');
     }
 
@@ -132,7 +133,8 @@ class AdminPasarDigitalController extends Controller
 
         $vehicle->delete();
 
-        return redirect()->route('admin.pasar')
+        // PERBAIKAN: Redirect ke index
+        return redirect()->route('admin.pasar.index')
             ->with('success', 'Kendaraan berhasil dihapus.');
     }
 }

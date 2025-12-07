@@ -49,7 +49,10 @@
         <div class="container d-flex gap-4">
             <a href="{{ route('admin.beranda') }}" class="nav-link-custom">Beranda</a>
             <a href="#" class="nav-link-custom">Profil Agent</a>
-            <a href="{{ route('admin.pasar') }}" class="nav-link-custom">Pasar Digital</a>
+            
+            {{-- PERBAIKAN: Ubah admin.pasar menjadi admin.pasar.index --}}
+            <a href="{{ route('admin.pasar.index') }}" class="nav-link-custom">Pasar Digital</a>
+            
             <a href="#" class="nav-link-custom">Pemandu Wisata</a>
             <a href="{{ route('admin.users.index') }}" class="nav-link-custom active">Kelola User</a>
         </div>

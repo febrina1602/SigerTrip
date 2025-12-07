@@ -17,7 +17,7 @@
                 <div class="text-center">
                     <i class="fas fa-user-circle text-dark" style="font-size: 1.8rem;"></i>
                     <div class="small fw-medium mt-1 text-dark">
-                        {{ Auth::user()->full_name ?? 'Admin' }}
+                        {{ Auth::user()->full_name ?? Auth::user()->name ?? 'Admin' }}
                     </div>
                 </div>
 
@@ -36,7 +36,8 @@
         <div class="container d-flex gap-4">
             <a href="{{ route('admin.beranda') }}" class="nav-link-custom">Beranda</a>
             <a href="#" class="nav-link-custom">Profil Agent</a>
-            <a href="{{ route('admin.pasar') }}" class="nav-link-custom">Pasar Digital</a>
+            {{-- PERBAIKAN: admin.pasar.index --}}
+            <a href="{{ route('admin.pasar.index') }}" class="nav-link-custom">Pasar Digital</a>
             <a href="#" class="nav-link-custom">Pemandu Wisata</a>
             <a href="{{ route('admin.users.index') }}" class="nav-link-custom active">Kelola User</a>
         </div>
@@ -186,7 +187,7 @@
                                     @enderror
                                 </div>
 
-                                {{-- STATUS BARU --}}
+                                {{-- STATUS --}}
                                 <div class="mb-3">
                                     <label for="status" class="form-label fw-semibold">
                                         Status <span class="text-danger">*</span>
@@ -196,13 +197,13 @@
                                             name="status" 
                                             required>
                                         <option value="aktif" {{ old('status', $user->status) == 'aktif' ? 'selected' : '' }}>
-                                            <i class="fas fa-check-circle"></i> Aktif
+                                            Aktif
                                         </option>
                                         <option value="pending" {{ old('status', $user->status) == 'pending' ? 'selected' : '' }}>
-                                            <i class="fas fa-clock"></i> Pending
+                                            Pending
                                         </option>
                                         <option value="nonaktif" {{ old('status', $user->status) == 'nonaktif' ? 'selected' : '' }}>
-                                            <i class="fas fa-times-circle"></i> Nonaktif
+                                            Nonaktif
                                         </option>
                                     </select>
                                     <small class="text-muted">

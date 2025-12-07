@@ -95,20 +95,20 @@ class User extends Authenticatable
     /**
      * When a user is created with role 'agent', ensure an Agent record exists.
      */
-    protected static function booted()
-    {
-        static::created(function ($user) {
-            if ($user->role === self::ROLE_AGENT && !$user->agent) {
-                try {
-                    $user->agent()->create([
-                        'name' => $user->full_name ?? $user->email ?? 'Agent',
-                        'agent_type' => 'LOCAL_TOUR',
-                    ]);
-                } catch (\Throwable $e) {
-                    // Don't throw on user creation; log for investigation.
-                    \Log::error('Failed to create Agent for user ' . $user->id . ': ' . $e->getMessage());
-                }
-            }
-        });
-    }
+    // protected static function booted()
+    // {
+    //     static::created(function ($user) {
+    //         if ($user->role === self::ROLE_AGENT && !$user->agent) {
+    //             try {
+    //                 $user->agent()->create([
+    //                     'name' => $user->full_name ?? $user->email ?? 'Agent',
+    //                     'agent_type' => 'LOCAL_TOUR',
+    //                 ]);
+    //             } catch (\Throwable $e) {
+    //                 // Don't throw on user creation; log for investigation.
+    //                 \Log::error('Failed to create Agent for user ' . $user->id . ': ' . $e->getMessage());
+    //             }
+    //         }
+    //     });
+    // }
 }

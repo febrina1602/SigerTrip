@@ -25,7 +25,7 @@ class AgentPasarDigitalController extends Controller
             abort(403, 'Data agen tidak ditemukan untuk akun ini.');
         }
 
-        return $user->agent; // kembalikan model Agent
+        return $user->agent;
     }
 
     /**
@@ -36,13 +36,16 @@ class AgentPasarDigitalController extends Controller
         $agent = $this->ensureAgent();
 
         $type  = $request->query('type'); // CAR / MOTORCYCLE / null
+        
+        // Menggunakan relasi untuk mengambil kendaraan milik agent ini saja
         $query = $agent->rentalVehicles()->orderBy('created_at', 'desc');
 
         if ($type) {
             $query->where('vehicle_type', $type);
         }
 
-        $vehicles = $query->get();
+        // Tambahkan pagination agar halaman tidak berat
+        $vehicles = $query->paginate(6)->withQueryString();
 
         return view('agent.pasar-digital.index', compact('vehicles', 'type'));
     }
@@ -57,26 +60,26 @@ class AgentPasarDigitalController extends Controller
     }
 
     /**
-     * Simpan kendaraan baru (VERSI DETAIL).
+     * Simpan kendaraan baru.
      */
     public function store(Request $request)
     {
         $agent = $this->ensureAgent();
 
         $data = $request->validate([
-            'name'          => 'required|string|max:255',
-            'vehicle_type'  => 'required|in:CAR,MOTORCYCLE',
-            'price_per_day' => 'required|numeric|min:0',
-            'location'      => 'required|string|max:255',
-            'description'   => 'nullable|string',
+            'name'              => 'required|string|max:255',
+            'vehicle_type'      => 'required|in:CAR,MOTORCYCLE',
+            'price_per_day'     => 'required|numeric|min:0',
+            'location'          => 'required|string|max:255',
+            'description'       => 'nullable|string',
 
-            'brand'         => 'nullable|string|max:100',
-            'model'         => 'nullable|string|max:100',
-            'year'          => 'nullable|integer|min:1990|max:' . (date('Y') + 1),
-            'transmission'  => 'nullable|string|max:50',
-            'seats'         => 'nullable|integer|min:1|max:20',
-            'plate_number'  => 'nullable|string|max:50',
-            'fuel_type'     => 'nullable|string|max:50',
+            'brand'             => 'nullable|string|max:100',
+            'model'             => 'nullable|string|max:100',
+            'year'              => 'nullable|integer|min:1990|max:' . (date('Y') + 1),
+            'transmission'      => 'nullable|string|max:50',
+            'seats'             => 'nullable|integer|min:1|max:20',
+            'plate_number'      => 'nullable|string|max:50',
+            'fuel_type'         => 'nullable|string|max:50',
 
             'include_driver'      => 'nullable|boolean',
             'include_fuel'        => 'nullable|boolean',
@@ -84,7 +87,7 @@ class AgentPasarDigitalController extends Controller
             'include_pickup_drop' => 'nullable|boolean',
             'terms_conditions'    => 'nullable|string',
 
-            'image'         => 'nullable|image|max:2048',
+            'image'             => 'nullable|image|max:2048',
         ]);
 
         $imagePath = null;
@@ -93,21 +96,21 @@ class AgentPasarDigitalController extends Controller
         }
 
         RentalVehicle::create([
-            'agent_id'      => $agent->id,
-            'name'          => $data['name'],
-            'vehicle_type'  => $data['vehicle_type'],
-            'price_per_day' => $data['price_per_day'],
-            'location'      => $data['location'],
-            'description'   => $data['description'] ?? null,
-            'image_url'     => $imagePath,
+            'agent_id'           => $agent->id,
+            'name'               => $data['name'],
+            'vehicle_type'       => $data['vehicle_type'],
+            'price_per_day'      => $data['price_per_day'],
+            'location'           => $data['location'],
+            'description'        => $data['description'] ?? null,
+            'image_url'          => $imagePath,
 
-            'brand'         => $data['brand'] ?? null,
-            'model'         => $data['model'] ?? null,
-            'year'          => $data['year'] ?? null,
-            'transmission'  => $data['transmission'] ?? null,
-            'seats'         => $data['seats'] ?? null,
-            'plate_number'  => $data['plate_number'] ?? null,
-            'fuel_type'     => $data['fuel_type'] ?? null,
+            'brand'              => $data['brand'] ?? null,
+            'model'              => $data['model'] ?? null,
+            'year'               => $data['year'] ?? null,
+            'transmission'       => $data['transmission'] ?? null,
+            'seats'              => $data['seats'] ?? null,
+            'plate_number'       => $data['plate_number'] ?? null,
+            'fuel_type'          => $data['fuel_type'] ?? null,
 
             'include_driver'     => $request->boolean('include_driver'),
             'include_fuel'       => $request->boolean('include_fuel'),
@@ -127,38 +130,39 @@ class AgentPasarDigitalController extends Controller
     {
         $agent = $this->ensureAgent();
 
+        // Pastikan kendaraan milik agent yang sedang login
         if ($vehicle->agent_id !== $agent->id) {
-            abort(403);
+            abort(403, 'Unauthorized action.');
         }
 
         return view('agent.pasar-digital.edit', compact('vehicle'));
     }
 
     /**
-     * Update kendaraan (VERSI DETAIL).
+     * Update kendaraan.
      */
     public function update(Request $request, RentalVehicle $vehicle)
     {
         $agent = $this->ensureAgent();
 
         if ($vehicle->agent_id !== $agent->id) {
-            abort(403);
+            abort(403, 'Unauthorized action.');
         }
 
         $data = $request->validate([
-            'name'          => 'required|string|max:255',
-            'vehicle_type'  => 'required|in:CAR,MOTORCYCLE',
-            'price_per_day' => 'required|numeric|min:0',
-            'location'      => 'required|string|max:255',
-            'description'   => 'nullable|string',
+            'name'              => 'required|string|max:255',
+            'vehicle_type'      => 'required|in:CAR,MOTORCYCLE',
+            'price_per_day'     => 'required|numeric|min:0',
+            'location'          => 'required|string|max:255',
+            'description'       => 'nullable|string',
 
-            'brand'         => 'nullable|string|max:100',
-            'model'         => 'nullable|string|max:100',
-            'year'          => 'nullable|integer|min:1990|max:' . (date('Y') + 1),
-            'transmission'  => 'nullable|string|max:50',
-            'seats'         => 'nullable|integer|min:1|max:20',
-            'plate_number'  => 'nullable|string|max:50',
-            'fuel_type'     => 'nullable|string|max:50',
+            'brand'             => 'nullable|string|max:100',
+            'model'             => 'nullable|string|max:100',
+            'year'              => 'nullable|integer|min:1990|max:' . (date('Y') + 1),
+            'transmission'      => 'nullable|string|max:50',
+            'seats'             => 'nullable|integer|min:1|max:20',
+            'plate_number'      => 'nullable|string|max:50',
+            'fuel_type'         => 'nullable|string|max:50',
 
             'include_driver'      => 'nullable|boolean',
             'include_fuel'        => 'nullable|boolean',
@@ -166,41 +170,44 @@ class AgentPasarDigitalController extends Controller
             'include_pickup_drop' => 'nullable|boolean',
             'terms_conditions'    => 'nullable|string',
 
-            'image'         => 'nullable|image|max:2048',
+            'image'             => 'nullable|image|max:2048',
         ]);
 
-        // Handle gambar
-        if ($request->hasFile('image')) {
-            // Hapus gambar lama jika ada
-            if ($vehicle->image_url) {
-                Storage::disk('public')->delete($vehicle->image_url);
-            }
-
-            // Simpan gambar baru
-            $vehicle->image_url = $request->file('image')->store('vehicles', 'public');
-        }
-
-        $vehicle->update([
-            'name'          => $data['name'],
-            'vehicle_type'  => $data['vehicle_type'],
-            'price_per_day' => $data['price_per_day'],
-            'location'      => $data['location'],
-            'description'   => $data['description'] ?? null,
-
-            'brand'         => $data['brand'] ?? null,
-            'model'         => $data['model'] ?? null,
-            'year'          => $data['year'] ?? null,
-            'transmission'  => $data['transmission'] ?? null,
-            'seats'         => $data['seats'] ?? null,
-            'plate_number'  => $data['plate_number'] ?? null,
-            'fuel_type'     => $data['fuel_type'] ?? null,
+        // Siapkan array data update
+        $updateData = [
+            'name'               => $data['name'],
+            'vehicle_type'       => $data['vehicle_type'],
+            'price_per_day'      => $data['price_per_day'],
+            'location'           => $data['location'],
+            'description'        => $data['description'] ?? null,
+            
+            'brand'              => $data['brand'] ?? null,
+            'model'              => $data['model'] ?? null,
+            'year'               => $data['year'] ?? null,
+            'transmission'       => $data['transmission'] ?? null,
+            'seats'              => $data['seats'] ?? null,
+            'plate_number'       => $data['plate_number'] ?? null,
+            'fuel_type'          => $data['fuel_type'] ?? null,
 
             'include_driver'     => $request->boolean('include_driver'),
             'include_fuel'       => $request->boolean('include_fuel'),
             'min_rental_days'    => $data['min_rental_days'] ?? 1,
             'include_pickup_drop'=> $request->boolean('include_pickup_drop'),
             'terms_conditions'   => $data['terms_conditions'] ?? null,
-        ]);
+        ];
+
+        // Handle gambar jika ada upload baru
+        if ($request->hasFile('image')) {
+            // Hapus gambar lama jika ada
+            if ($vehicle->image_url) {
+                Storage::disk('public')->delete($vehicle->image_url);
+            }
+            // Simpan gambar baru & masukkan ke array update
+            $updateData['image_url'] = $request->file('image')->store('vehicles', 'public');
+        }
+
+        // Lakukan update
+        $vehicle->update($updateData);
 
         return redirect()->route('agent.pasar.index')
             ->with('success', 'Data kendaraan berhasil diperbarui.');
@@ -214,9 +221,10 @@ class AgentPasarDigitalController extends Controller
         $agent = $this->ensureAgent();
 
         if ($vehicle->agent_id !== $agent->id) {
-            abort(403);
+            abort(403, 'Unauthorized action.');
         }
 
+        // Hapus file gambar jika ada
         if ($vehicle->image_url) {
             Storage::disk('public')->delete($vehicle->image_url);
         }

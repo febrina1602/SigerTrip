@@ -17,7 +17,7 @@
                 <div class="text-center">
                     <i class="fas fa-user-circle text-dark" style="font-size: 1.8rem;"></i>
                     <div class="small fw-medium mt-1 text-dark">
-                        {{ Auth::user()->full_name ?? 'Admin' }}
+                        {{ Auth::user()->full_name ?? Auth::user()->name ?? 'Admin' }}
                     </div>
                 </div>
 
@@ -34,9 +34,10 @@
     {{-- NAVIGATION --}}
     <nav class="nav-custom bg-light py-2 border-bottom">
         <div class="container d-flex gap-4">
-            <a href="{{ route('admin.beranda') }}" class="nav-link-custom active">Beranda</a>
+            <a href="{{ route('admin.beranda') }}" class="nav-link-custom">Beranda</a>
             <a href="#" class="nav-link-custom">Profil Agent</a>
-            <a href="{{ route('admin.pasar') }}" class="nav-link-custom">Pasar Digital</a>
+            {{-- PERBAIKAN: admin.pasar.index --}}
+            <a href="{{ route('admin.pasar.index') }}" class="nav-link-custom">Pasar Digital</a>
             <a href="#" class="nav-link-custom">Pemandu Wisata</a>
             <a href="{{ route('admin.users.index') }}" class="nav-link-custom">Kelola User</a>
         </div>
@@ -62,8 +63,7 @@
 
             {{-- Header --}}
             <div class="d-flex justify-content-between align-items-center mb-4">
-
-            <h4 class="fw-bold mb-0">
+                <h4 class="fw-bold mb-0">
                     <i class="fas fa-tags me-2"></i>Kelola Kategori Destinasi
                 </h4>
 
@@ -77,7 +77,6 @@
                     </a>
                 </div>
             </div>
-
 
             {{-- Grid Kategori --}}
             <div class="row row-cols-1 row-cols-md-3 row-cols-lg-4 g-4">

@@ -190,11 +190,14 @@
     {{-- NAVIGATION --}}
     <nav class="nav-custom bg-light py-2 border-bottom">
         <div class="container d-flex gap-4">
-            <a href="{{ route('admin.beranda') }}" class="nav-link-custom {{ request()->routeIs('admin.beranda') ? 'active' : '' }}">Beranda</a>
+            <a href="{{ route('admin.beranda') }}" class="nav-link-custom">Beranda</a>
             <a href="#" class="nav-link-custom">Profil Agent</a>
-            <a href="{{ route('admin.pasar') }}" class="nav-link-custom {{ request()->routeIs('admin.pasar') ? 'active' : '' }}">Pasar Digital</a>
+            
+            {{-- PERBAIKAN: admin.pasar.index --}}
+            <a href="{{ route('admin.pasar.index') }}" class="nav-link-custom {{ request()->routeIs('admin.pasar*') ? 'active' : '' }}">Pasar Digital</a>
+            
             <a href="#" class="nav-link-custom">Pemandu Wisata</a>
-            <a href="{{ route('admin.users.index') }}" class="nav-link-custom {{ request()->routeIs('admin.users.index') ? 'active' : '' }}">Kelola User</a>
+            <a href="{{ route('admin.users.index') }}" class="nav-link-custom">Kelola User</a>
         </div>
     </nav>
 
@@ -219,17 +222,18 @@
 
         <div class="d-flex gap-3 flex-wrap mb-4">
 
-            <a href="{{ route('admin.pasar') }}"
+            {{-- PERBAIKAN: admin.pasar.index --}}
+            <a href="{{ route('admin.pasar.index') }}"
                class="category-box {{ !$type ? 'active' : '' }}">
                 <i class="fa-solid fa-car-side"></i> Semua Kendaraan
             </a>
 
-            <a href="{{ route('admin.pasar', ['type' => 'CAR']) }}"
+            <a href="{{ route('admin.pasar.index', ['type' => 'CAR']) }}"
                class="category-box {{ $type === 'CAR' ? 'active' : '' }}">
                 <i class="fa-solid fa-car"></i> Mobil
             </a>
 
-            <a href="{{ route('admin.pasar', ['type' => 'MOTORCYCLE']) }}"
+            <a href="{{ route('admin.pasar.index', ['type' => 'MOTORCYCLE']) }}"
                class="category-box {{ $type === 'MOTORCYCLE' ? 'active' : '' }}">
                 <i class="fa-solid fa-motorcycle"></i> Motor
             </a>
@@ -365,7 +369,8 @@
 
                         {{-- View All Link --}}
                         @if($totalVehicles > 3)
-                            <a href="{{ route('admin.pasar', ['agent' => $agentId]) }}" class="view-all-link">
+                            {{-- PERBAIKAN: admin.pasar.index --}}
+                            <a href="{{ route('admin.pasar.index', ['agent' => $agentId]) }}" class="view-all-link">
                                 <i class="fa-solid fa-arrow-right me-1"></i> Lihat semua {{ $totalVehicles }} kendaraan dari agent ini
                             </a>
                         @endif

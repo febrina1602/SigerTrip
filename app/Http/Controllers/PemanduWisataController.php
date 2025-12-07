@@ -35,8 +35,9 @@ class PemanduWisataController extends Controller
         }
 
         // USER/GUEST: lihat catalog semua LocalTourAgent dari verified agents
-        $query = LocalTourAgent::whereHas('agent', function($q) {
-            $q->where('is_verified', true);
+        $query = LocalTourAgent::where('is_verified', true) // Cek cabang
+        ->whereHas('agent', function($q) {
+            $q->where('is_verified', true); // Cek induk
         });
 
         if ($keyword) {
