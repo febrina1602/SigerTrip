@@ -76,5 +76,7 @@ class Kernel extends HttpKernel
 
         // Cegah cache setelah login/logout
         'prevent-back-history' => \App\Http\Middleware\PreventBackHistory::class,
+
+        'verified.agent' => \App\Http\Middleware\VerifiedAgent::class,
     ];
 }

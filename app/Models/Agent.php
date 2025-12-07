@@ -41,15 +41,8 @@ class Agent extends Model
         return $this->hasMany(LocalTourAgent::class);
     }
 
-    /**
-     * PERBAIKAN: Ubah relasi agar langsung ke TourPackage
-     */
     public function tourPackages()
     {
-        // SEBELUMNYA (Salah karena lewat LocalTourAgent):
-        // return $this->hasManyThrough(TourPackage::class, LocalTourAgent::class);
-        
-        // SEKARANG (Benar, langsung ke agent_id di tour_packages):
         return $this->hasMany(TourPackage::class, 'agent_id');
     }
 
@@ -66,5 +59,15 @@ class Agent extends Model
     public function scopePending($q)
     {
         return $q->where('is_verified', false);
+    }
+
+    // ======= TAMBAHKAN ACCESSOR =======
+    public function getIsProfileCompleteAttribute()
+    {
+        // Hitung profil lengkap jika semua field wajib ada
+        return !empty($this->name)
+            && !empty($this->address)
+            && !empty($this->contact_phone)
+            && !empty($this->description);
     }
 }

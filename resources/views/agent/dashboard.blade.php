@@ -3,6 +3,7 @@
 @section('title', 'Dashboard Agent - SigerTrip')
 
 @section('content')
+
 <div class="min-vh-100 bg-light">
     
     @include('components.layout.header')
@@ -10,6 +11,73 @@
     {{-- MAIN CONTENT --}}
     <div class="container mt-4 mb-5">
         
+        {{-- STATUS ALERT - IMPROVED UI --}}
+        @if (!$agent->is_verified)
+            <div class="mb-4">
+                <div class="alert alert-warning border-0 rounded-4 shadow-sm" role="alert">
+                    <div class="d-flex align-items-center">
+                        <div class="flex-shrink-0">
+                            <i class="fas fa-clock text-warning" style="font-size: 2rem;"></i>
+                        </div>
+                        <div class="flex-grow-1 ms-3">
+                            <h5 class="alert-heading mb-1 fw-bold">
+                                Menunggu Verifikasi Admin
+                            </h5>
+                            <p class="mb-0 text-muted">
+                                Profil agensi Anda sedang dalam proses verifikasi oleh tim admin kami. 
+                                <strong>Fitur Pasar Digital dan Paket Perjalanan akan aktif setelah verifikasi selesai.</strong>
+                            </p>
+
+                            <div class="mt-2">
+                                @if($agent->is_profile_complete)
+                                    {{-- Jika profil lengkap --}}
+                                    <small class="text-muted d-block mb-2">
+                                        <i class="fas fa-check-circle me-1" style="color: #10b981;"></i>
+                                        Status: <strong>Profil Lengkap</strong>
+                                    </small>
+
+                                    <a href="{{ route('agent.profile.edit') }}" class="btn btn-sm btn-outline-secondary">
+                                        <i class="fas fa-edit me-1"></i>Edit Profil
+                                    </a>
+
+                                @else
+                                    {{-- Jika profil belum lengkap --}}
+                                    <small class="text-danger d-block mb-2">
+                                        <i class="fas fa-exclamation-circle me-1"></i>
+                                        Status: <strong>Profil Belum Lengkap</strong>
+                                    </small>
+
+                                    <a href="{{ route('agent.profile.edit') }}" class="btn btn-sm btn-warning">
+                                        <i class="fas fa-edit me-1"></i>Lengkapi Profil Sekarang
+                                    </a>
+                                @endif
+                            </div>
+
+                        </div>
+                    </div>
+                </div>
+            </div>
+        @else
+            <div class="mb-4">
+                <div class="alert alert-success border-0 rounded-4 shadow-sm" role="alert">
+                    <div class="d-flex align-items-center">
+                        <div class="flex-shrink-0">
+                            <i class="fas fa-check-circle text-success" style="font-size: 2rem;"></i>
+                        </div>
+                        <div class="flex-grow-1 ms-3">
+                            <h5 class="alert-heading mb-1 fw-bold">
+                                Profil Terverifikasi!
+                            </h5>
+                            <p class="mb-0 text-muted">
+                                Selamat! Profil Anda sudah diverifikasi. Semua fitur sekarang dapat Anda akses.
+                            </p>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        @endif
+
+
         {{-- WELCOME SECTION --}}
         <div class="row mb-5">
             <div class="col-12">
@@ -109,19 +177,35 @@
                 <h5 class="fw-bold mb-3">Aksi Cepat</h5>
                 <div class="row g-3">
                     <div class="col-md-6 col-lg-3">
-                        {{-- Tombol untuk menambah paket (Sementara Modal) --}}
-                        <button class="btn btn-outline-success w-100 rounded-3 py-3" data-bs-toggle="modal" data-bs-target="#addTourPackageModal">
-                            <i class="fas fa-plus me-2"></i> Buat Paket Perjalanan
-                        </button>
-                    </div>
-                    <div class="col-md-6 col-lg-3">
-                        <a href="{{ route('agent.pasar.index') }}" class="btn btn-outline-warning w-100 rounded-3 py-3">
-                            <i class="fas fa-car me-2"></i> Kelola Pasar Digital
+                        {{-- Pasar Digital --}}
+                        <a href="{{ route('agent.pasar.index') }}" class="btn btn-outline-warning w-100 rounded-3 py-3 position-relative">
+                            <i class="fas fa-car me-2"></i> Pasar Digital
+                            @if(!$agent->is_verified)
+                                <span class="position-absolute top-0 start-50 translate-middle badge bg-warning rounded-pill">
+                                    <i class="fas fa-lock" style="font-size: 0.6rem;"></i>
+                                </span>
+                            @endif
                         </a>
                     </div>
                     <div class="col-md-6 col-lg-3">
-                        <a href="{{ route('profile.show') }}" class="btn btn-outline-secondary w-100 rounded-3 py-3">
-                            <i class="fas fa-gear me-2"></i> Pengaturan Profil
+                        {{-- Paket Perjalanan --}}
+                        <a href="{{ route('agent.tour-packages.index') }}" class="btn btn-outline-success w-100 rounded-3 py-3 position-relative">
+                            <i class="fas fa-plus me-2"></i> Paket Perjalanan
+                            @if(!$agent->is_verified)
+                                <span class="position-absolute top-0 start-50 translate-middle badge bg-warning rounded-pill">
+                                    <i class="fas fa-lock" style="font-size: 0.6rem;"></i>
+                                </span>
+                            @endif
+                        </a>
+                    </div>
+                    <div class="col-md-6 col-lg-3">
+                        <a href="{{ route('agent.profile.edit') }}" class="btn btn-outline-secondary w-100 rounded-3 py-3">
+                            <i class="fas fa-gear me-2"></i> Edit Profil
+                        </a>
+                    </div>
+                    <div class="col-md-6 col-lg-3">
+                        <a href="{{ route('profile.show') }}" class="btn btn-outline-info w-100 rounded-3 py-3">
+                            <i class="fas fa-user me-2"></i> Profil Akun
                         </a>
                     </div>
                 </div>
@@ -155,17 +239,12 @@
                                             <td>{{ $package->duration ?? '-' }}</td>
                                             <td>
                                                 <div class="btn-group btn-group-sm">
-                                                    {{-- Tombol Edit (Trigger Modal) --}}
-                                                    <button type="button" 
-                                                            class="btn btn-outline-primary" 
-                                                            onclick="openEditPackageModal({{ json_encode($package) }})">
+                                                    <a href="{{ route('agent.tour-packages.edit', $package->id) }}" class="btn btn-outline-primary">
                                                         <i class="fas fa-edit"></i>
-                                                    </button>
-
-                                                    {{-- Tombol Hapus --}}
-                                                    <form action="{{ route('agent.tour_packages.delete', $package->id) }}" method="POST" class="d-inline" onsubmit="return confirm('Hapus paket ini?');">
+                                                    </a>
+                                                    <form action="{{ route('agent.tour-packages.destroy', $package->id) }}" method="POST" class="d-inline" onsubmit="return confirm('Hapus paket ini?');">
                                                         @csrf
-                                                        {{-- Note: Controller uses standard POST for delete based on routes provided previously --}}
+                                                        @method('DELETE')
                                                         <button type="submit" class="btn btn-outline-danger" style="border-top-left-radius: 0; border-bottom-left-radius: 0;">
                                                             <i class="fas fa-trash"></i>
                                                         </button>
@@ -189,202 +268,5 @@
 
     </div>
 </div>
-
-{{-- MODAL: Add Local Tour Agent --}}
-<div class="modal fade" id="addLocalTourAgentModal" tabindex="-1">
-    <div class="modal-dialog modal-dialog-centered">
-        <div class="modal-content border-0 rounded-4">
-            <div class="modal-header border-0 pb-0">
-                <h5 class="modal-title fw-bold">Tambah Agen Tour Lokal</h5>
-                <button type="button" class="btn-close" data-bs-dismiss="modal"></button>
-            </div>
-            <form id="addLocalTourAgentForm">
-                @csrf
-                <div class="modal-body">
-                    <div id="agentAlert" class="alert d-none"></div>
-                    
-                    <div class="mb-3">
-                        <label class="form-label small fw-bold">Nama Agen / Cabang</label>
-                        <input type="text" name="name" class="form-control" required placeholder="Contoh: Cabang Way Kambas">
-                    </div>
-                    <div class="mb-3">
-                        <label class="form-label small fw-bold">Alamat</label>
-                        <input type="text" name="address" class="form-control" placeholder="Lokasi operasional">
-                    </div>
-                    <div class="mb-3">
-                        <label class="form-label small fw-bold">Nomor Telepon</label>
-                        <input type="text" name="contact_phone" class="form-control" placeholder="08...">
-                    </div>
-                    <div class="mb-3">
-                        <label class="form-label small fw-bold">Deskripsi</label>
-                        <textarea name="description" class="form-control" rows="3"></textarea>
-                    </div>
-                </div>
-                <div class="modal-footer border-0 pt-0">
-                    <button type="button" class="btn btn-light rounded-3" data-bs-dismiss="modal">Batal</button>
-                    <button type="submit" class="btn btn-primary rounded-3 px-4">Simpan</button>
-                </div>
-            </form>
-        </div>
-    </div>
-</div>
-
-{{-- MODAL: Add Tour Package (Placeholder) --}}
-<div class="modal fade" id="addTourPackageModal" tabindex="-1">
-    <div class="modal-dialog modal-dialog-centered">
-        <div class="modal-content border-0 rounded-4">
-            <div class="modal-header border-0">
-                <h5 class="modal-title fw-bold">Buat Paket Baru</h5>
-                <button type="button" class="btn-close" data-bs-dismiss="modal"></button>
-            </div>
-            <div class="modal-body text-center py-4">
-                <i class="fas fa-person-digging fa-3x text-warning mb-3"></i>
-                <h5>Fitur Segera Hadir</h5>
-                <p class="text-muted">Untuk saat ini, silakan hubungi admin untuk menambahkan paket perjalanan kompleks.</p>
-            </div>
-        </div>
-    </div>
-</div>
-
-{{-- MODAL: Edit Tour Package --}}
-<div class="modal fade" id="editPackageModal" tabindex="-1">
-    <div class="modal-dialog modal-dialog-centered">
-        <div class="modal-content border-0 rounded-4">
-            <div class="modal-header border-0 pb-0">
-                <h5 class="modal-title fw-bold">Edit Paket Perjalanan</h5>
-                <button type="button" class="btn-close" data-bs-dismiss="modal"></button>
-            </div>
-            <form id="editPackageForm">
-                @csrf
-                <div class="modal-body">
-                    <div id="editPackageAlert" class="alert d-none"></div>
-                    <input type="hidden" id="edit_package_id">
-
-                    <div class="mb-3">
-                        <label class="form-label small fw-bold">Harga per Orang (Rp)</label>
-                        <input type="number" name="price_per_person" id="edit_price" class="form-control" required>
-                    </div>
-                    <div class="mb-3">
-                        <label class="form-label small fw-bold">Durasi</label>
-                        <input type="text" name="duration" id="edit_duration" class="form-control" placeholder="Contoh: 2 Hari 1 Malam">
-                    </div>
-                    <div class="mb-3">
-                        <label class="form-label small fw-bold">Fasilitas</label>
-                        <textarea name="facilities" id="edit_facilities" class="form-control" rows="2" placeholder="Makan siang, Tiket masuk..."></textarea>
-                    </div>
-                    <div class="mb-3">
-                        <label class="form-label small fw-bold">Deskripsi</label>
-                        <textarea name="description" id="edit_description" class="form-control" rows="3"></textarea>
-                    </div>
-                </div>
-                <div class="modal-footer border-0 pt-0">
-                    <button type="button" class="btn btn-light rounded-3" data-bs-dismiss="modal">Batal</button>
-                    <button type="submit" class="btn btn-primary rounded-3 px-4">Update</button>
-                </div>
-            </form>
-        </div>
-    </div>
-</div>
-
-@push('scripts')
-<script>
-    // === 1. Handle Add Local Agent (AJAX) ===
-    document.getElementById('addLocalTourAgentForm').addEventListener('submit', async function(e) {
-        e.preventDefault();
-        const alertBox = document.getElementById('agentAlert');
-        const btn = this.querySelector('button[type="submit"]');
-        
-        btn.disabled = true;
-        btn.innerText = 'Menyimpan...';
-        alertBox.classList.add('d-none');
-
-        const formData = new FormData(this);
-
-        try {
-            const res = await fetch("{{ route('agent.local_tour_agents.store') }}", {
-                method: 'POST',
-                headers: {
-                    'X-CSRF-TOKEN': '{{ csrf_token() }}',
-                    'Accept': 'application/json'
-                },
-                body: formData
-            });
-
-            const data = await res.json();
-
-            if (!res.ok) throw new Error(data.message || 'Gagal menyimpan.');
-
-            // Success
-            location.reload(); 
-
-        } catch (err) {
-            alertBox.classList.remove('d-none', 'alert-success');
-            alertBox.classList.add('alert-danger');
-            alertBox.innerText = err.message;
-            btn.disabled = false;
-            btn.innerText = 'Simpan';
-        }
-    });
-
-    // === 2. Handle Open Edit Modal ===
-    function openEditPackageModal(packageData) {
-        document.getElementById('edit_package_id').value = packageData.id;
-        document.getElementById('edit_price').value = packageData.price_per_person;
-        document.getElementById('edit_duration').value = packageData.duration;
-        document.getElementById('edit_description').value = packageData.description;
-        
-        // Handle facilities array/string
-        let facilities = packageData.facilities;
-        if(Array.isArray(facilities)) {
-            facilities = facilities.join(', ');
-        }
-        document.getElementById('edit_facilities').value = facilities;
-
-        new bootstrap.Modal(document.getElementById('editPackageModal')).show();
-    }
-
-    // === 3. Handle Edit Package Submit (AJAX) ===
-    document.getElementById('editPackageForm').addEventListener('submit', async function(e) {
-        e.preventDefault();
-        const pkgId = document.getElementById('edit_package_id').value;
-        const alertBox = document.getElementById('editPackageAlert');
-        const btn = this.querySelector('button[type="submit"]');
-        
-        // Construct URL manually since ID is dynamic
-        // Assuming route: /agent/tour-packages/{id}/update
-        const url = "{{ url('/agent/tour-packages') }}/" + pkgId + "/update";
-
-        btn.disabled = true;
-        btn.innerText = 'Updating...';
-        alertBox.classList.add('d-none');
-
-        const formData = new FormData(this);
-
-        try {
-            const res = await fetch(url, {
-                method: 'POST',
-                headers: {
-                    'X-CSRF-TOKEN': '{{ csrf_token() }}',
-                    'Accept': 'application/json'
-                },
-                body: formData
-            });
-
-            const data = await res.json();
-
-            if (!res.ok) throw new Error(data.message || 'Gagal update.');
-
-            location.reload();
-
-        } catch (err) {
-            alertBox.classList.remove('d-none');
-            alertBox.classList.add('alert-danger');
-            alertBox.innerText = err.message;
-            btn.disabled = false;
-            btn.innerText = 'Update';
-        }
-    });
-</script>
-@endpush
 
 @endsection

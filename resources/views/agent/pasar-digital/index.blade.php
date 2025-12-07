@@ -10,13 +10,40 @@
     {{-- Header Section --}}
     <div class="d-flex justify-content-between align-items-center mb-4">
         <div>
-            <h3 class="fw-bold mb-1">Pasar Digital (Agent)</h3>
+            <h3 class="fw-bold mb-1">Pasar Digital</h3>
             <p class="text-muted mb-0">Kelola kendaraan yang Anda sewakan.</p>
         </div>
-        <a href="{{ route('agent.pasar.create') }}" class="btn btn-primary">
-            <i class="fas fa-plus me-2"></i> Tambah Kendaraan
-        </a>
+        @if($agent->is_verified)
+            <a href="{{ route('agent.pasar.create') }}" class="btn btn-primary">
+                <i class="fas fa-plus me-2"></i> Tambah Kendaraan
+            </a>
+        @else
+            <button class="btn btn-secondary" disabled title="Harap tunggu verifikasi admin">
+                <i class="fas fa-lock me-2"></i> Tambah Kendaraan
+            </button>
+        @endif
     </div>
+
+    {{-- Status Alert - Jika belum verified --}}
+    @if(!$agent->is_verified)
+        <div class="alert alert-warning border-0 rounded-4 shadow-sm mb-4" role="alert">
+            <div class="d-flex align-items-center">
+                <div class="flex-shrink-0">
+                    <i class="fas fa-clock text-warning" style="font-size: 1.5rem;"></i>
+                </div>
+                <div class="flex-grow-1 ms-3">
+                    <h5 class="alert-heading mb-1 fw-bold">
+                        Fitur Terbatas - Menunggu Verifikasi Admin
+                    </h5>
+                    <p class="mb-0 text-muted">
+                        Anda masih <strong>belum bisa menambah kendaraan baru</strong>. 
+                        Profil Anda sedang dalam proses verifikasi oleh tim admin kami. 
+                        Fitur ini akan aktif setelah verifikasi selesai.
+                    </p>
+                </div>
+            </div>
+        </div>
+    @endif
 
     {{-- Alert Success --}}
     @if(session('success'))
@@ -58,16 +85,25 @@
 
                             {{-- Actions --}}
                             <div class="d-flex gap-2">
-                                <a href="{{ route('agent.pasar.edit', $vehicle->id) }}" class="btn btn-sm btn-outline-warning flex-fill">
-                                    <i class="fas fa-edit"></i> Edit
-                                </a>
-                                <form action="{{ route('agent.pasar.destroy', $vehicle->id) }}" method="POST" class="flex-fill" onsubmit="return confirm('Yakin hapus kendaraan ini?');">
-                                    @csrf
-                                    @method('DELETE')
-                                    <button type="submit" class="btn btn-sm btn-outline-danger w-100">
-                                        <i class="fas fa-trash"></i> Hapus
+                                @if($agent->is_verified)
+                                    <a href="{{ route('agent.pasar.edit', $vehicle->id) }}" class="btn btn-sm btn-outline-warning flex-fill">
+                                        <i class="fas fa-edit"></i> Edit
+                                    </a>
+                                    <form action="{{ route('agent.pasar.destroy', $vehicle->id) }}" method="POST" class="flex-fill" onsubmit="return confirm('Yakin hapus kendaraan ini?');">
+                                        @csrf
+                                        @method('DELETE')
+                                        <button type="submit" class="btn btn-sm btn-outline-danger w-100">
+                                            <i class="fas fa-trash"></i> Hapus
+                                        </button>
+                                    </form>
+                                @else
+                                    <button class="btn btn-sm btn-secondary flex-fill" disabled>
+                                        <i class="fas fa-lock me-1"></i> Edit
                                     </button>
-                                </form>
+                                    <button class="btn btn-sm btn-secondary flex-fill" disabled>
+                                        <i class="fas fa-lock me-1"></i> Hapus
+                                    </button>
+                                @endif
                             </div>
                         </div>
                     </div>
@@ -81,14 +117,24 @@
         </div>
 
     @else
-        {{-- Empty State (Menggunakan style desain asli) --}}
+        {{-- Empty State --}}
         <div class="text-center py-5">
-            <img src="{{ asset('images/empty_marketplace.svg') }}" alt="Pasar Digital Kosong" style="max-width: 320px; opacity: 0.8;" onerror="this.style.display='none'">
-            <h3 class="mt-4">Belum Ada Kendaraan</h3>
-            <p class="text-muted">Anda belum mendaftarkan kendaraan apapun di Pasar Digital.</p>
-            <a href="{{ route('agent.pasar.create') }}" class="btn btn-primary mt-3 px-4 rounded-pill">
-                <i class="fas fa-plus me-2"></i> Tambah Kendaraan Pertama
-            </a>
+            <i class="fas fa-car fa-4x text-muted opacity-25 mb-3"></i>
+            <h4>Belum Ada Kendaraan</h4>
+            <p class="text-muted mb-4">Anda belum mendaftarkan kendaraan apapun di Pasar Digital.</p>
+            
+            @if($agent->is_verified)
+                <a href="{{ route('agent.pasar.create') }}" class="btn btn-primary">
+                    <i class="fas fa-plus me-2"></i> Tambah Kendaraan Pertama
+                </a>
+            @else
+                <div class="alert alert-warning d-inline-block rounded-4 mt-3" style="max-width: 400px;">
+                    <p class="mb-0 text-muted">
+                        <i class="fas fa-clock me-2"></i>
+                        <strong>Fitur akan aktif</strong> setelah profil Anda diverifikasi oleh admin
+                    </p>
+                </div>
+            @endif
         </div>
     @endif
 </div>

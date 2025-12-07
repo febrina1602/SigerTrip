@@ -77,28 +77,41 @@ Route::middleware(['is_user', 'prevent-back-history'])->group(function () {
 Route::prefix('agent')
     ->middleware(['auth', 'agent', 'prevent-back-history'])
     ->group(function () {
+        
         // Profil
-        Route::get('/profile/edit', [\App\Http\Controllers\AgentProfileController::class, 'edit'])->name('agent.profile.edit');
-        Route::put('/profile/update', [\App\Http\Controllers\AgentProfileController::class, 'update'])->name('agent.profile.update');
+        Route::get('/profile/edit', [\App\Http\Controllers\AgentProfileController::class, 'edit'])
+            ->name('agent.profile.edit');
+        Route::put('/profile/update', [\App\Http\Controllers\AgentProfileController::class, 'update'])
+            ->name('agent.profile.update');
         
         // Dashboard
-        Route::get('/dashboard', [AgentDashboardController::class, 'index'])->name('agent.dashboard');
+        Route::get('/dashboard', [AgentDashboardController::class, 'index'])
+            ->name('agent.dashboard');
         
-        // Pasar Digital (Manajemen)
-        Route::get('/pasar-digital', [AgentPasarDigitalController::class, 'index'])->name('agent.pasar.index');
-        Route::get('/pasar-digital/create', [AgentPasarDigitalController::class, 'create'])->name('agent.pasar.create');
-        Route::post('/pasar-digital', [AgentPasarDigitalController::class, 'store'])->name('agent.pasar.store');
-        Route::get('/pasar-digital/{vehicle}/edit', [AgentPasarDigitalController::class, 'edit'])->name('agent.pasar.edit');
-        Route::put('/pasar-digital/{vehicle}', [AgentPasarDigitalController::class, 'update'])->name('agent.pasar.update');
-        Route::delete('/pasar-digital/{vehicle}', [AgentPasarDigitalController::class, 'destroy'])->name('agent.pasar.destroy');
+        // Pasar Digital (Manajemen) - Bisa diakses, tapi POST/STORE diproteksi di controller
+        Route::get('/pasar-digital', [AgentPasarDigitalController::class, 'index'])
+            ->name('agent.pasar.index');
+        Route::get('/pasar-digital/create', [AgentPasarDigitalController::class, 'create'])
+            ->name('agent.pasar.create');
+        Route::post('/pasar-digital', [AgentPasarDigitalController::class, 'store'])
+            ->name('agent.pasar.store');
+        Route::get('/pasar-digital/{vehicle}/edit', [AgentPasarDigitalController::class, 'edit'])
+            ->name('agent.pasar.edit');
+        Route::put('/pasar-digital/{vehicle}', [AgentPasarDigitalController::class, 'update'])
+            ->name('agent.pasar.update');
+        Route::delete('/pasar-digital/{vehicle}', [AgentPasarDigitalController::class, 'destroy'])
+            ->name('agent.pasar.destroy');
 
-        // Paket Perjalanan (Manajemen)
+        // Paket Perjalanan (Manajemen) - Bisa diakses, tapi POST/STORE diproteksi di controller
         Route::resource('tour-packages', TourPackageController::class, ['as' => 'agent']);
-        Route::delete('/tour-packages/{tourPackage}/delete', [TourPackageController::class, 'destroy'])->name('agent.tour_packages.delete');
+        Route::delete('/tour-packages/{tourPackage}/delete', [TourPackageController::class, 'destroy'])
+            ->name('agent.tour_packages.delete');
         
         // Legacy Local Agents (jika masih ada sisa)
-        Route::post('/local-tour-agents', [AgentDashboardController::class, 'storeLocalTourAgent'])->name('agent.local_tour_agents.store');
-        Route::delete('/local-tour-agents/{localTourAgent}', [AgentDashboardController::class, 'deleteLocalTourAgent'])->name('agent.local_tour_agents.delete');
+        Route::post('/local-tour-agents', [AgentDashboardController::class, 'storeLocalTourAgent'])
+            ->name('agent.local_tour_agents.store');
+        Route::delete('/local-tour-agents/{localTourAgent}', [AgentDashboardController::class, 'deleteLocalTourAgent'])
+            ->name('agent.local_tour_agents.delete');
     });
 
 // ==== KHUSUS ADMIN ====
