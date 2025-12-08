@@ -10,6 +10,7 @@ use App\Http\Controllers\AdminUserController;
 use App\Http\Controllers\AdminCategoryController;
 use App\Http\Controllers\AdminPasarDigitalController;
 use App\Http\Controllers\AdminAgentProfileController;
+use App\Http\Controllers\AdminTourPackageController;
 use App\Http\Controllers\PasarDigitalController;
 use App\Http\Controllers\PemanduWisataController;
 use App\Http\Controllers\ProfileController;
@@ -134,6 +135,12 @@ Route::prefix('admin')
         
         // Pasar Digital (Admin)
         Route::resource('pasar', AdminPasarDigitalController::class, ['as' => 'admin', 'parameters' => ['pasar' => 'vehicle']]);
+
+        // Paket Perjalanan (Admin)
+        Route::get('/tour-packages', [AdminTourPackageController::class, 'index'])->name('admin.tour-packages.index');
+        Route::get('/tour-packages/{id}/edit', [AdminTourPackageController::class, 'edit'])->name('admin.tour-packages.edit');
+        Route::put('/tour-packages/{id}', [AdminTourPackageController::class, 'update'])->name('admin.tour-packages.update');
+        Route::delete('/tour-packages/{id}', [AdminTourPackageController::class, 'destroy'])->name('admin.tour-packages.destroy');
 
         // Destinasi (CRUD)
         Route::get('/wisata/create', [AdminDestinationController::class, 'create'])->name('admin.wisata.create');
