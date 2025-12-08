@@ -142,6 +142,35 @@
         color: #ff3d00;
         background-color: #fff7ec;
     }
+
+    /* Breadcrumb styling */
+    .breadcrumb {
+        background-color: transparent;
+        padding: 0;
+        margin-bottom: 1rem;
+    }
+
+    .breadcrumb a {
+        color: #ff7a00;
+    }
+
+    .breadcrumb a:hover {
+        color: #ff3d00;
+    }
+
+    .back-button {
+        display: inline-flex;
+        align-items: center;
+        gap: 0.5rem;
+        color: #ff7a00;
+        text-decoration: none;
+        font-weight: 600;
+        margin-bottom: 1.5rem;
+    }
+
+    .back-button:hover {
+        color: #ff3d00;
+    }
 </style>
 @endpush
 
@@ -194,17 +223,36 @@
             <a href="{{route('admin.profil-agent.index')}}" class="nav-link-custom">Profil Agent</a>
             <a href="{{ route('admin.pasar.index') }}" class="nav-link-custom {{ request()->routeIs('admin.pasar*') ? 'active' : '' }}">Pasar Digital</a>
             
-            <a href="#" class="nav-link-custom">Pemandu Wisata</a>
+            <a href="{{ route('admin.tour-packages.index') }}" class="nav-link-custom">Pemandu Wisata</a>
             <a href="{{ route('admin.users.index') }}" class="nav-link-custom">Kelola User</a>
         </div>
     </nav>
 
     <main class="container py-4 py-md-5">
 
+        {{-- BACK BUTTON (Jika view detail agent) --}}
+        @if(isset($agentId))
+            <a href="{{ route('admin.pasar.index') }}" class="back-button">
+                <i class="fas fa-arrow-left"></i> Kembali ke Daftar Agent
+            </a>
+        @endif
+
         {{-- TITLE --}}
         <div class="mb-4">
-            <h2 class="fw-bold mb-0" style="font-size: 1.5rem;">Pasar Digital (Admin)</h2>
-            <p class="text-muted mb-0">Kelola semua kendaraan yang didaftarkan oleh agent/mitra.</p>
+            <h2 class="fw-bold mb-0" style="font-size: 1.5rem;">
+                @if(isset($agentId))
+                    Kendaraan dari {{ $vehicles->first()->agent->user->full_name ?? $vehicles->first()->agent->user->name }}
+                @else
+                    Pasar Digital (Admin)
+                @endif
+            </h2>
+            <p class="text-muted mb-0">
+                @if(isset($agentId))
+                    Kelola semua kendaraan dari agent ini
+                @else
+                    Kelola semua kendaraan yang didaftarkan oleh agent/mitra
+                @endif
+            </p>
         </div>
 
         {{-- PESAN SUKSES --}}
@@ -215,83 +263,152 @@
             </div>
         @endif
 
-        {{-- FILTER KATEGORI --}}
-        @php $type = request('type'); @endphp
+        {{-- FILTER KATEGORI (Hanya tampil jika tidak ada filter agent) --}}
+        @if(!isset($agentId))
+            @php $type = request('type'); @endphp
 
-        <div class="d-flex gap-3 flex-wrap mb-4">
+            <div class="d-flex gap-3 flex-wrap mb-4">
+                <a href="{{ route('admin.pasar.index') }}"
+                   class="category-box {{ !$type ? 'active' : '' }}">
+                    <i class="fa-solid fa-car-side"></i> Semua Kendaraan
+                </a>
 
-            {{-- PERBAIKAN: admin.pasar.index --}}
-            <a href="{{ route('admin.pasar.index') }}"
-               class="category-box {{ !$type ? 'active' : '' }}">
-                <i class="fa-solid fa-car-side"></i> Semua Kendaraan
-            </a>
+                <a href="{{ route('admin.pasar.index', ['type' => 'CAR']) }}"
+                   class="category-box {{ $type === 'CAR' ? 'active' : '' }}">
+                    <i class="fa-solid fa-car"></i> Mobil
+                </a>
 
-            <a href="{{ route('admin.pasar.index', ['type' => 'CAR']) }}"
-               class="category-box {{ $type === 'CAR' ? 'active' : '' }}">
-                <i class="fa-solid fa-car"></i> Mobil
-            </a>
+                <a href="{{ route('admin.pasar.index', ['type' => 'MOTORCYCLE']) }}"
+                   class="category-box {{ $type === 'MOTORCYCLE' ? 'active' : '' }}">
+                    <i class="fa-solid fa-motorcycle"></i> Motor
+                </a>
+            </div>
+        @endif
 
-            <a href="{{ route('admin.pasar.index', ['type' => 'MOTORCYCLE']) }}"
-               class="category-box {{ $type === 'MOTORCYCLE' ? 'active' : '' }}">
-                <i class="fa-solid fa-motorcycle"></i> Motor
-            </a>
-        </div>
-
-        {{-- STATISTIK SINGKAT --}}
-        <div class="row g-3 mb-4">
-            <div class="col-md-3 col-sm-6">
-                <div class="card border-0 shadow-sm text-center p-3">
-                    <h6 class="text-muted mb-1">Total Kendaraan</h6>
-                    <h3 class="fw-bold text-primary mb-0">{{ $allVehicles->count() }}</h3>
+        {{-- STATISTIK SINGKAT (Hanya tampil jika tidak ada filter agent) --}}
+        @if(!isset($agentId))
+            <div class="row g-3 mb-4">
+                <div class="col-md-3 col-sm-6">
+                    <div class="card border-0 shadow-sm text-center p-3">
+                        <h6 class="text-muted mb-1">Total Kendaraan</h6>
+                        <h3 class="fw-bold text-primary mb-0">{{ $allVehicles->count() }}</h3>
+                    </div>
+                </div>
+                <div class="col-md-3 col-sm-6">
+                    <div class="card border-0 shadow-sm text-center p-3">
+                        <h6 class="text-muted mb-1">Total Agent</h6>
+                        <h3 class="fw-bold text-success mb-0">{{ $allVehicles->groupBy('agent_id')->count() }}</h3>
+                    </div>
+                </div>
+                <div class="col-md-3 col-sm-6">
+                    <div class="card border-0 shadow-sm text-center p-3">
+                        <h6 class="text-muted mb-1">Mobil</h6>
+                        <h3 class="fw-bold text-info mb-0">{{ $allVehicles->where('vehicle_type', 'CAR')->count() }}</h3>
+                    </div>
+                </div>
+                <div class="col-md-3 col-sm-6">
+                    <div class="card border-0 shadow-sm text-center p-3">
+                        <h6 class="text-muted mb-1">Motor</h6>
+                        <h3 class="fw-bold text-warning mb-0">{{ $allVehicles->where('vehicle_type', 'MOTORCYCLE')->count() }}</h3>
+                    </div>
                 </div>
             </div>
-            <div class="col-md-3 col-sm-6">
-                <div class="card border-0 shadow-sm text-center p-3">
-                    <h6 class="text-muted mb-1">Total Agent</h6>
-                    <h3 class="fw-bold text-success mb-0">{{ $allVehicles->groupBy('agent_id')->count() }}</h3>
-                </div>
-            </div>
-            <div class="col-md-3 col-sm-6">
-                <div class="card border-0 shadow-sm text-center p-3">
-                    <h6 class="text-muted mb-1">Mobil</h6>
-                    <h3 class="fw-bold text-info mb-0">{{ $allVehicles->where('vehicle_type', 'CAR')->count() }}</h3>
-                </div>
-            </div>
-            <div class="col-md-3 col-sm-6">
-                <div class="card border-0 shadow-sm text-center p-3">
-                    <h6 class="text-muted mb-1">Motor</h6>
-                    <h3 class="fw-bold text-warning mb-0">{{ $allVehicles->where('vehicle_type', 'MOTORCYCLE')->count() }}</h3>
-                </div>
-            </div>
-        </div>
+        @endif
 
-        {{-- LIST KENDARAAN GROUPED BY AGENT --}}
-        <h5 class="fw-bold mb-4">Kendaraan per Agent (Menampilkan 6 per halaman)</h5>
+        {{-- DAFTAR KENDARAAN --}}
+        @if(!isset($agentId))
+            <h5 class="fw-bold mb-4">Kendaraan per Agent</h5>
+        @else
+            <h5 class="fw-bold mb-4">Semua Kendaraan dari Agent ({{ $vehicles->total() }} total)</h5>
+        @endif
 
-        @if($allVehicles->isEmpty())
+        @if($vehicles->isEmpty())
 
             {{-- EMPTY STATE --}}
             <div class="text-center py-5">
                 <i class="fa-solid fa-car-side mb-3" style="font-size:40px; color:#C4C4C4;"></i>
                 <p class="fw-semibold mb-1">Tidak ada kendaraan</p>
-                <p class="text-muted mb-0">Belum ada agent yang mendaftarkan kendaraan.</p>
+                <p class="text-muted mb-0">
+                    @if(isset($agentId))
+                        Agent ini belum mendaftarkan kendaraan.
+                    @else
+                        Belum ada agent yang mendaftarkan kendaraan.
+                    @endif
+                </p>
+            </div>
+
+        @elseif(isset($agentId))
+            {{-- DISPLAY MODE: Detail Agent (Grid semua kendaraan) --}}
+            <div class="row g-4">
+                @foreach($vehicles as $vehicle)
+                    @php
+                        $imageUrl = $vehicle->image_url
+                            ? asset('storage/'.$vehicle->image_url)
+                            : 'https://images.unsplash.com/photo-1553531889-a2b91d310614?w=600&q=80';
+                    @endphp
+
+                    <div class="col-md-6 col-lg-4">
+                        <div class="card vehicle-card h-100 border-0 shadow-sm">
+                            <img src="{{ $imageUrl }}" class="card-img-top" alt="{{ $vehicle->name }}">
+
+                            <div class="card-body d-flex flex-column">
+                                <h5 class="fw-bold mb-1" style="font-size: 1rem;">{{ $vehicle->name }}</h5>
+
+                                <p class="text-muted small mb-1">
+                                    <i class="fa-solid fa-location-dot me-1"></i>
+                                    {{ Str::limit($vehicle->location ?? 'Lokasi tidak diisi', 30) }}
+                                </p>
+
+                                <p class="fw-bold mb-2" style="font-size: 0.95rem;">
+                                    Rp {{ number_format($vehicle->price_per_day ?? 0, 0, ',', '.') }} / hari
+                                </p>
+
+                                <span class="badge bg-light text-muted mb-3">
+                                    {{ $vehicle->vehicle_type === 'CAR' ? 'Mobil' : 'Motor' }}
+                                </span>
+
+                                <div class="d-flex justify-content-between gap-2 pt-2 border-top">
+                                    <a href="{{ route('admin.pasar.edit', $vehicle->id) }}"
+                                       class="btn btn-sm btn-outline-primary flex-grow-1">
+                                        <i class="fa-solid fa-pen me-1"></i> Edit
+                                    </a>
+
+                                    <form action="{{ route('admin.pasar.destroy', $vehicle->id) }}"
+                                          method="POST" onsubmit="return confirm('Hapus kendaraan ini?');" class="flex-grow-1">
+                                        @csrf
+                                        @method('DELETE')
+                                        <button type="submit" class="btn btn-sm btn-outline-danger w-100">
+                                            <i class="fa-solid fa-trash-can me-1"></i> Hapus
+                                        </button>
+                                    </form>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                @endforeach
             </div>
 
         @else
+            {{-- DISPLAY MODE: Grouped by Agent --}}
+            @php
+                // Group vehicles by agent
+                $groupedVehicles = $vehicles->groupBy(function($vehicle) {
+                    return $vehicle->agent_id;
+                });
+            @endphp
 
-            @foreach($vehicles as $agentVehicles)
+            @foreach($groupedVehicles as $agentGroupId => $agentVehicles)
 
                 @php
                     $agent = $agentVehicles->first()->agent;
                     $agentUser = $agent->user;
-                    $agentId = $agent->id;
                     $initials = strtoupper(substr($agentUser->full_name ?? $agentUser->name, 0, 1));
-                    $totalVehicles = $allVehicles->where('agent_id', $agentId)->count();
+                    $totalVehicles = $allVehicles->where('agent_id', $agentGroupId)->count();
                     // Get first 3 vehicles to display
                     $displayVehicles = $agentVehicles->take(3);
                 @endphp
 
-                <div class="agent-section collapsed" data-agent-id="{{ $agentId }}">
+                <div class="agent-section collapsed" data-agent-id="{{ $agentGroupId }}">
                     {{-- Agent Header (Clickable) --}}
                     <div class="agent-header" onclick="toggleAgent(this)">
                         <div class="agent-avatar">{{ $initials }}</div>
@@ -367,8 +484,7 @@
 
                         {{-- View All Link --}}
                         @if($totalVehicles > 3)
-                            {{-- PERBAIKAN: admin.pasar.index --}}
-                            <a href="{{ route('admin.pasar.index', ['agent' => $agentId]) }}" class="view-all-link">
+                            <a href="{{ route('admin.pasar.index', ['agent' => $agentGroupId]) }}" class="view-all-link">
                                 <i class="fa-solid fa-arrow-right me-1"></i> Lihat semua {{ $totalVehicles }} kendaraan dari agent ini
                             </a>
                         @endif
@@ -377,11 +493,13 @@
 
             @endforeach
 
-            {{-- PAGINATION --}}
+        @endif
+
+        {{-- PAGINATION --}}
+        @if($vehicles->hasPages())
             <div class="d-flex justify-content-center">
                 {{ $vehicles->links('pagination::bootstrap-5') }}
             </div>
-
         @endif
 
     </main>

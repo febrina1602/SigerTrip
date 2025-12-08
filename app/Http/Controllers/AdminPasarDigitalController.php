@@ -5,136 +5,113 @@ namespace App\Http\Controllers;
 use App\Models\RentalVehicle;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Storage;
-use Illuminate\Pagination\LengthAwarePaginator;
 
 class AdminPasarDigitalController extends Controller
 {
     /**
-     * Halaman daftar semua kendaraan (admin view)
+     * Display all vehicles grouped by agent
      */
     public function index(Request $request)
     {
-        $type = $request->query('type'); // CAR / MOTORCYCLE / null
-        
-        $allVehiclesQuery = RentalVehicle::with('agent');
-        
-        $query = RentalVehicle::with('agent')
-            ->orderBy('agent_id', 'asc')
-            ->orderBy('created_at', 'desc');
+        // Ambil agent ID dari query (untuk filter)
+        $agentId = $request->query('agent');
+        $type = $request->query('type');
 
+        // Ambil semua kendaraan untuk statistik
+        $allVehicles = RentalVehicle::with('agent.user')->get();
+
+        // Apply type filter
         if ($type) {
-            $query->where('vehicle_type', $type);
-            $allVehiclesQuery->where('vehicle_type', $type);
+            $allVehicles = $allVehicles->where('vehicle_type', $type);
         }
 
-        $allVehicles = $allVehiclesQuery->get();
+        // Jika ada filter agent, tampilkan semua kendaraan dari agent tersebut
+        if ($agentId) {
+            $vehicles = RentalVehicle::where('agent_id', $agentId)
+                ->with('agent.user')
+                ->orderBy('created_at', 'desc')
+                ->paginate(12);
 
-        $allGrouped = $query->get()->groupBy('agent_id');
-        
-        $perPage = 6;
-        $page = $request->get('page', 1);
-        $total = count($allGrouped);
-        
-        $paginatedAgents = $allGrouped->slice(($page - 1) * $perPage, $perPage);
-        
-        $vehicles = new LengthAwarePaginator(
-            $paginatedAgents, // Hapus values()->all() agar keys terjaga
-            $total,
-            $perPage,
-            $page,
-            [
-                'path'  => $request->url(),
-                'query' => $request->query(),
-            ]
-        );
+            return view('admin.pasar-digital.index', compact('vehicles', 'allVehicles', 'agentId', 'type'));
+        }
+
+        // Sebaliknya, group by agent dengan pagination
+        // Pagination berdasarkan vehicles, bukan agents
+        $vehicles = RentalVehicle::with('agent.user')
+            ->orderBy('agent_id', 'asc')
+            ->orderBy('created_at', 'desc')
+            ->paginate(6); // 6 vehicles per page
 
         return view('admin.pasar-digital.index', compact('vehicles', 'allVehicles', 'type'));
     }
 
     /**
-     * Form edit kendaraan (admin)
+     * Show edit form for a vehicle
      */
-    public function edit(RentalVehicle $vehicle)
+    public function edit($id)
     {
+        $vehicle = RentalVehicle::findOrFail($id);
         return view('admin.pasar-digital.edit', compact('vehicle'));
     }
 
     /**
-     * Update kendaraan (admin)
+     * Update a vehicle
      */
-    public function update(Request $request, RentalVehicle $vehicle)
+    public function update(Request $request, $id)
     {
-        $data = $request->validate([
-            'name'             => 'required|string|max:255',
-            'vehicle_type'     => 'required|in:CAR,MOTORCYCLE',
-            'price_per_day'    => 'required|numeric|min:0',
-            'location'         => 'required|string|max:255',
-            'description'      => 'nullable|string',
+        $vehicle = RentalVehicle::findOrFail($id);
 
-            'brand'            => 'nullable|string|max:100',
-            'model'            => 'nullable|string|max:100',
-            'year'             => 'nullable|integer|min:1990|max:' . (date('Y') + 1),
-            'transmission'     => 'nullable|string|max:50',
-            'seats'            => 'nullable|integer|min:1|max:20',
-            'plate_number'     => 'nullable|string|max:50',
-            'fuel_type'        => 'nullable|string|max:50',
-
-            'include_driver'      => 'nullable|boolean',
-            'include_fuel'        => 'nullable|boolean',
-            'min_rental_days'     => 'nullable|integer|min:1|max:30',
+        $validated = $request->validate([
+            'name' => 'required|string|max:255',
+            'vehicle_type' => 'required|in:CAR,MOTORCYCLE',
+            'price_per_day' => 'required|numeric|min:0',
+            'location' => 'required|string|max:255',
+            'description' => 'nullable|string',
+            'brand' => 'nullable|string|max:100',
+            'model' => 'nullable|string|max:100',
+            'year' => 'nullable|integer|min:1990|max:' . (date('Y') + 1),
+            'transmission' => 'nullable|string|max:50',
+            'seats' => 'nullable|integer|min:1|max:20',
+            'plate_number' => 'nullable|string|max:50',
+            'fuel_type' => 'nullable|string|max:50',
+            'include_driver' => 'nullable|boolean',
+            'include_fuel' => 'nullable|boolean',
+            'min_rental_days' => 'nullable|integer|min:1|max:30',
             'include_pickup_drop' => 'nullable|boolean',
-            'terms_conditions'    => 'nullable|string',
-
-            'image'            => 'nullable|image|max:2048',
+            'terms_conditions' => 'nullable|string',
+            'image' => 'nullable|image|max:2048',
         ]);
 
-        // Gambar baru
+        // Handle image
         if ($request->hasFile('image')) {
             if ($vehicle->image_url) {
                 Storage::disk('public')->delete($vehicle->image_url);
             }
-            $vehicle->image_url = $request->file('image')->store('vehicles', 'public');
+            $validated['image_url'] = $request->file('image')->store('vehicles', 'public');
         }
 
-        $vehicle->update([
-            'name'               => $data['name'],
-            'vehicle_type'       => $data['vehicle_type'],
-            'price_per_day'      => $data['price_per_day'],
-            'location'           => $data['location'],
-            'description'        => $data['description'] ?? null,
-            'brand'              => $data['brand'] ?? null,
-            'model'              => $data['model'] ?? null,
-            'year'               => $data['year'] ?? null,
-            'transmission'       => $data['transmission'] ?? null,
-            'seats'              => $data['seats'] ?? null,
-            'plate_number'       => $data['plate_number'] ?? null,
-            'fuel_type'          => $data['fuel_type'] ?? null,
+        $vehicle->update($validated);
 
-            'include_driver'     => $request->boolean('include_driver'),
-            'include_fuel'       => $request->boolean('include_fuel'),
-            'min_rental_days'    => $data['min_rental_days'] ?? 1,
-            'include_pickup_drop'=> $request->boolean('include_pickup_drop'),
-            'terms_conditions'   => $data['terms_conditions'] ?? null,
-        ]);
-
-        // PERBAIKAN: Redirect ke index (bukan admin.pasar)
         return redirect()->route('admin.pasar.index')
-            ->with('success', 'Data kendaraan berhasil diperbarui.');
+            ->with('success', 'Kendaraan berhasil diperbarui!');
     }
 
     /**
-     * Hapus kendaraan (admin)
+     * Delete a vehicle
      */
-    public function destroy(RentalVehicle $vehicle)
+    public function destroy($id)
     {
+        $vehicle = RentalVehicle::findOrFail($id);
+
+        // Delete image
         if ($vehicle->image_url) {
             Storage::disk('public')->delete($vehicle->image_url);
         }
 
         $vehicle->delete();
 
-        // PERBAIKAN: Redirect ke index
         return redirect()->route('admin.pasar.index')
-            ->with('success', 'Kendaraan berhasil dihapus.');
+            ->with('success', 'Kendaraan berhasil dihapus!');
     }
 }
+?>
