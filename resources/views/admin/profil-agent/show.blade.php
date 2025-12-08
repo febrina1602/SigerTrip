@@ -110,7 +110,7 @@
             <a href="{{ route('admin.beranda') }}" class="nav-link-custom">Beranda</a>
             <a href="{{ route('admin.profil-agent.index') }}" class="nav-link-custom active">Profil Agent</a>
             <a href="{{ route('admin.pasar.index') }}" class="nav-link-custom">Pasar Digital</a>
-            <a href="#" class="nav-link-custom">Pemandu Wisata</a>
+            <a href="{{ route('admin.tour-packages.index') }}" class="nav-link-custom">Pemandu Wisata</a>
             <a href="{{ route('admin.users.index') }}" class="nav-link-custom">Kelola User</a>
         </div>
     </nav>
