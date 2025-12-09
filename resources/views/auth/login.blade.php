@@ -111,7 +111,7 @@
           </div>
 
           <div class="d-flex justify-content-end mb-3 small-links">
-            <a href="#">Lupa Kata sandi ?</a>
+            <a href="{{ route('password.request') }}">Lupa Kata sandi?</a>
           </div>
 
           <div class="d-grid">

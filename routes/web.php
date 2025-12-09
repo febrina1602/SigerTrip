@@ -17,6 +17,7 @@ use App\Http\Controllers\ProfileController;
 use App\Http\Controllers\AgentDashboardController;
 use App\Http\Controllers\AgentPasarDigitalController;
 use App\Http\Controllers\TourPackageController;
+use App\Http\Controllers\PasswordResetController; // Import PasswordResetController
 
 // ==== HALAMAN UTAMA ====
 Route::redirect('/', '/beranda');
@@ -33,6 +34,18 @@ Route::middleware('guest')->group(function () {
     Route::get('/login', [AuthController::class, 'showLoginForm'])->name('login');
     Route::post('/login', [AuthController::class, 'login'])->name('login.post');
     Route::get('/agent/login', [AuthController::class, 'showAgentLoginForm'])->name('agent.login');
+    Route::get('lupa-kata-sandi', [PasswordResetController::class, 'showForm'])
+        ->name('password.request');
+
+    Route::post('lupa-kata-sandi', [PasswordResetController::class, 'sendResetLink'])
+        ->name('password.email');
+
+    // Digunakan Laravel → token lewat query string
+    Route::get('reset-kata-sandi', [PasswordResetController::class, 'resetForm'])
+        ->name('password.reset');
+
+    Route::post('reset-kata-sandi', [PasswordResetController::class, 'resetPassword'])
+        ->name('password.update');
 });
 
 // ==== GLOBAL AUTH (Bisa diakses Semua Role: Admin, Agent, User) ====
@@ -41,10 +54,6 @@ Route::middleware(['auth', 'prevent-back-history'])->group(function () {
 });
 
 // ==== ROUTE USER & PUBLIK (DIPROTEKSI DARI AGENT/ADMIN) ====
-// Middleware 'is_user' harus dikonfigurasi untuk:
-// 1. Mengizinkan Guest (belum login)
-// 2. Mengizinkan User (role: user)
-// 3. Melempar Agent/Admin ke dashboard masing-masing
 Route::middleware(['is_user', 'prevent-back-history'])->group(function () {
     
     // -- Route Publik (Bisa Guest & User) --

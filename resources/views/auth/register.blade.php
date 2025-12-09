@@ -1,10 +1,13 @@
+@php 
+    $isAgent = true; 
+@endphp
+
 @extends('layouts.app')
 
-@section('title', isset($isAgent) && $isAgent ? 'Registrasi Mitra - SigerTrip' : 'Registrasi - SigerTrip')
+@section('title', 'Registrasi Mitra - SigerTrip')
 
 @push('styles')
 <style>
-  /* Khusus halaman register */
   .auth-wrapper{
     max-width:1180px; margin:28px auto; background:#fff;
     border-radius:18px; box-shadow:0 12px 30px rgba(0,0,0,.08); overflow:hidden;
@@ -31,12 +34,10 @@
   }
   .btn-grad:hover{ filter:brightness(.96); color:#fff; }
 
-  /* Sembunyikan gambar hanya di < md (mobile) */
   @media (max-width: 767.98px){
     .image-col{ display:none; }
     .content{ padding:20px; }
   }
-  /* Jaga-jaga override jika ada CSS lama yang menyembunyikan image-col di md */
   @media (min-width: 768px){
     .image-col{ display:block !important; }
   }
@@ -47,7 +48,7 @@
 <div class="auth-wrapper">
   <div class="topbar">
     <div class="brand">
-      <img src="{{ asset('images/logo-sigertrip.png') }}" alt="Logo" onerror="this.style.display='none'">
+      <img src="{{ asset('images/logo-sigertrip.png') }}" alt="Logo">
       <span>SigerTrip</span>
     </div>
   </div>
@@ -55,48 +56,44 @@
   <div class="content">
     <div class="row g-4 align-items-center">
 
-      {{-- Gambar kiri (muncul mulai md) --}}
       <div class="col-lg-6 image-col d-none d-md-block">
         <img
           src="{{ asset('images/sunsetlog.png') }}"
           alt="Sunset SigerTrip"
           class="w-100"
           style="height:600px;object-fit:cover;border-radius:16px"
-          loading="lazy"
-          onerror="this.src='https://images.unsplash.com/photo-1511764220567-4b75a0a36eb1?q=80&w=1080&auto=format&fit=crop'">
+          loading="lazy">
       </div>
 
-      {{-- Form kanan --}}
       <div class="col-lg-6">
         <a href="{{ url()->previous() }}" class="kembali d-inline-block mb-2">
           <i class="fa-solid fa-chevron-left me-1"></i> Kembali
         </a>
 
-        <h2 class="form-title">
-          {{ isset($isAgent) && $isAgent ? 'Registrasi Mitra SigerTrip' : 'Registrasi' }}
-        </h2>
+        <h2 class="form-title">Registrasi Mitra SigerTrip</h2>
 
-        {{-- Tampilkan pesan sukses dari session --}}
+        {{-- Pesan sukses --}}
         @if (session('success'))
           <div class="alert alert-info">
             {{ session('success') }}
           </div>
         @endif
 
+        {{-- Error --}}
         @if ($errors->any())
           <div class="alert alert-danger">
             <ul class="mb-0 ps-3">
-              @foreach ($errors->all() as $error) <li>{{ $error }}</li> @endforeach
+              @foreach ($errors->all() as $error) 
+                <li>{{ $error }}</li>
+              @endforeach
             </ul>
           </div>
         @endif
 
-        <form method="POST"
-              action="{{ isset($isAgent) && $isAgent ? route('register.agent.post') : route('register') }}"
-              class="mt-2">
+        {{-- Form Registrasi MITRA --}}
+        <form method="POST" action="{{ route('register.agent.post') }}" class="mt-2">
           @csrf
 
-          {{-- Nama lengkap --}}
           <div class="mb-3 position-relative">
             <input type="text" name="full_name" value="{{ old('full_name') }}"
                    class="form-control @error('full_name') is-invalid @enderror"
@@ -104,7 +101,6 @@
             <i class="fa-regular fa-user input-icon"></i>
           </div>
 
-          {{-- Nomor telepon --}}
           <div class="mb-3 position-relative">
             <input type="text" name="phone_number" value="{{ old('phone_number') }}"
                    class="form-control @error('phone_number') is-invalid @enderror"
@@ -112,7 +108,6 @@
             <i class="fa-solid fa-phone input-icon"></i>
           </div>
 
-          {{-- Email --}}
           <div class="mb-3 position-relative">
             <input type="email" name="email" value="{{ old('email') }}"
                    class="form-control @error('email') is-invalid @enderror"
@@ -120,28 +115,25 @@
             <i class="fa-regular fa-envelope input-icon"></i>
           </div>
 
-          {{-- Password --}}
           <div class="mb-3 position-relative">
             <input id="password" type="password" name="password"
                    class="form-control @error('password') is-invalid @enderror"
                    placeholder="Password" required>
             <button type="button" class="btn btn-link p-0 input-icon"
-                    onclick="togglePwd('password', this)" aria-label="Tampilkan/Kunci Password">
+                    onclick="togglePwd('password', this)">
               <i class="fa-regular fa-eye"></i>
             </button>
           </div>
 
-          {{-- Konfirmasi Password --}}
           <div class="mb-3 position-relative">
             <input id="password_confirmation" type="password" name="password_confirmation"
                    class="form-control" placeholder="Konfirmasi Password" required>
             <button type="button" class="btn btn-link p-0 input-icon"
-                    onclick="togglePwd('password_confirmation', this)" aria-label="Tampilkan/Kunci Konfirmasi Password">
+                    onclick="togglePwd('password_confirmation', this)">
               <i class="fa-regular fa-eye"></i>
             </button>
           </div>
 
-          {{-- Checkbox syarat & ketentuan --}}
           <div class="mb-3">
             <div class="form-check d-flex align-items-center gap-2">
               <input class="form-check-input" type="checkbox" id="agree" required>
@@ -152,26 +144,20 @@
             </div>
           </div>
 
-          {{-- Tombol daftar --}}
           <div class="d-grid">
             <button type="submit" class="btn btn-grad">
-              {{ isset($isAgent) && $isAgent ? 'Daftar sebagai Mitra' : 'Daftar' }}
+              Daftar sebagai Mitra
             </button>
           </div>
 
-          {{-- Tombol ke halaman registrasi mitra (hanya di halaman register biasa) --}}
-          @if (!isset($isAgent) || !$isAgent)
-            <div class="d-grid mt-2">
-              <a href="{{ route('register.agent') }}" class="btn btn-outline-danger">
-                Daftar sebagai Mitra SigerTrip
-              </a>
-            </div>
-          @endif
-
           <p class="text-center mt-3 mb-0">
-            Sudah memiliki akun? <a href="{{ route('login') }}" class="text-danger text-decoration-none fw-semibold">Masuk Disini</a>
+            Sudah memiliki akun? 
+            <a href="{{ route('login') }}" class="text-danger fw-semibold text-decoration-none">
+              Masuk Disini
+            </a>
           </p>
         </form>
+
       </div>
     </div>
   </div>
@@ -182,9 +168,15 @@
   function togglePwd(id, el){
     const input = document.getElementById(id);
     const icon  = el.querySelector('i');
-    if(input.type === 'password'){ input.type='text'; icon.classList.replace('fa-eye','fa-eye-slash'); }
-    else{ input.type='password'; icon.classList.replace('fa-eye-slash','fa-eye'); }
+    if(input.type === 'password'){ 
+      input.type='text'; 
+      icon.classList.replace('fa-eye','fa-eye-slash'); 
+    } else { 
+      input.type='password'; 
+      icon.classList.replace('fa-eye-slash','fa-eye'); 
+    }
   }
 </script>
 @endpush
+
 @endsection
