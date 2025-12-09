@@ -43,10 +43,18 @@ class AgentDashboardController extends Controller
         // Hitung total agen tour lokal
         $totalLocalTourAgents = $localTourAgents->count();
 
-        // Ambil semua paket perjalanan dari agen tour lokal milik agent ini
-        $tourPackages = TourPackage::whereIn('local_tour_agent_id', $localTourAgents->pluck('id'))
-            ->orderBy('created_at', 'desc')
-            ->get();
+        // Ambil semua paket perjalanan milik agent ini, baik yang terkait langsung lewat agent_id
+        // maupun yang terkait lewat local_tour_agent_id. Ini memastikan paket yang dibuat
+        // oleh agent (tanpa cabang) tetap terhitung.
+        $tourPackagesQuery = TourPackage::query()
+            ->where('agent_id', $agent->id);
+
+        $localIds = $localTourAgents->pluck('id')->filter()->values()->all();
+        if (!empty($localIds)) {
+            $tourPackagesQuery->orWhereIn('local_tour_agent_id', $localIds);
+        }
+
+        $tourPackages = $tourPackagesQuery->orderBy('created_at', 'desc')->get();
 
         // Hitung total paket perjalanan
         $totalTourPackages = $tourPackages->count();
@@ -60,12 +68,16 @@ class AgentDashboardController extends Controller
                 ->unique()
         );
 
-        // Rating rata-rata agen
-        $averageRating = $localTourAgents->avg('rating') ?? 0;
+        // Rating rata-rata: gunakan rating pada agent jika ada, else rata-rata rating lokal
+        $averageRating = $agent->rating ?? $localTourAgents->avg('rating') ?? 0;
 
-        // Data untuk grafik (paket terbaru bulan ini)
-        $packagesThisMonth = TourPackage::whereIn('local_tour_agent_id', $localTourAgents->pluck('id'))
-            ->whereMonth('created_at', now()->month)
+        // Data untuk grafik (paket terbaru bulan ini) berdasarkan query yang sama
+        $packagesThisMonth = TourPackage::query()
+            ->where('agent_id', $agent->id);
+        if (!empty($localIds)) {
+            $packagesThisMonth->orWhereIn('local_tour_agent_id', $localIds);
+        }
+        $packagesThisMonth = $packagesThisMonth->whereMonth('created_at', now()->month)
             ->whereYear('created_at', now()->year)
             ->count();
 
@@ -74,6 +86,9 @@ class AgentDashboardController extends Controller
 
         // Paket terbaru (untuk ditampilkan)
         $recentTourPackages = $tourPackages->take(5);
+
+        // Hitung total kendaraan (Pasar Digital) milik agent
+        $totalVehicles = \App\Models\RentalVehicle::where('agent_id', $agent->id)->count();
 
         return view('agent.dashboard', compact(
             'agent',
@@ -86,6 +101,7 @@ class AgentDashboardController extends Controller
             'packagesThisMonth',
             'recentLocalTourAgents',
             'recentTourPackages',
+            'totalVehicles',
             'user'
         ));
     }

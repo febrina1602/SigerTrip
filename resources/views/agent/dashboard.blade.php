@@ -159,11 +159,11 @@
                     <div class="card-body">
                         <div class="d-flex align-items-center justify-content-between">
                             <div>
-                                <p class="text-muted small mb-1">Destinasi Unik</p>
-                                <h3 class="fw-bold mb-0" style="color: #10b981;">{{ $totalDestinations }}</h3>
+                                <p class="text-muted small mb-1">Kendaraan (Pasar Digital)</p>
+                                <h3 class="fw-bold mb-0" style="color: #10b981;">{{ $totalVehicles }}</h3>
                             </div>
                             <div class="rounded-circle p-3" style="background-color: #d1fae5;">
-                                <i class="fas fa-globe" style="font-size: 1.5rem; color: #10b981;"></i>
+                                <i class="fas fa-car-side" style="font-size: 1.5rem; color: #10b981;"></i>
                             </div>
                         </div>
                     </div>

@@ -88,10 +88,7 @@
                             <input type="file" name="cover_image_file" class="form-control" accept="image/*">
                         </div>
 
-                        <div class="mb-4 form-check form-switch">
-                            <input class="form-check-input" type="checkbox" id="is_published" name="is_published" value="1" checked>
-                            <label class="form-check-label fw-bold small" for="is_published">Publikasikan Paket Ini?</label>
-                        </div>
+                        {{-- Toggle publikasi dihilangkan: pengaturan publikasi dikontrol oleh admin/draft policy --}}
 
                         <div class="d-flex justify-content-end gap-2">
                             <a href="{{ route('agent.tour-packages.index') }}" class="btn btn-light">Batal</a>
