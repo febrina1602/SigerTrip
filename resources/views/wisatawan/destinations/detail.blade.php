@@ -4,31 +4,7 @@
 
 @section('content')
 <div class="min-vh-100 bg-white">
-    <header>
-        <div class="d-flex align-items-center">
-            <img src="{{ asset('images/logo.png') }}" alt="SigerTrip Logo">
-        </div>
-        <div>
-            <button class="btn-custom me-2">Masuk</button>
-            <button class="btn-custom">Daftar</button>
-        </div>
-    </header>
-
-    <nav class="nav-custom">
-        <div class="container py-0">
-            <div class="d-flex gap-4">
-                <a href="{{ route('beranda.wisatawan') }}" class="nav-link-custom active">
-                    Beranda
-                </a>
-                <a href="#" class="nav-link-custom">
-                    Pasar Digital
-                </a>
-                <a href="#" class="nav-link-custom">
-                    Pemandu Wisata
-                </a>
-            </div>
-        </div>
-    </nav>
+    @include('components.layout.header')
 
     <div>
         <img src="{{ $destination->image_url ?? 'https://images.unsplash.com/photo-1507525428034-b723cf961d3e?w=1200&q=80' }}" 
@@ -140,14 +116,26 @@
                     </div>
                 </div>
 
-                @if($destination->popular_activities)
-                <div class="mb-4">
-                    <h2 class="h4 fw-bold text-dark mb-3">Aktivitas Populer</h2>
-                    <p class="text-secondary">
-                        @if(is_array($destination->popular_activities))
-                            {{ implode(', ', $destination->popular_activities) }}
+                @if(!empty($destination->popular_activities))
+                <div class="mb-2 text-start">
+                    <p class="small fw-semibold text-dark mb-1">Aktivitas Populer:</p>
+                    
+                    @php
+                        $acts = $destination->popular_activities;
+                        //  decode jika datanya ternyata string
+                        if (is_string($acts)) {
+                            $json = json_decode($acts, true);
+                            if (json_last_error() === JSON_ERROR_NONE && is_array($json)) { 
+                                $acts = $json; 
+                            }
+                        }
+                    @endphp
+
+                    <p class="small text-muted mb-0">
+                        @if(is_array($acts))
+                            {{ implode(', ', $acts) }}
                         @else
-                            {{ $destination->popular_activities }}
+                            {{ $acts }}
                         @endif
                     </p>
                 </div>
@@ -195,42 +183,5 @@
             </div>
         </div>
     </div>
-
-    <!-- FOOTER -->
-    <footer class="footer position-relative">
-        <div class="container py-3">
-            <div class="row align-items-start">
-                <div class="col-md-3 d-flex align-items-center mb-3 mb-md-0">
-                    <img src="{{ asset('images/logo.png') }}" alt="Logo SigerTrip" class="me-2" style="height:50px;">
-                </div>
-
-                <div class="col-md-3 text-center mb-3 mb-md-0">
-                    <h6 class="fw-bold mb-2">Ikuti Kami</h6>
-                    <div class="d-flex justify-content-center align-items-center social-icons">
-                        <a href="#"><i class="fab fa-instagram"></i></a>
-                        <a href="#"><i class="fab fa-facebook-f"></i></a>
-                        <a href="#"><i class="fab fa-x-twitter"></i></a>
-                        <a href="#"><i class="fab fa-tiktok"></i></a>
-                        <a href="#"><i class="fab fa-youtube"></i></a>
-                    </div>
-                </div>
-
-                <div class="col-md-3 mb-3 mb-md-0">
-                    <h6 class="fw-bold mb-2">Dibuat Oleh:</h6>
-                    <p class="mb-1">Febrina Aulia Azahra</p>
-                    <p class="mb-1">Carissa Oktavia Sanjaya</p>
-                    <p class="mb-1">Dilvi Yola</p>
-                    <p class="mb-0">M. Hafiz Abyan</p>
-                </div>
-
-                <div class="col-md-3">
-                    <h6 class="fw-bold mb-2">Informasi</h6>
-                    <p class="mb-1"><a href="#" class="footer-link">Tentang</a></p>
-                    <p class="mb-0"><a href="#" class="footer-link">FAQ</a></p>
-                </div>
-            </div>
-        </div>
-        <img src="{{ asset('images/siger-pattern.png') }}" alt="Siger Pattern" class="siger-pattern">
-    </footer>
 </div>
 @endsection

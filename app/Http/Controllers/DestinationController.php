@@ -37,7 +37,7 @@ class DestinationController extends Controller
             ->orderBy('created_at', 'desc')
             ->get();
         
-        return view('destinations.category', compact('category', 'categories', 'destinations'));
+        return view('wisatawan.destinations.category', compact('category', 'categories', 'destinations'));
     }
     
     /**
@@ -57,6 +57,6 @@ class DestinationController extends Controller
             ->limit(3)
             ->get();
         
-        return view('destinations.detail', compact('destination', 'relatedDestinations'));
+        return view('wisatawan.destinations.detail', compact('destination', 'relatedDestinations'));
     }
 }

@@ -13,33 +13,30 @@ class DestinationCategorySeeder extends Seeder
      */
     public function run(): void
     {
-        // Gunakan updateOrCreate:
-        // Parameter 1: Cari berdasarkan 'name'
-        // Parameter 2: Data yang diisi (termasuk 'icon_url' dari tabel Anda)
         
         DestinationCategory::updateOrCreate(
             ['name' => 'Pantai'],
-            ['icon_url' => null] // Sesuai tabel 'destination_categories'
+            ['icon_url' => 'https://cdn-icons-png.flaticon.com/128/3097/3097033.png'] 
         );
         
         DestinationCategory::updateOrCreate(
             ['name' => 'Gunung'],
-            ['icon_url' => null]
+            ['icon_url' => 'https://cdn-icons-png.flaticon.com/128/2072/2072895.png']
         );
         
         DestinationCategory::updateOrCreate(
             ['name' => 'Air Terjun'],
-            ['icon_url' => null]
+            ['icon_url' => 'https://cdn-icons-png.flaticon.com/128/182/182161.png']
         );
         
         DestinationCategory::updateOrCreate(
             ['name' => 'Kuliner'],
-            ['icon_url' => null]
+            ['icon_url' => 'https://cdn-icons-png.flaticon.com/128/3448/3448613.png']
         );
         
         DestinationCategory::updateOrCreate(
             ['name' => 'Budaya'],
-            ['icon_url' => null]
+            ['icon_url' => 'https://cdn-icons-png.flaticon.com/128/3958/3958410.png']
         );
     }
 }
